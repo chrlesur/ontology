@@ -39,6 +39,38 @@ It can handle various input formats and use different language models for analys
 	TranslationStarted   = "Translation started"
 	TranslationRetry     = "Translation retry"
 	TranslationCompleted = "Translation completed"
+
+	ErrCreateLogDir = "Failed to create log directory"
+	ErrOpenLogFile  = "Failed to open log file"
+
+	ParseStarted             = "Parsing started"
+	ParseFailed              = "Parsing failed"
+	ParseCompleted           = "Parsing completed"
+	MetadataExtractionFailed = "Metadata extraction failed"
+	PageParseFailed          = "Failed to parse page"
+	TextExtractionFailed     = "Failed to extract text from page"
+
+	ErrInvalidContent          = "invalid content"
+	ErrTokenization            = "tokenization error"
+	ErrReadingContent          = "error reading content"
+	ErrTokenizerInitialization = "error initializing tokenizer"
+	ErrTokenCounting           = "error counting tokens"
+
+	LogSegmentationStarted   = "Segmentation started"
+	LogSegmentationCompleted = "Segmentation completed: %d segments"
+	LogContextGeneration     = "Generating context"
+	LogMergingSegments       = "Merging segments"
+
+	ErrReadConfigFile  = "Failed to read config file: %v"
+    ErrParseConfigFile = "Failed to parse config file: %v"
+    ErrNoAPIKeys       = "No API keys provided for any LLM service"
+
+	StartingQuickStatementConversion = "Starting conversion to QuickStatement format"
+    QuickStatementConversionCompleted = "QuickStatement conversion completed"
+    StartingRDFConversion = "Starting conversion to RDF format"
+    RDFConversionCompleted = "RDF conversion completed"
+    StartingOWLConversion = "Starting conversion to OWL format"
+    OWLConversionCompleted = "OWL conversion completed"
 )
 
 func GetMessage(key string) string {

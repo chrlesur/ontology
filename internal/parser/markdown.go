@@ -4,8 +4,9 @@ import (
     "io/ioutil"
     "os"
     "path/filepath"
+	"fmt"
+    "time"
 
-    "github.com/chrlesur/Ontology/internal/logger"
     "github.com/chrlesur/Ontology/internal/i18n"
 )
 
@@ -27,14 +28,14 @@ func NewMarkdownParser() Parser {
 
 // Parse lit le contenu d'un fichier Markdown
 func (p *MarkdownParser) Parse(path string) ([]byte, error) {
-    logger.Debug(i18n.ParseStarted, "Markdown", path)
+    log.Debug(i18n.ParseStarted, "Markdown", path)
     content, err := ioutil.ReadFile(path)
     if err != nil {
-        logger.Error(i18n.ParseFailed, "Markdown", path, err)
+        log.Error(i18n.ParseFailed, "Markdown", path, err)
         return nil, err
     }
     p.extractMetadata(path)
-    logger.Info(i18n.ParseCompleted, "Markdown", path)
+    log.Info(i18n.ParseCompleted, "Markdown", path)
     return content, nil
 }
 
@@ -47,7 +48,7 @@ func (p *MarkdownParser) GetMetadata() map[string]string {
 func (p *MarkdownParser) extractMetadata(path string) {
     info, err := os.Stat(path)
     if err != nil {
-        logger.Warning(i18n.MetadataExtractionFailed, path, err)
+        log.Warning(i18n.MetadataExtractionFailed, path, err)
         return
     }
     p.metadata["filename"] = filepath.Base(path)

@@ -1,64 +1,80 @@
 package ontology
 
 import (
-    "fmt"
-    "os"
+	"fmt"
+	"os"
 
-    "github.com/spf13/cobra"
-    "github.com/chrlesur/Ontology/internal/config"
-    "github.com/chrlesur/Ontology/internal/logger"
-    "github.com/chrlesur/Ontology/internal/i18n"
+	"github.com/chrlesur/Ontology/internal/config"
+	"github.com/chrlesur/Ontology/internal/i18n"
+	"github.com/chrlesur/Ontology/internal/logger"
+	"github.com/chrlesur/Ontology/internal/pipeline"
+	"github.com/spf13/cobra"
+	"github.com/spf13/viper"
 )
 
 var (
-    cfgFile string
-    debug   bool
-    silent  bool
+	cfgFile   string
+	inputFile string
+	passes    int
+	ontology  string
 )
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-    Use:   "ontology",
-    Short: i18n.RootCmdShortDesc,
-    Long:  i18n.RootCmdLongDesc,
-    // Uncomment the following line if your bare application
-    // has an action associated with it:
-    // Run: func(cmd *cobra.Command, args []string) { },
+	Use:   "ontology",
+	Short: i18n.GetMessage("RootCmdShort"),
+	Long:  i18n.GetMessage("RootCmdLong"),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		p, err := pipeline.NewPipeline()
+		if err != nil {
+			return err
+		}
+		return p.ExecutePipeline(inputFile, passes, ontology)
+	},
 }
 
-// Execute adds all child commands to the root command and sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute() {
-    err := rootCmd.Execute()
-    if err != nil {
-        logger.Error(i18n.ErrorExecutingRootCmd, err)
-        os.Exit(1)
-    }
+	if err := rootCmd.Execute(); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
 }
 
 func init() {
-    cobra.OnInitialize(initConfig)
+	cobra.OnInitialize(initConfig)
 
-    rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", i18n.ConfigFlagUsage)
-    rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, i18n.DebugFlagUsage)
-    rootCmd.PersistentFlags().BoolVar(&silent, "silent", false, i18n.SilentFlagUsage)
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", i18n.GetMessage("ConfigFlagUsage"))
+	rootCmd.PersistentFlags().StringVar(&inputFile, "input", "", i18n.GetMessage("InputFlagUsage"))
+	rootCmd.PersistentFlags().IntVar(&passes, "passes", 1, i18n.GetMessage("PassesFlagUsage"))
+	rootCmd.PersistentFlags().StringVar(&ontology, "ontology", "", i18n.GetMessage("OntologyFlagUsage"))
+	rootCmd.PersistentFlags().BoolVar(&config.GetConfig().ExportRDF, "rdf", false, i18n.GetMessage("RDFFlagUsage"))
+	rootCmd.PersistentFlags().BoolVar(&config.GetConfig().ExportOWL, "owl", false, i18n.GetMessage("OWLFlagUsage"))
+	rootCmd.MarkFlagRequired("input")
 }
 
-// initConfig reads in config file and ENV variables if set.
 func initConfig() {
-    if cfgFile != "" {
-        // Use config file from the flag.
-        config.LoadConfig(cfgFile)
-    }
+	if cfgFile != "" {
+		// Use config file from the flag.
+		viper.SetConfigFile(cfgFile)
+	} else {
+		// Search config in home directory with name ".ontology" (without extension).
+		viper.AddConfigPath(".")
+		viper.SetConfigName(".ontology")
+	}
 
-    // Initialize logger based on debug and silent flags
-    if debug {
-        logger.SetLevel(logger.DebugLevel)
-    } else if silent {
-        logger.SetLevel(logger.ErrorLevel)
-    } else {
-        logger.SetLevel(logger.InfoLevel)
-    }
+	viper.AutomaticEnv() // read in environment variables that match
 
-    logger.Info(i18n.InitializingApplication)
+	// If a config file is found, read it in.
+	if err := viper.ReadInConfig(); err == nil {
+		fmt.Println("Using config file:", viper.ConfigFileUsed())
+	}
+
+	// Initialize logger
+	logLevel := viper.GetString("log_level")
+	if logLevel == "" {
+		logLevel = "info"
+	}
+	logger.SetLevel(logger.ParseLevel(logLevel))
+
+	// Initialize other configurations
+	config.InitConfig(viper.GetViper())
 }

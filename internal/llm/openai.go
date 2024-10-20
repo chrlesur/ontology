@@ -3,12 +3,11 @@
 package llm
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"github.com/chrlesur/Ontology/internal/config"
 	"github.com/chrlesur/Ontology/internal/i18n"
-	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/sashabaranov/go-openai"
 )
 
@@ -25,6 +24,7 @@ var supportedModels = map[string]bool{
 	"o1-preview":  true,
 	"o1-mini":     true,
 }
+
 
 // NewOpenAIClient creates a new OpenAI client
 func NewOpenAIClient(apiKey string, model string) (*OpenAIClient, error) {
@@ -45,7 +45,7 @@ func NewOpenAIClient(apiKey string, model string) (*OpenAIClient, error) {
 
 // Translate sends a prompt to the OpenAI API and returns the response
 func (c *OpenAIClient) Translate(prompt string, context string) (string, error) {
-	logger.Debug(i18n.TranslationStarted, "OpenAI", c.model)
+	log.Debug(i18n.TranslationStarted, "OpenAI", c.model)
 
 	var result string
 	var err error
@@ -54,7 +54,7 @@ func (c *OpenAIClient) Translate(prompt string, context string) (string, error) 
 		if err == nil {
 			break
 		}
-		logger.Warning(i18n.TranslationRetry, attempt, err)
+		log.Warning(i18n.TranslationRetry, attempt, err)
 		time.Sleep(time.Duration(attempt) * time.Second)
 	}
 
@@ -62,34 +62,29 @@ func (c *OpenAIClient) Translate(prompt string, context string) (string, error) 
 		return "", fmt.Errorf("%w: %v", ErrTranslationFailed, err)
 	}
 
-	logger.Info(i18n.TranslationCompleted, "OpenAI", c.model)
+	log.Info(i18n.TranslationCompleted, "OpenAI", c.model)
 	return result, nil
 }
 
-func (c *OpenAIClient) makeRequest(prompt string, context string) (string, error) {
-	url := config.GetConfig().OpenAIAPIURL
-
-	req, err := c.client.NewRequest("POST", url, openai.ChatCompletionRequest{
+func (c *OpenAIClient) makeRequest(prompt string, systemContext string) (string, error) {
+	req := openai.ChatCompletionRequest{
 		Model: c.model,
 		Messages: []openai.ChatCompletionMessage{
 			{
 				Role:    openai.ChatMessageRoleSystem,
-				Content: context,
+				Content: systemContext,
 			},
 			{
 				Role:    openai.ChatMessageRoleUser,
 				Content: prompt,
 			},
 		},
-	})
-	if err != nil {
-		return "", fmt.Errorf("error creating request: %w", err)
 	}
 
-	var resp openai.ChatCompletionResponse
-	err = c.client.SendRequest(req, &resp)
+	ctx := context.Background()
+	resp, err := c.client.CreateChatCompletion(ctx, req)
 	if err != nil {
-		return "", fmt.Errorf("error sending request: %w", err)
+		return "", fmt.Errorf("error creating chat completion: %w", err)
 	}
 
 	if len(resp.Choices) == 0 {

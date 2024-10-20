@@ -56,6 +56,7 @@ Le logiciel identifiera et extraira chaque élément d'information du document d
 Pour tous les modules : 
 
 - Limiter la taille d'un package à maximum 10 méthodes et découper le code logiciel finement
+- toujours commencer par les packages utilitaires (comme le logger)
 
 ### 1. Analyse et Segmentation des Documents
 

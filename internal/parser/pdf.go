@@ -1,85 +1,86 @@
 package parser
 
 import (
-    "github.com/unidoc/unipdf/v3/model"
-    "github.com/chrlesur/Ontology/internal/logger"
-    "github.com/chrlesur/Ontology/internal/i18n"
+	"os"
+	"strings"
+
+	"github.com/chrlesur/Ontology/internal/i18n"
+	"github.com/unidoc/unipdf/v3/core"
+	"github.com/unidoc/unipdf/v3/extractor"
+	"github.com/unidoc/unipdf/v3/model"
 )
 
-func init() {
-    RegisterParser(".pdf", NewPDFParser)
+// ParsePDF reads a PDF file and returns its content as a byte slice.
+func ParsePDF(path string) ([]byte, error) {
+	log.Debug(i18n.ParseStarted)
+
+	f, err := os.Open(path)
+	if err != nil {
+		log.Error(i18n.ParseFailed, err)
+		return nil, err
+	}
+	defer f.Close()
+
+	pdfReader, err := model.NewPdfReader(f)
+	if err != nil {
+		log.Error(i18n.ParseFailed, err)
+		return nil, err
+	}
+
+	numPages, err := pdfReader.GetNumPages()
+	if err != nil {
+		log.Error(i18n.ParseFailed, err)
+		return nil, err
+	}
+
+	var content strings.Builder
+	for pageNum := 0; pageNum < numPages; pageNum++ {
+		page, err := pdfReader.GetPage(pageNum + 1)
+		if err != nil {
+			log.Error(i18n.PageParseFailed, err)
+			continue
+		}
+
+		ex, err := extractor.New(page)
+		if err != nil {
+			log.Error(i18n.TextExtractionFailed, err)
+			continue
+		}
+
+		text, err := ex.ExtractText()
+		if err != nil {
+			log.Error(i18n.TextExtractionFailed, err)
+			continue
+		}
+
+		content.WriteString(text)
+	}
+
+	log.Info(i18n.ParseCompleted)
+	return []byte(content.String()), nil
 }
 
-// PDFParser implémente l'interface Parser pour les fichiers PDF
-type PDFParser struct {
-    metadata map[string]string
-}
+// GetPDFMetadata extracts metadata from a PDF file.
+func GetPDFMetadata(pdfReader *model.PdfReader) map[string]string {
+	metadata := make(map[string]string)
 
-// NewPDFParser crée une nouvelle instance de PDFParser
-func NewPDFParser() Parser {
-    return &PDFParser{
-        metadata: make(map[string]string),
-    }
-}
+	trailer, err := pdfReader.GetTrailer()
+	if err != nil {
+		log.Error(i18n.MetadataExtractionFailed, err)
+		return metadata
+	}
 
-// Parse extrait le contenu textuel d'un fichier PDF
-func (p *PDFParser) Parse(path string) ([]byte, error) {
-    logger.Debug(i18n.ParseStarted, "PDF", path)
-    f, err := os.Open(path)
-    if err != nil {
-        logger.Error(i18n.ParseFailed, "PDF", path, err)
-        return nil, err
-    }
-    defer f.Close()
+	if trailer.Get("Info") != nil {
+		infoDict, ok := trailer.Get("Info").(*core.PdfObjectDictionary)
+		if ok {
+			for _, key := range infoDict.Keys() {
+				val := infoDict.Get(key)
+				if strObj, isStr := val.(*core.PdfObjectString); isStr {
+					metadata[string(key)] = strObj.String()
+				}
+			}
+		}
+	}
 
-    pdfReader, err := model.NewPdfReader(f)
-    if err != nil {
-        logger.Error(i18n.ParseFailed, "PDF", path, err)
-        return nil, err
-    }
-
-    var content []byte
-    numPages, err := pdfReader.GetNumPages()
-    if err != nil {
-        logger.Error(i18n.ParseFailed, "PDF", path, err)
-        return nil, err
-    }
-
-    for i := 1; i <= numPages; i++ {
-        page, err := pdfReader.GetPage(i)
-        if err != nil {
-            logger.Warning(i18n.PageParseFailed, i, path, err)
-            continue
-        }
-        text, err := page.GetAllText()
-        if err != nil {
-            logger.Warning(i18n.TextExtractionFailed, i, path, err)
-            continue
-        }
-        content = append(content, []byte(text)...)
-    }
-
-    p.extractMetadata(pdfReader)
-    logger.Info(i18n.ParseCompleted, "PDF", path)
-    return content, nil
-}
-
-// GetMetadata retourne les métadonnées du fichier PDF
-func (p *PDFParser) GetMetadata() map[string]string {
-    return p.metadata
-}
-
-// extractMetadata extrait les métadonnées du PDF
-func (p *PDFParser) extractMetadata(pdfReader *model.PdfReader) {
-    info, err := pdfReader.GetInfo()
-    if err != nil {
-        logger.Warning(i18n.MetadataExtractionFailed, "PDF", err)
-        return
-    }
-    p.metadata["title"] = info.Title.String()
-    p.metadata["author"] = info.Author.String()
-    p.metadata["subject"] = info.Subject.String()
-    p.metadata["keywords"] = info.Keywords.String()
-    p.metadata["creator"] = info.Creator.String()
-    p.metadata["producer"] = info.Producer.String()
+	return metadata
 }

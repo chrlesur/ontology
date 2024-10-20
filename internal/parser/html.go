@@ -5,7 +5,6 @@ import (
     "strings"
 
     "golang.org/x/net/html"
-    "github.com/chrlesur/Ontology/internal/logger"
     "github.com/chrlesur/Ontology/internal/i18n"
 )
 
@@ -27,16 +26,16 @@ func NewHTMLParser() Parser {
 
 // Parse extrait le contenu textuel d'un fichier HTML
 func (p *HTMLParser) Parse(path string) ([]byte, error) {
-    logger.Debug(i18n.ParseStarted, "HTML", path)
+    log.Debug(i18n.ParseStarted, "HTML", path)
     content, err := ioutil.ReadFile(path)
     if err != nil {
-        logger.Error(i18n.ParseFailed, "HTML", path, err)
+        log.Error(i18n.ParseFailed, "HTML", path, err)
         return nil, err
     }
 
     doc, err := html.Parse(strings.NewReader(string(content)))
     if err != nil {
-        logger.Error(i18n.ParseFailed, "HTML", path, err)
+        log.Error(i18n.ParseFailed, "HTML", path, err)
         return nil, err
     }
 
@@ -53,7 +52,7 @@ func (p *HTMLParser) Parse(path string) ([]byte, error) {
     extractText(doc)
 
     p.extractMetadata(doc)
-    logger.Info(i18n.ParseCompleted, "HTML", path)
+    log.Info(i18n.ParseCompleted, "HTML", path)
     return []byte(textContent.String()), nil
 }
 

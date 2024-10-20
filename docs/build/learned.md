@@ -1,0 +1,2 @@
+- Bien demander à ce que les fonctions utilitaires et notamment le systeme de journalisation soit fait au début.
+- 

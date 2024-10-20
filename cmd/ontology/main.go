@@ -2,10 +2,19 @@
 
 package main
 
-import "github.com/chrlesur/Ontology/cmd/ontology"
+import (
+	"fmt"
+	"os"
 
-// main is the entry point of the Ontology application.
-// It calls the Run function from the ontology package.
+	"github.com/chrlesur/Ontology/cmd/ontology"
+	"github.com/chrlesur/Ontology/internal/config"
+)
+
 func main() {
-    ontology.Run()
+	cfg := config.GetConfig()
+	if err := cfg.ValidateConfig(); err != nil {
+		fmt.Printf("Configuration error: %v\n", err)
+		os.Exit(1)
+	}
+	ontology.Execute()
 }
