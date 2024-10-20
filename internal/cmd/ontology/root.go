@@ -6,7 +6,6 @@ import (
 
 	"github.com/chrlesur/Ontology/internal/config"
 	"github.com/chrlesur/Ontology/internal/i18n"
-	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/chrlesur/Ontology/internal/pipeline"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -73,7 +72,7 @@ func initConfig() {
 	if logLevel == "" {
 		logLevel = "info"
 	}
-	logger.SetLevel(logger.ParseLevel(logLevel))
+	log.SetLevel(log.ParseLevel(logLevel))
 
 	// Initialize other configurations
 	config.InitConfig(viper.GetViper())

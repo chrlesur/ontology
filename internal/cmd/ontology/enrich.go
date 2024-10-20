@@ -2,8 +2,7 @@ package ontology
 
 import (
 	"github.com/chrlesur/Ontology/internal/i18n"
-	"github.com/chrlesur/Ontology/internal/logger"
-	"github.com/chrlesur/Ontology/internal/pipeline"
+    "github.com/chrlesur/Ontology/internal/pipeline"
 	"github.com/spf13/cobra"
 )
 
@@ -13,7 +12,6 @@ var (
 	format    string
 	llm       string
 	llmModel  string
-	passes    int
 	rdf       bool
 	owl       bool
 	recursive bool
@@ -25,16 +23,16 @@ var enrichCmd = &cobra.Command{
 	Short: i18n.EnrichCmdShortDesc,
 	Long:  i18n.EnrichCmdLongDesc,
 	Run: func(cmd *cobra.Command, args []string) {
-		logger.Info(i18n.StartingEnrichProcess)
+		log.Info(i18n.StartingEnrichProcess)
 
 		// TODO: Implement actual pipeline execution
 		err := pipeline.ExecutePipeline()
 		if err != nil {
-			logger.Error(i18n.ErrorExecutingPipeline, err)
+			log.Error(i18n.ErrorExecutingPipeline, err)
 			return
 		}
 
-		logger.Info(i18n.EnrichProcessCompleted)
+		log.Info(i18n.EnrichProcessCompleted)
 	},
 }
 
