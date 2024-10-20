@@ -107,21 +107,27 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 }
 
 func (p *Pipeline) parseInput(input string) ([]byte, error) {
-	info, err := os.Stat(input)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrAccessInput"), err)
-	}
+    info, err := os.Stat(input)
+    if err != nil {
+        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrAccessInput"), err)
+    }
 
-	if info.IsDir() {
-		return p.parseDirectory(input)
-	}
+    if info.IsDir() {
+        return p.parseDirectory(input)
+    }
 
-	ext := filepath.Ext(input)
-	parser, err := parser.GetParser(ext)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrUnsupportedFormat"), err)
-	}
-	return parser.Parse(input)
+    ext := filepath.Ext(input)
+    parser, err := parser.GetParser(ext)
+    if err != nil {
+        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrUnsupportedFormat"), err)
+    }
+
+    content, err := parser.Parse(input)
+    if err != nil {
+        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrParseFile"), err)
+    }
+
+    return content, nil
 }
 
 func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {

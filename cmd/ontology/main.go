@@ -1,20 +1,15 @@
-// cmd/ontology/main.go
-
 package main
 
 import (
 	"fmt"
 	"os"
 
-	"github.com/chrlesur/Ontology/cmd/ontology"
-	"github.com/chrlesur/Ontology/internal/config"
+	"github.com/chrlesur/Ontology/internal/cmd/ontology"
 )
 
 func main() {
-	cfg := config.GetConfig()
-	if err := cfg.ValidateConfig(); err != nil {
-		fmt.Printf("Configuration error: %v\n", err)
+	if err := ontology.Execute(); err != nil {
+		fmt.Println(err)
 		os.Exit(1)
 	}
-	ontology.Execute()
 }
