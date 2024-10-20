@@ -33,6 +33,7 @@ type Config struct {
 	OntologyName string `yaml:"ontology_name"`
 	ExportRDF    bool   `yaml:"export_rdf"`
 	ExportOWL    bool   `yaml:"export_owl"`
+	Input        string `yaml:"input"`
 }
 
 // GetConfig returns the singleton instance of Config

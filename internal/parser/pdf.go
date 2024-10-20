@@ -1,86 +1,85 @@
 package parser
 
 import (
-	"os"
-	"strings"
+	"bytes"
+	"fmt"
+	"io"
 
 	"github.com/chrlesur/Ontology/internal/i18n"
-	"github.com/unidoc/unipdf/v3/core"
-	"github.com/unidoc/unipdf/v3/extractor"
-	"github.com/unidoc/unipdf/v3/model"
+	"github.com/ledongthuc/pdf"
 )
 
-// ParsePDF reads a PDF file and returns its content as a byte slice.
-func ParsePDF(path string) ([]byte, error) {
-	log.Debug(i18n.ParseStarted)
+func init() {
+	log.Debug("Registering PDF parser")
+	RegisterParser(".pdf", NewPDFParser)
+}
 
-	f, err := os.Open(path)
+type PDFParser struct {
+	metadata map[string]string
+}
+
+func NewPDFParser() Parser {
+	log.Debug("Creating new PDF parser")
+	return &PDFParser{
+		metadata: make(map[string]string),
+	}
+}
+
+func (p *PDFParser) Parse(path string) ([]byte, error) {
+	log.Debug("Parsing PDF file: %s", path)
+	content, err := ParsePDF(path)
 	if err != nil {
-		log.Error(i18n.ParseFailed, err)
 		return nil, err
+	}
+	p.extractMetadata(path)
+	return content, nil
+}
+
+func (p *PDFParser) GetMetadata() map[string]string {
+	return p.metadata
+}
+
+func (p *PDFParser) extractMetadata(path string) {
+	log.Debug("Extracting metadata from PDF file: %s", path)
+	f, r, err := pdf.Open(path)
+	if err != nil {
+		log.Error("Failed to open PDF: %v", err)
+		return
 	}
 	defer f.Close()
 
-	pdfReader, err := model.NewPdfReader(f)
-	if err != nil {
-		log.Error(i18n.ParseFailed, err)
-		return nil, err
-	}
+	// Extract basic information
+	p.metadata["PageCount"] = fmt.Sprintf("%d", r.NumPage())
 
-	numPages, err := pdfReader.GetNumPages()
-	if err != nil {
-		log.Error(i18n.ParseFailed, err)
-		return nil, err
-	}
-
-	var content strings.Builder
-	for pageNum := 0; pageNum < numPages; pageNum++ {
-		page, err := pdfReader.GetPage(pageNum + 1)
-		if err != nil {
-			log.Error(i18n.PageParseFailed, err)
-			continue
-		}
-
-		ex, err := extractor.New(page)
-		if err != nil {
-			log.Error(i18n.TextExtractionFailed, err)
-			continue
-		}
-
-		text, err := ex.ExtractText()
-		if err != nil {
-			log.Error(i18n.TextExtractionFailed, err)
-			continue
-		}
-
-		content.WriteString(text)
-	}
-
-	log.Info(i18n.ParseCompleted)
-	return []byte(content.String()), nil
+	log.Debug("Extracted %d metadata items", len(p.metadata))
 }
 
-// GetPDFMetadata extracts metadata from a PDF file.
-func GetPDFMetadata(pdfReader *model.PdfReader) map[string]string {
-	metadata := make(map[string]string)
+// ParsePDF reads a PDF file and returns its content as a byte slice.
+func ParsePDF(path string) ([]byte, error) {
+	log.Debug(i18n.Messages.ParseStarted)
 
-	trailer, err := pdfReader.GetTrailer()
+	f, r, err := pdf.Open(path)
 	if err != nil {
-		log.Error(i18n.MetadataExtractionFailed, err)
-		return metadata
+		log.Error(i18n.Messages.ParseFailed, err)
+		return nil, fmt.Errorf("failed to open PDF: %w", err)
+	}
+	defer f.Close()
+
+	var buf bytes.Buffer
+	b, err := r.GetPlainText()
+	if err != nil {
+		log.Error("Failed to get plain text: %v", err)
+		return nil, fmt.Errorf("failed to get plain text: %w", err)
 	}
 
-	if trailer.Get("Info") != nil {
-		infoDict, ok := trailer.Get("Info").(*core.PdfObjectDictionary)
-		if ok {
-			for _, key := range infoDict.Keys() {
-				val := infoDict.Get(key)
-				if strObj, isStr := val.(*core.PdfObjectString); isStr {
-					metadata[string(key)] = strObj.String()
-				}
-			}
-		}
+	_, err = io.Copy(&buf, b)
+	if err != nil {
+		log.Error("Failed to read content: %v", err)
+		return nil, fmt.Errorf("failed to read content: %w", err)
 	}
 
-	return metadata
+	content := buf.Bytes()
+	log.Info(i18n.Messages.ParseCompleted)
+	log.Debug("Total extracted content length: %d characters", len(content))
+	return content, nil
 }

@@ -28,14 +28,14 @@ func NewTextParser() Parser {
 
 // Parse lit le contenu d'un fichier texte
 func (p *TextParser) Parse(path string) ([]byte, error) {
-	log.Debug(i18n.ParseStarted, "text", path)
+	log.Debug(i18n.Messages.ParseStarted, "text", path)
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Error(i18n.ParseFailed, "text", path, err)
+		log.Error(i18n.Messages.ParseFailed, "text", path, err)
 		return nil, err
 	}
 	p.extractMetadata(path)
-	log.Info(i18n.ParseCompleted, "text", path)
+	log.Info(i18n.Messages.ParseCompleted, "text", path)
 	return content, nil
 }
 
@@ -48,7 +48,7 @@ func (p *TextParser) GetMetadata() map[string]string {
 func (p *TextParser) extractMetadata(path string) {
 	info, err := os.Stat(path)
 	if err != nil {
-		log.Warning(i18n.MetadataExtractionFailed, path, err)
+		log.Warning(i18n.Messages.MetadataExtractionFailed, path, err)
 		return
 	}
 	p.metadata["filename"] = filepath.Base(path)

@@ -27,11 +27,11 @@ func NewDOCXParser() Parser {
 
 // Parse extrait le contenu textuel d'un fichier DOCX
 func (p *DOCXParser) Parse(path string) ([]byte, error) {
-	log.Debug(i18n.ParseStarted, "DOCX", path)
+	log.Debug(i18n.Messages.ParseStarted, "DOCX", path)
 
 	reader, err := zip.OpenReader(path)
 	if err != nil {
-		log.Error(i18n.ParseFailed, "DOCX", path, err)
+		log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
 		return nil, err
 	}
 	defer reader.Close()
@@ -41,14 +41,14 @@ func (p *DOCXParser) Parse(path string) ([]byte, error) {
 		if file.Name == "word/document.xml" {
 			rc, err := file.Open()
 			if err != nil {
-				log.Error(i18n.ParseFailed, "DOCX", path, err)
+				log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
 				return nil, err
 			}
 			defer rc.Close()
 
 			content, err := ioutil.ReadAll(rc)
 			if err != nil {
-				log.Error(i18n.ParseFailed, "DOCX", path, err)
+				log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
 				return nil, err
 			}
 
@@ -64,7 +64,7 @@ func (p *DOCXParser) Parse(path string) ([]byte, error) {
 
 			err = xml.Unmarshal(content, &document)
 			if err != nil {
-				log.Error(i18n.ParseFailed, "DOCX", path, err)
+				log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
 				return nil, err
 			}
 
@@ -79,7 +79,7 @@ func (p *DOCXParser) Parse(path string) ([]byte, error) {
 	}
 
 	p.extractMetadata(reader)
-	log.Info(i18n.ParseCompleted, "DOCX", path)
+	log.Info(i18n.Messages.ParseCompleted, "DOCX", path)
 	return []byte(textContent.String()), nil
 }
 
@@ -94,14 +94,14 @@ func (p *DOCXParser) extractMetadata(reader *zip.ReadCloser) {
 		if file.Name == "docProps/core.xml" {
 			rc, err := file.Open()
 			if err != nil {
-				log.Warning(i18n.MetadataExtractionFailed, "DOCX", err)
+				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
 				return
 			}
 			defer rc.Close()
 
 			content, err := ioutil.ReadAll(rc)
 			if err != nil {
-				log.Warning(i18n.MetadataExtractionFailed, "DOCX", err)
+				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
 				return
 			}
 
@@ -117,7 +117,7 @@ func (p *DOCXParser) extractMetadata(reader *zip.ReadCloser) {
 
 			err = xml.Unmarshal(content, &coreProps)
 			if err != nil {
-				log.Warning(i18n.MetadataExtractionFailed, "DOCX", err)
+				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
 				return
 			}
 

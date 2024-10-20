@@ -6,6 +6,7 @@ import (
 
 	"github.com/chrlesur/Ontology/internal/config"
 	"github.com/chrlesur/Ontology/internal/i18n"
+	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/chrlesur/Ontology/internal/pipeline"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -16,12 +17,13 @@ var (
 	inputFile string
 	passes    int
 	ontology  string
+	DebugMode bool
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "ontology",
-	Short: i18n.GetMessage("RootCmdShort"),
-	Long:  i18n.GetMessage("RootCmdLong"),
+	Short: i18n.Messages.RootCmdShortDesc,
+	Long:  i18n.Messages.RootCmdLongDesc,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		p, err := pipeline.NewPipeline()
 		if err != nil {
@@ -31,23 +33,36 @@ var rootCmd = &cobra.Command{
 	},
 }
 
-func Execute() {
-	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+func Execute() error {
+	if DebugMode {
+		log.Debug(i18n.Messages.DebugFlagUsage)
+		logger.GetLogger().SetLevel(logger.DebugLevel)
 	}
+	err := rootCmd.Execute()
+	if err != nil {
+		log.Error(i18n.GetMessage("CommandExecutionError"), err)
+	}
+
+	return err
 }
 
 func init() {
 	cobra.OnInitialize(initConfig)
-
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", i18n.GetMessage("ConfigFlagUsage"))
 	rootCmd.PersistentFlags().StringVar(&inputFile, "input", "", i18n.GetMessage("InputFlagUsage"))
 	rootCmd.PersistentFlags().IntVar(&passes, "passes", 1, i18n.GetMessage("PassesFlagUsage"))
 	rootCmd.PersistentFlags().StringVar(&ontology, "ontology", "", i18n.GetMessage("OntologyFlagUsage"))
 	rootCmd.PersistentFlags().BoolVar(&config.GetConfig().ExportRDF, "rdf", false, i18n.GetMessage("RDFFlagUsage"))
 	rootCmd.PersistentFlags().BoolVar(&config.GetConfig().ExportOWL, "owl", false, i18n.GetMessage("OWLFlagUsage"))
+	rootCmd.PersistentFlags().BoolVar(&DebugMode, "debug", false, "Enable debug mode with detailed logging")
 	rootCmd.MarkFlagRequired("input")
+
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		if DebugMode {
+			log.SetLevel(logger.DebugLevel)
+			log.Debug("Debug mode enabled in root.go")
+		}
+	}
 }
 
 func initConfig() {
@@ -72,8 +87,10 @@ func initConfig() {
 	if logLevel == "" {
 		logLevel = "info"
 	}
-	log.SetLevel(log.ParseLevel(logLevel))
-
+	log.SetLevel(logger.ParseLevel(logLevel))
 	// Initialize other configurations
-	config.InitConfig(viper.GetViper())
+	if err := config.GetConfig().Reload(); err != nil {
+		fmt.Printf("Error reloading config: %v\n", err)
+		os.Exit(1)
+	}
 }

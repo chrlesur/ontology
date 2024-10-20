@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"sync"
 	"time"
 
@@ -79,6 +80,8 @@ func (l *Logger) setupLogFile() {
 
 // SetLevel sets the current log level
 func (l *Logger) SetLevel(level LogLevel) {
+	l.mu.Lock()
+	defer l.mu.Unlock()
 	l.level = level
 }
 
@@ -91,13 +94,16 @@ func (l *Logger) log(level LogLevel, message string, args ...interface{}) {
 	defer l.mu.Unlock()
 
 	_, file, line, _ := runtime.Caller(2)
-	logMessage := fmt.Sprintf("[%s] %s:%d - %s", level, filepath.Base(file), line, fmt.Sprintf(message, args...))
+	levelStr := [...]string{"DEBUG", "INFO", "WARNING", "ERROR"}[level]
+	logMessage := fmt.Sprintf("[%s] %s:%d - %s", levelStr, filepath.Base(file), line, fmt.Sprintf(message, args...))
 	l.logger.Println(logMessage)
 }
 
 // Debug logs a message at DebugLevel
-func (l *Logger) Debug(message string, args ...interface{}) {
-	l.log(DebugLevel, message, args...)
+func (l *Logger) Debug(format string, args ...interface{}) {
+    if l.GetLevel() <= DebugLevel {
+        l.log(DebugLevel, format, args...)
+    }
 }
 
 // Info logs a message at InfoLevel
@@ -132,4 +138,27 @@ func (l *Logger) RotateLogs() error {
 	// Implementation of log rotation
 	// This is a placeholder and should be implemented based on specific requirements
 	return nil
+}
+
+// ParseLevel converts a string level to LogLevel
+func ParseLevel(level string) LogLevel {
+	switch strings.ToLower(level) {
+	case "debug":
+		return DebugLevel
+	case "info":
+		return InfoLevel
+	case "warning":
+		return WarningLevel
+	case "error":
+		return ErrorLevel
+	default:
+		return InfoLevel
+	}
+}
+
+// Ajoutez cette méthode
+func (l *Logger) GetLevel() LogLevel {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.level
 }

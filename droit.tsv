@@ -1,0 +1,63 @@
+jurisprudence	Concept	Source de droit, vision réaliste opposée à la vision légiscentrique
+droit international privé	Concept	Domaine du droit traitant des situations juridiques internationales
+Code civil	Organisation	Code français contenant des règles sur l'application du droit dans l'espace
+loi pénale française	Concept	Règles d'application du droit pénal français dans l'espace
+Cour de cassation	Organisation	Plus haute juridiction de l'ordre judiciaire français
+droit civil	Concept	Branche du droit privé régissant les relations entre personnes privées
+conflit de lois	Concept	Situation où plusieurs systèmes juridiques peuvent s'appliquer
+règle de conflit	Concept	Règle déterminant quel droit s'applique dans une situation internationale
+règle matérielle	Concept	Règle régissant directement le fond d'un litige international
+Convention de La Haye	Organisation	Traités internationaux harmonisant le droit international privé
+règlement européen	Concept	Texte législatif européen directement applicable dans les États membres
+RGPD	Organisation	Règlement général sur la protection des données personnelles en Europe
+règle désignatrice	Concept	Règle indiquant quel droit s'applique dans une situation internationale
+juridiction compétente	Concept	Tribunal habilité à juger une affaire internationale
+jurisprudence	est_source_de	droit	La jurisprudence est considérée comme une source de droit dans la vision réaliste
+droit international privé	traite_de	conflit de lois	Le DIP s'occupe des situations juridiques internationales impliquant des conflits de lois
+Code civil	contient	règle de conflit	L'article 3 du Code civil pose des règles sur l'application du droit dans l'espace
+loi pénale française	régit	application du droit pénal	Articles du Code pénal définissent l'application de la loi pénale française dans l'espace
+Cour de cassation	produit	jurisprudence	La Cour de cassation rend des arrêts qui forment la jurisprudence
+conflit de lois	résolu_par	règle de conflit	Les règles de conflit permettent de déterminer quel droit s'applique en cas de conflit de lois
+règle matérielle	s'applique_directement_à	situation internationale	Certaines règles matérielles s'appliquent directement sans passer par une règle de conflit
+Convention de La Haye	harmonise	droit international privé	Les conventions de La Haye visent à harmoniser les règles de droit international privé
+règlement européen	prime_sur	droit national	Les règlements européens s'appliquent directement et priment sur le droit national
+RGPD	est_un	règlement européen	Le RGPD est un exemple de règlement européen directement applicable
+règle désignatrice	détermine	droit applicable	Les règles désignatrices indiquent quel droit s'applique dans une situation internationale
+juridiction compétente	distinct_de	droit applicable	La détermination du tribunal compétent est distincte du choix du droit applicable
+jurisprudence	Concept	Source de droit, interprétation et application du droit par les tribunaux
+légiscentrique	Concept	Vision centrée sur la loi comme seule source de droit
+vision réaliste	Concept	Reconnaissance de la jurisprudence comme source de droit
+hiérarchie des normes	Concept	Organisation des différents types de règles juridiques selon leur importance
+application dans le temps	Concept	Comment les lois s'appliquent au fil du temps
+application dans l'espace	Concept	Comment les lois s'appliquent selon les territoires
+droit international privé	Concept	Branche du droit traitant des conflits de lois entre pays
+Code civil	Document	Code fondamental du droit civil français
+lois de police	Concept	Règles d'ordre public s'appliquant à tous sur un territoire
+droit pénal	Concept	Branche du droit traitant des infractions et des peines
+situation juridique internationale	Concept	Cas impliquant des éléments de droit de différents pays
+conflit de lois	Concept	Situation où plusieurs systèmes juridiques peuvent s'appliquer
+naturalisation	Concept	Procédure d'acquisition d'une nouvelle nationalité
+fraude à la loi	Concept	Contournement illégal d'une loi en utilisant une autre loi
+règlement Rome	Document	Ensemble de textes européens sur les conflits de lois
+conventions de La Haye	Document	Traités internationaux sur divers aspects du droit international privé
+règle matérielle	Concept	Règle qui régit directement le fond d'un litige international
+règle désignatrice	Concept	Règle qui détermine quel droit national s'applique dans un cas international
+RGPD	Document	Règlement général sur la protection des données (européen)
+loi applicable	Concept	Droit national qui s'applique à une situation internationale
+juridiction compétente	Concept	Tribunal habilité à juger une affaire internationale
+jurisprudence	estUneSourceDe	droit	La jurisprudence est reconnue comme une source de droit dans la vision réaliste
+vision réaliste	s'opposeA	légiscentrique	La vision réaliste s'oppose à la vision légiscentrique sur le rôle de la jurisprudence
+hiérarchie des normes	estUnTypeDe	application du droit	La hiérarchie des normes concerne l'application des règles juridiques selon leur importance
+application dans le temps	estUnTypeDe	application du droit	Concerne comment les lois s'appliquent au fil du temps
+application dans l'espace	estUnTypeDe	application du droit	Concerne comment les lois s'appliquent selon les territoires
+droit international privé	traite	conflit de lois	Le droit international privé s'occupe des conflits de lois entre pays
+Code civil	contient	article 3	L'article 3 du Code civil traite de l'application des lois dans l'espace
+lois de police	sontUnTypeDe	règles d'ordre public	Les lois de police sont des règles d'ordre public s'appliquant à tous sur un territoire
+situation juridique internationale	peutCauserUn	conflit de lois	Une situation juridique internationale peut entraîner un conflit de lois
+naturalisation	peutÊtreUtiliséePour	fraude à la loi	La naturalisation peut être utilisée pour contourner une loi (ex: cas Princesse de Bauffremont)
+règlement Rome	règle	conflit de lois	Les règlements Rome sont des textes européens qui règlent les conflits de lois
+conventions de La Haye	règlent	aspects du droit international privé	Ces conventions traitent divers aspects du droit international privé
+règle matérielle	s'appliqueDirectementA	litige international	Une règle matérielle régit directement le fond d'un litige international
+règle désignatrice	détermine	loi applicable	Une règle désignatrice détermine quel droit national s'applique dans un cas international
+RGPD	estUn	règlement européen	Le RGPD est un exemple de règlement européen s'appliquant directement
+loi applicable	estDifférentDe	juridiction compétente	La loi applicable peut différer du pays de la juridiction compétente

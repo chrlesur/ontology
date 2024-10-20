@@ -7,9 +7,9 @@ import (
 )
 
 var (
-	ErrUnsupportedModel  = errors.New(i18n.ErrUnsupportedModel)
-	ErrAPIKeyMissing     = errors.New(i18n.ErrAPIKeyMissing)
-	ErrTranslationFailed = errors.New(i18n.ErrTranslationFailed)
-	ErrInvalidLLMType    = errors.New(i18n.ErrInvalidLLMType)
-	ErrContextTooLong    = errors.New(i18n.ErrContextTooLong)
+	ErrUnsupportedModel  = errors.New(i18n.Messages.ErrUnsupportedModel)
+	ErrAPIKeyMissing     = errors.New(i18n.Messages.ErrAPIKeyMissing)
+	ErrTranslationFailed = errors.New(i18n.Messages.ErrTranslationFailed)
+	ErrInvalidLLMType    = errors.New(i18n.Messages.ErrInvalidLLMType)
+	ErrContextTooLong    = errors.New(i18n.Messages.ErrContextTooLong)
 )

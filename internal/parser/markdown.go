@@ -28,14 +28,14 @@ func NewMarkdownParser() Parser {
 
 // Parse lit le contenu d'un fichier Markdown
 func (p *MarkdownParser) Parse(path string) ([]byte, error) {
-    log.Debug(i18n.ParseStarted, "Markdown", path)
+    log.Debug(i18n.Messages.ParseStarted, "Markdown", path)
     content, err := ioutil.ReadFile(path)
     if err != nil {
-        log.Error(i18n.ParseFailed, "Markdown", path, err)
+        log.Error(i18n.Messages.ParseFailed, "Markdown", path, err)
         return nil, err
     }
     p.extractMetadata(path)
-    log.Info(i18n.ParseCompleted, "Markdown", path)
+    log.Info(i18n.Messages.ParseCompleted, "Markdown", path)
     return content, nil
 }
 
@@ -48,7 +48,7 @@ func (p *MarkdownParser) GetMetadata() map[string]string {
 func (p *MarkdownParser) extractMetadata(path string) {
     info, err := os.Stat(path)
     if err != nil {
-        log.Warning(i18n.MetadataExtractionFailed, path, err)
+        log.Warning(i18n.Messages.MetadataExtractionFailed, path, err)
         return
     }
     p.metadata["filename"] = filepath.Base(path)

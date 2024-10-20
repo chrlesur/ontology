@@ -26,16 +26,16 @@ func NewHTMLParser() Parser {
 
 // Parse extrait le contenu textuel d'un fichier HTML
 func (p *HTMLParser) Parse(path string) ([]byte, error) {
-    log.Debug(i18n.ParseStarted, "HTML", path)
+    log.Debug(i18n.Messages.ParseStarted, "HTML", path)
     content, err := ioutil.ReadFile(path)
     if err != nil {
-        log.Error(i18n.ParseFailed, "HTML", path, err)
+        log.Error(i18n.Messages.ParseFailed, "HTML", path, err)
         return nil, err
     }
 
     doc, err := html.Parse(strings.NewReader(string(content)))
     if err != nil {
-        log.Error(i18n.ParseFailed, "HTML", path, err)
+        log.Error(i18n.Messages.ParseFailed, "HTML", path, err)
         return nil, err
     }
 
@@ -52,7 +52,7 @@ func (p *HTMLParser) Parse(path string) ([]byte, error) {
     extractText(doc)
 
     p.extractMetadata(doc)
-    log.Info(i18n.ParseCompleted, "HTML", path)
+    log.Info(i18n.Messages.ParseCompleted, "HTML", path)
     return []byte(textContent.String()), nil
 }
 

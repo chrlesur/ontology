@@ -14,6 +14,7 @@ import (
 	"github.com/chrlesur/Ontology/internal/llm"
 	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/chrlesur/Ontology/internal/parser"
+	"github.com/chrlesur/Ontology/internal/prompt"
 	"github.com/chrlesur/Ontology/internal/segmenter"
 )
 
@@ -44,6 +45,7 @@ func NewPipeline() (*Pipeline, error) {
 // ExecutePipeline orchestrates the entire workflow
 func (p *Pipeline) ExecutePipeline(input string, passes int, existingOntology string) error {
 	p.logger.Info(i18n.GetMessage("StartingPipeline"))
+	p.logger.Debug("Input: %s, Passes: %d, Existing Ontology: %s", input, passes, existingOntology)
 
 	var result string
 	var err error
@@ -51,20 +53,25 @@ func (p *Pipeline) ExecutePipeline(input string, passes int, existingOntology st
 	if existingOntology != "" {
 		result, err = p.loadExistingOntology(existingOntology)
 		if err != nil {
+			p.logger.Error(i18n.GetMessage("ErrLoadExistingOntology"), err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrLoadExistingOntology"), err)
 		}
+		p.logger.Debug("Loaded existing ontology, length: %d", len(result))
 	}
 
 	for i := 0; i < passes; i++ {
 		p.logger.Info(i18n.GetMessage("StartingPass"), i+1)
 		result, err = p.processSinglePass(input, result)
 		if err != nil {
+			p.logger.Error(i18n.GetMessage("ErrProcessingPass"), i+1, err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrProcessingPass"), err)
 		}
+		p.logger.Debug("Completed pass %d, result length: %d", i+1, len(result))
 	}
 
 	err = p.saveResult(result)
 	if err != nil {
+		p.logger.Error(i18n.GetMessage("ErrSavingResult"), err)
 		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrSavingResult"), err)
 	}
 
@@ -73,10 +80,14 @@ func (p *Pipeline) ExecutePipeline(input string, passes int, existingOntology st
 }
 
 func (p *Pipeline) processSinglePass(input string, previousResult string) (string, error) {
+	p.logger.Debug("Processing single pass, input length: %d, previous result length: %d", len(input), len(previousResult))
+
 	content, err := p.parseInput(input)
 	if err != nil {
+		p.logger.Error("Failed to parse input: %v", err)
 		return "", err
 	}
+	p.logger.Debug("Parsed content length: %d", len(content))
 
 	segments, err := segmenter.Segment(content, segmenter.SegmentConfig{
 		MaxTokens:   p.config.MaxTokens,
@@ -84,8 +95,10 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 		Model:       p.config.DefaultModel,
 	})
 	if err != nil {
+		p.logger.Error("Failed to segment content: %v", err)
 		return "", fmt.Errorf("%s: %w", i18n.GetMessage("ErrSegmentContent"), err)
 	}
+	p.logger.Debug("Number of segments: %d", len(segments))
 
 	results := make([]string, len(segments))
 	var wg sync.WaitGroup
@@ -93,12 +106,19 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 		wg.Add(1)
 		go func(i int, seg []byte) {
 			defer wg.Done()
-			result, err := p.processSegment(seg, previousResult)
+			p.logger.Debug("Processing segment %d/%d, length: %d", i+1, len(segments), len(seg))
+			context := segmenter.GetContext(segments, i, segmenter.SegmentConfig{
+				MaxTokens:   p.config.MaxTokens,
+				ContextSize: p.config.ContextSize,
+				Model:       p.config.DefaultModel,
+			})
+			result, err := p.processSegment(seg, context, previousResult)
 			if err != nil {
-				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i, err)
+				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i+1, err)
 				return
 			}
 			results[i] = result
+			p.logger.Debug("Segment %d processed successfully, result length: %d", i+1, len(result))
 		}(i, segment)
 	}
 	wg.Wait()
@@ -107,27 +127,27 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 }
 
 func (p *Pipeline) parseInput(input string) ([]byte, error) {
-    info, err := os.Stat(input)
-    if err != nil {
-        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrAccessInput"), err)
-    }
+	info, err := os.Stat(input)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrAccessInput"), err)
+	}
 
-    if info.IsDir() {
-        return p.parseDirectory(input)
-    }
+	if info.IsDir() {
+		return p.parseDirectory(input)
+	}
 
-    ext := filepath.Ext(input)
-    parser, err := parser.GetParser(ext)
-    if err != nil {
-        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrUnsupportedFormat"), err)
-    }
+	ext := filepath.Ext(input)
+	parser, err := parser.GetParser(ext)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrUnsupportedFormat"), err)
+	}
 
-    content, err := parser.Parse(input)
-    if err != nil {
-        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrParseFile"), err)
-    }
+	content, err := parser.Parse(input)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrParseFile"), err)
+	}
 
-    return content, nil
+	return content, nil
 }
 
 func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {
@@ -158,11 +178,35 @@ func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {
 	return content, nil
 }
 
-func (p *Pipeline) processSegment(segment []byte, context string) (string, error) {
-	result, err := p.llm.Translate(string(segment), context)
-	if err != nil {
-		return "", fmt.Errorf("%s: %w", i18n.GetMessage("ErrLLMTranslation"), err)
+func (p *Pipeline) processSegment(segment []byte, context string, previousResult string) (string, error) {
+	p.logger.Debug("Processing segment of length %d", len(segment))
+
+	// Extraction d'entités
+	entityValues := map[string]string{
+		"text":            string(segment),
+		"context":         context,
+		"previous_result": previousResult,
 	}
+	entityResult, err := p.llm.ProcessWithPrompt(prompt.EntityExtractionPrompt, entityValues)
+	if err != nil {
+		return "", fmt.Errorf("entity extraction failed: %w", err)
+	}
+
+	// Extraction de relations
+	relationValues := map[string]string{
+		"text":            string(segment),
+		"entities":        entityResult,
+		"context":         context,
+		"previous_result": previousResult,
+	}
+	relationResult, err := p.llm.ProcessWithPrompt(prompt.RelationExtractionPrompt, relationValues)
+	if err != nil {
+		return "", fmt.Errorf("relation extraction failed: %w", err)
+	}
+
+	// Combinez les résultats et retournez-les
+	result := entityResult + "\n" + relationResult
+	p.logger.Debug("Combined LLM output:\n%s", result)
 	return result, nil
 }
 

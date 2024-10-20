@@ -1,2 +1,3 @@
 - Bien demander à ce que les fonctions utilitaires et notamment le systeme de journalisation soit fait au début.
+- Les configurations et parametres doivent etre définie en premier pour tout le monde
 - 
