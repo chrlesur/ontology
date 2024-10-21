@@ -43,40 +43,40 @@ func NewPipeline() (*Pipeline, error) {
 }
 
 // ExecutePipeline orchestrates the entire workflow
-func (p *Pipeline) ExecutePipeline(input string, passes int, existingOntology string) error {
-	p.logger.Info(i18n.GetMessage("StartingPipeline"))
-	p.logger.Debug("Input: %s, Passes: %d, Existing Ontology: %s", input, passes, existingOntology)
+func (p *Pipeline) ExecutePipeline(input string, output string, passes int, existingOntology string) error {
+    p.logger.Info(i18n.GetMessage("StartingPipeline"))
+    p.logger.Debug("Input: %s, Output: %s, Passes: %d, Existing Ontology: %s", input, output, passes, existingOntology)
 
-	var result string
-	var err error
+    var result string
+    var err error
 
-	if existingOntology != "" {
-		result, err = p.loadExistingOntology(existingOntology)
-		if err != nil {
-			p.logger.Error(i18n.GetMessage("ErrLoadExistingOntology"), err)
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrLoadExistingOntology"), err)
-		}
-		p.logger.Debug("Loaded existing ontology, length: %d", len(result))
-	}
+    if existingOntology != "" {
+        result, err = p.loadExistingOntology(existingOntology)
+        if err != nil {
+            p.logger.Error(i18n.GetMessage("ErrLoadExistingOntology"), err)
+            return fmt.Errorf("%s: %w", i18n.GetMessage("ErrLoadExistingOntology"), err)
+        }
+        p.logger.Debug("Loaded existing ontology, length: %d", len(result))
+    }
 
-	for i := 0; i < passes; i++ {
-		p.logger.Info(i18n.GetMessage("StartingPass"), i+1)
-		result, err = p.processSinglePass(input, result)
-		if err != nil {
-			p.logger.Error(i18n.GetMessage("ErrProcessingPass"), i+1, err)
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrProcessingPass"), err)
-		}
-		p.logger.Debug("Completed pass %d, result length: %d", i+1, len(result))
-	}
+    for i := 0; i < passes; i++ {
+        p.logger.Info(i18n.GetMessage("StartingPass"), i+1)
+        result, err = p.processSinglePass(input, result)
+        if err != nil {
+            p.logger.Error(i18n.GetMessage("ErrProcessingPass"), i+1, err)
+            return fmt.Errorf("%s: %w", i18n.GetMessage("ErrProcessingPass"), err)
+        }
+        p.logger.Debug("Completed pass %d, result length: %d", i+1, len(result))
+    }
 
-	err = p.saveResult(result)
-	if err != nil {
-		p.logger.Error(i18n.GetMessage("ErrSavingResult"), err)
-		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrSavingResult"), err)
-	}
+    err = p.saveResult(result, output)
+    if err != nil {
+        p.logger.Error(i18n.GetMessage("ErrSavingResult"), err)
+        return fmt.Errorf("%s: %w", i18n.GetMessage("ErrSavingResult"), err)
+    }
 
-	p.logger.Info(i18n.GetMessage("PipelineCompleted"))
-	return nil
+    p.logger.Info(i18n.GetMessage("PipelineCompleted"))
+    return nil
 }
 
 func (p *Pipeline) processSinglePass(input string, previousResult string) (string, error) {
@@ -223,41 +223,50 @@ func (p *Pipeline) loadExistingOntology(path string) (string, error) {
 	return string(content), nil
 }
 
-func (p *Pipeline) saveResult(result string) error {
-	qsc := converter.NewQuickStatementConverter(p.logger)
+func (p *Pipeline) saveResult(result string, outputPath string) error {
+    qsc := converter.NewQuickStatementConverter(p.logger)
 
-	qs, err := qsc.Convert([]byte(result), "", "") // Nous utilisons des chaînes vides pour context et ontology pour l'instant
-	if err != nil {
-		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertQuickStatement"), err)
-	}
+    qs, err := qsc.Convert([]byte(result), "", "") // Nous utilisons des chaînes vides pour context et ontology pour l'instant
+    if err != nil {
+        return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertQuickStatement"), err)
+    }
 
-	filename := fmt.Sprintf("%s.tsv", p.config.OntologyName)
-	err = ioutil.WriteFile(filename, []byte(qs), 0644)
-	if err != nil {
-		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOutput"), err)
-	}
+    // Utilisez filepath.Dir et filepath.Base pour gérer correctement les chemins
+    dir := filepath.Dir(outputPath)
+    baseName := filepath.Base(outputPath)
+    ext := filepath.Ext(baseName)
+    nameWithoutExt := strings.TrimSuffix(baseName, ext)
 
-	if p.config.ExportRDF {
-		rdf, err := qsc.ConvertToRDF(qs)
-		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertRDF"), err)
-		}
-		err = ioutil.WriteFile(fmt.Sprintf("%s.rdf", p.config.OntologyName), []byte(rdf), 0644)
-		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteRDF"), err)
-		}
-	}
+    // Écrivez le fichier TSV
+    tsvPath := filepath.Join(dir, nameWithoutExt+".tsv")
+    err = ioutil.WriteFile(tsvPath, []byte(qs), 0644)
+    if err != nil {
+        return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOutput"), err)
+    }
 
-	if p.config.ExportOWL {
-		owl, err := qsc.ConvertToOWL(qs)
-		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertOWL"), err)
-		}
-		err = ioutil.WriteFile(fmt.Sprintf("%s.owl", p.config.OntologyName), []byte(owl), 0644)
-		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOWL"), err)
-		}
-	}
+    if p.config.ExportRDF {
+        rdf, err := qsc.ConvertToRDF(qs)
+        if err != nil {
+            return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertRDF"), err)
+        }
+        rdfPath := filepath.Join(dir, nameWithoutExt+".rdf")
+        err = ioutil.WriteFile(rdfPath, []byte(rdf), 0644)
+        if err != nil {
+            return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteRDF"), err)
+        }
+    }
 
-	return nil
+    if p.config.ExportOWL {
+        owl, err := qsc.ConvertToOWL(qs)
+        if err != nil {
+            return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertOWL"), err)
+        }
+        owlPath := filepath.Join(dir, nameWithoutExt+".owl")
+        err = ioutil.WriteFile(owlPath, []byte(owl), 0644)
+        if err != nil {
+            return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOWL"), err)
+        }
+    }
+
+    return nil
 }
