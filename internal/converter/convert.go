@@ -61,7 +61,7 @@ func (qsc *QuickStatementConverter) parseSegment(segment []byte) ([]Statement, e
 
 		parts := strings.Split(line, "\t")
 		if len(parts) < 3 {
-			log.Warning("Skipping invalid line: %s", line)
+			log.Debug("Skipping invalid line: %s", line)
 			continue
 		}
 		statement := Statement{

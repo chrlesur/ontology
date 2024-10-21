@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/chrlesur/Ontology/internal/i18n"
+	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/chrlesur/Ontology/internal/pipeline"
 	"github.com/spf13/cobra"
 )
@@ -31,18 +32,50 @@ var enrichCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		input := args[0]
+		log := logger.GetLogger()
 		log.Info(i18n.Messages.StartingEnrichProcess)
 
-		// Vérifier si l'input est un fichier ou un répertoire
-		fileInfo, err := os.Stat(input)
+		// Utiliser le chemin absolu pour l'entrée
+		absInput, err := filepath.Abs(input)
 		if err != nil {
-			return fmt.Errorf("%s: %w", i18n.Messages.ErrAccessInput, err)
+			return fmt.Errorf("error getting absolute path: %w", err)
 		}
 
-		if fileInfo.IsDir() {
-			return processDirectory(input)
+		// Déterminer le nom de fichier de sortie si non spécifié
+		if output == "" {
+			output = generateOutputFilename(absInput, owl, rdf)
+		} else {
+			// Si output est spécifié, s'assurer qu'il est absolu
+			output, err = filepath.Abs(output)
+			if err != nil {
+				return fmt.Errorf("error getting absolute path for output: %w", err)
+			}
 		}
-		return processFile(input)
+
+		p, err := pipeline.NewPipeline()
+		if err != nil {
+			return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
+		}
+
+		p.SetProgressCallback(func(info pipeline.ProgressInfo) {
+			switch info.CurrentStep {
+			case "Starting Pass":
+				log.Info("Starting pass %d of %d", info.CurrentPass, info.TotalPasses)
+			case "Segmenting":
+				log.Info("Segmenting input into %d parts", info.TotalSegments)
+			case "Processing Segment":
+				log.Info("Processing segment %d of %d", info.ProcessedSegments, info.TotalSegments)
+			}
+		})
+
+		err = p.ExecutePipeline(absInput, output, passes, existingOntology)
+		if err != nil {
+			return fmt.Errorf("%s: %w", i18n.Messages.ErrorExecutingPipeline, err)
+		}
+
+		log.Info(i18n.Messages.EnrichProcessCompleted)
+		log.Info("File processed: %s, output: %s", absInput, output)
+		return nil
 	},
 }
 
@@ -76,41 +109,42 @@ func processDirectory(dirPath string) error {
 }
 
 func processFile(filePath string) error {
-    outputPath := output
-    if outputPath == "" {
-        // Générer le nom de fichier de sortie dans le même répertoire que le fichier d'entrée
-        dir := filepath.Dir(filePath)
-        baseName := filepath.Base(filePath)
-        baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
-        
-        var extension string
-        if owl {
-            extension = ".owl"
-        } else if rdf {
-            extension = ".rdf"
-        } else {
-            extension = ".tsv"
-        }
-        
-        outputPath = filepath.Join(dir, baseName+extension)
-    }
+	outputPath := output
+	if outputPath == "" {
+		// Générer le nom de fichier de sortie dans le même répertoire que le fichier d'entrée
+		dir := filepath.Dir(filePath)
+		baseName := filepath.Base(filePath)
+		baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
 
-    p, err := pipeline.NewPipeline()
-    if err != nil {
-        return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
-    }
+		var extension string
+		if owl {
+			extension = ".owl"
+		} else if rdf {
+			extension = ".rdf"
+		} else {
+			extension = ".tsv"
+		}
 
-    // Passer le chemin de sortie à ExecutePipeline
-    err = p.ExecutePipeline(filePath, outputPath, passes, existingOntology)
-    if err != nil {
-        return fmt.Errorf("%s: %w", i18n.Messages.ErrorExecutingPipeline, err)
-    }
+		outputPath = filepath.Join(dir, baseName+extension)
+	}
 
-    log.Info(fmt.Sprintf("File processed: %s, output: %s", filePath, outputPath))
-    return nil
+	p, err := pipeline.NewPipeline()
+	if err != nil {
+		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
+	}
+
+	// Passer le chemin de sortie à ExecutePipeline
+	err = p.ExecutePipeline(filePath, outputPath, passes, existingOntology)
+	if err != nil {
+		return fmt.Errorf("%s: %w", i18n.Messages.ErrorExecutingPipeline, err)
+	}
+
+	log.Info(fmt.Sprintf("File processed: %s, output: %s", filePath, outputPath))
+	return nil
 }
 
 func generateOutputFilename(input string, owl, rdf bool) string {
+	dir := filepath.Dir(input)
 	baseName := filepath.Base(input)
 	baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
 
@@ -123,5 +157,5 @@ func generateOutputFilename(input string, owl, rdf bool) string {
 		extension = ".tsv"
 	}
 
-	return baseName + extension
+	return filepath.Join(dir, baseName+extension)
 }

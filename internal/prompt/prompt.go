@@ -40,7 +40,7 @@ Format your response as a list of entities, one per line, using tabs to separate
 EntityName\tEntityType\tDescription/Context
 
 Ensure that your extractions are relevant to creating an ontology and avoid including irrelevant or trivial information.
-Use the original document language
+Use the original document language. Do it silently with no comment.
 `)
 
 	RelationExtractionPrompt = NewPromptTemplate(`
@@ -62,26 +62,33 @@ Format your response as a list of relationships, one per line, using tabs to sep
 SourceEntity\tRelationshipType\tTargetEntity\tDescription/Context
 
 Focus on meaningful relationships that contribute to the structure of the ontology. Avoid trivial or overly generic relationships.
-Use the original document language
+Use the original document language. Do it silently with no comment.
 `)
 
-	OntologyEnrichmentPrompt = NewPromptTemplate(`
-Given the following partial ontology and new text, suggest additions or modifications to enrich the ontology:
+OntologyEnrichmentPrompt = NewPromptTemplate(`
+Vous êtes un expert en ontologies chargé d'enrichir et de raffiner une ontologie existante. Voici l'ontologie actuelle et de nouvelles informations à intégrer :
 
-Current Ontology:
-{current_ontology}
+Ontologie actuelle :
+{previous_result}
 
-New Text:
+Nouveau texte à analyser :
 {text}
 
-Provide your suggestions in the following format:
-1. Type of Change (Add/Modify/Remove)
-2. Entity or Relationship affected
-3. Proposed change
-4. Justification for the change
+Contexte supplémentaire :
+{context}
 
-Ensure that your suggestions maintain the coherence and relevance of the ontology while incorporating new information from the text.
-Use the original document language
+Votre tâche :
+1. Analyser le nouveau texte et le contexte.
+2. Identifier les nouvelles entités et relations pertinentes.
+3. Intégrer ces nouvelles informations dans l'ontologie existante.
+4. Raffiner les entités et relations existantes si nécessaire.
+5. Assurer la cohérence globale de l'ontologie.
 
+Fournissez l'ontologie enrichie et raffinée dans le format suivant :
+- Pour les entités : Nom_Entité\tType_Entité\tDescription
+- Pour les relations : Entité_Source\tType_Relation\tEntité_Cible\tDescription
+
+Assurez-vous que chaque élément de l'ontologie est pertinent et contribue à une représentation complète et cohérente du domaine.
+Utilisez la langue originale du document. Répondez silencieusement, sans commentaires additionnels.
 `)
 )
