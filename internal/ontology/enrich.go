@@ -64,7 +64,7 @@ var enrichCmd = &cobra.Command{
 			case "Segmenting":
 				log.Info("Segmenting input into %d parts", info.TotalSegments)
 			case "Processing Segment":
-				log.Info("Processing segment %d of %d", info.ProcessedSegments, info.TotalSegments)
+				log.Debug("Processing segment %d of %d", info.ProcessedSegments, info.TotalSegments)
 			}
 		})
 

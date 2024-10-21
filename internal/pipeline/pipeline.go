@@ -93,8 +93,6 @@ func (p *Pipeline) ExecutePipeline(input string, output string, passes int, exis
 				CurrentStep: "Starting Pass",
 			})
 		}
-		p.logger.Info(i18n.GetMessage("StartingPass"), i+1)
-
 		initialTokenCount := len(tke.Encode(result, nil, nil))
 		p.logger.Info("Starting pass %d with initial result token count: %d", i+1, initialTokenCount)
 
@@ -132,14 +130,24 @@ func truncateString(s string, maxLength int) string {
 }
 
 func (p *Pipeline) processSinglePass(input string, previousResult string) (string, error) {
-	p.logger.Debug("Processing single pass, input length: %d, previous result length: %d", len(input), len(previousResult))
+	// Initialiser le tokenizer
+	tke, err := tiktoken.GetEncoding("cl100k_base")
+	if err != nil {
+		p.logger.Error("Failed to initialize tokenizer: %v", err)
+		return "", fmt.Errorf("failed to initialize tokenizer: %w", err)
+	}
+
+	inputTokens := len(tke.Encode(input, nil, nil))
+	previousResultTokens := len(tke.Encode(previousResult, nil, nil))
+	p.logger.Info("Processing single pass, input tokens: %d, previous result tokens: %d", inputTokens, previousResultTokens)
 
 	content, err := p.parseInput(input)
 	if err != nil {
 		p.logger.Error("Failed to parse input: %v", err)
 		return "", err
 	}
-	p.logger.Debug("Parsed content length: %d", len(content))
+	contentTokens := len(tke.Encode(string(content), nil, nil))
+	p.logger.Info("Parsed content tokens: %d", contentTokens)
 
 	segments, err := segmenter.Segment(content, segmenter.SegmentConfig{
 		MaxTokens:   p.config.MaxTokens,
@@ -150,7 +158,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 		p.logger.Error("Failed to segment content: %v", err)
 		return "", fmt.Errorf("%s: %w", i18n.GetMessage("ErrSegmentContent"), err)
 	}
-	p.logger.Debug("Number of segments: %d", len(segments))
+	p.logger.Info("Number of segments: %d", len(segments))
 
 	if p.progressCallback != nil {
 		p.progressCallback(ProgressInfo{
@@ -165,7 +173,8 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 		wg.Add(1)
 		go func(i int, seg []byte) {
 			defer wg.Done()
-			p.logger.Debug("Processing segment %d/%d, length: %d", i+1, len(segments), len(seg))
+			segmentTokens := len(tke.Encode(string(seg), nil, nil))
+			p.logger.Debug("Processing segment %d/%d, tokens: %d", i+1, len(segments), segmentTokens)
 			context := segmenter.GetContext(segments, i, segmenter.SegmentConfig{
 				MaxTokens:   p.config.MaxTokens,
 				ContextSize: p.config.ContextSize,
@@ -176,8 +185,9 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i+1, err)
 				return
 			}
+			resultTokens := len(tke.Encode(result, nil, nil))
 			results[i] = result
-			p.logger.Debug("Segment %d processed successfully, result length: %d", i+1, len(result))
+			p.logger.Info("Segment %d processed successfully, result tokens: %d", i+1, resultTokens)
 			if p.progressCallback != nil {
 				p.progressCallback(ProgressInfo{
 					CurrentStep:       "Processing Segment",
@@ -189,7 +199,17 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 	}
 	wg.Wait()
 
-	return p.combineResults(results)
+	// Fusionner les résultats de tous les segments
+	mergedResult, err := p.mergeResults(previousResult, results)
+	if err != nil {
+		p.logger.Error("Failed to merge segment results: %v", err)
+		return "", fmt.Errorf("failed to merge segment results: %w", err)
+	}
+
+	mergedResultTokens := len(tke.Encode(mergedResult, nil, nil))
+	p.logger.Info("Merged result tokens: %d", mergedResultTokens)
+
+	return mergedResult, nil
 }
 
 func (p *Pipeline) parseInput(input string) ([]byte, error) {
@@ -247,33 +267,38 @@ func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {
 func (p *Pipeline) processSegment(segment []byte, context string, previousResult string) (string, error) {
 	p.logger.Debug("Processing segment of length %d", len(segment))
 
-	// Extraction d'entités
-	entityValues := map[string]string{
+	enrichmentValues := map[string]string{
 		"text":            string(segment),
 		"context":         context,
 		"previous_result": previousResult,
 	}
-	entityResult, err := p.llm.ProcessWithPrompt(prompt.EntityExtractionPrompt, entityValues)
+
+	enrichedResult, err := p.llm.ProcessWithPrompt(prompt.OntologyEnrichmentPrompt, enrichmentValues)
 	if err != nil {
-		return "", fmt.Errorf("entity extraction failed: %w", err)
+		return "", fmt.Errorf("ontology enrichment failed: %w", err)
 	}
 
-	// Extraction de relations
-	relationValues := map[string]string{
-		"text":            string(segment),
-		"entities":        entityResult,
-		"context":         context,
-		"previous_result": previousResult,
-	}
-	relationResult, err := p.llm.ProcessWithPrompt(prompt.RelationExtractionPrompt, relationValues)
-	if err != nil {
-		return "", fmt.Errorf("relation extraction failed: %w", err)
+	p.logger.Debug("Enriched ontology:\n%s", enrichedResult)
+	return enrichedResult, nil
+}
+
+func (p *Pipeline) mergeResults(previousResult string, newResults []string) (string, error) {
+	// Combiner tous les nouveaux résultats
+	combinedNewResults := strings.Join(newResults, "\n")
+
+	// Préparer les valeurs pour le prompt de fusion
+	mergeValues := map[string]string{
+		"previous_ontology": previousResult,
+		"new_ontology":      combinedNewResults,
 	}
 
-	// Combinez les résultats et retournez-les
-	result := entityResult + "\n" + relationResult
-	p.logger.Debug("Combined LLM output:\n%s", result)
-	return result, nil
+	// Utiliser le LLM pour fusionner les résultats
+	mergedResult, err := p.llm.ProcessWithPrompt(prompt.OntologyMergePrompt, mergeValues)
+	if err != nil {
+		return "", fmt.Errorf("ontology merge failed: %w", err)
+	}
+
+	return mergedResult, nil
 }
 
 func (p *Pipeline) combineResults(results []string) (string, error) {

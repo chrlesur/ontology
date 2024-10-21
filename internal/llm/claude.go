@@ -47,7 +47,7 @@ func NewClaudeClient(apiKey string, model string) (*ClaudeClient, error) {
 	return &ClaudeClient{
 		apiKey: apiKey,
 		model:  model,
-		client: &http.Client{Timeout: 30 * time.Second},
+		client: &http.Client{Timeout: 60 * time.Second},
 		config: config.GetConfig(),
 	}, nil
 }
@@ -67,8 +67,7 @@ func (c *ClaudeClient) Translate(prompt string, context string) (string, error) 
 		log.Debug("Attempt %d of %d", attempt+1, maxRetries)
 		result, err = c.makeRequest(prompt, context)
 		if err == nil {
-			log.Info(i18n.Messages.TranslationCompleted, "Claude", c.model)
-			log.Debug("Translation successful, result length: %d", len(result))
+			log.Debug(i18n.Messages.TranslationCompleted, "Claude", c.model)
 			return result, nil
 		}
 
