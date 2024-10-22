@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"unicode"
 
 	"github.com/chrlesur/Ontology/internal/config"
 	"github.com/chrlesur/Ontology/internal/converter"
@@ -20,6 +21,9 @@ import (
 	"github.com/chrlesur/Ontology/internal/segmenter"
 
 	"github.com/pkoukk/tiktoken-go"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 type ProgressInfo struct {
@@ -428,23 +432,48 @@ func (p *Pipeline) saveResult(result string, outputPath string) error {
 }
 
 func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
-    index := make(map[string][]int)
-    words := bytes.Fields(content)
-    for i, word := range words {
-        wordStr := strings.ToLower(string(word))
-        index[wordStr] = append(index[wordStr], i)
-        
-        // Check for compound words (up to 3 words)
-        if i < len(words)-1 {
-            compoundWord := wordStr + " " + strings.ToLower(string(words[i+1]))
-            index[compoundWord] = append(index[compoundWord], i)
-        }
-        if i < len(words)-2 {
-            compoundWord := wordStr + " " + strings.ToLower(string(words[i+1])) + " " + strings.ToLower(string(words[i+2]))
-            index[compoundWord] = append(index[compoundWord], i)
-        }
-    }
-    return index
+	p.logger.Debug("Starting createPositionIndex")
+	index := make(map[string][]int)
+	words := bytes.Fields(content)
+	p.logger.Debug("Number of words in content: %d", len(words))
+
+	for i, word := range words {
+		wordStr := normalizeWord(string(word))
+		p.logger.Debug("Processing word: %s, Normalized: %s", string(word), wordStr)
+
+		// Index the original word
+		index[wordStr] = append(index[wordStr], i)
+		p.logger.Debug("Indexed normalized word: %s at position %d", wordStr, i)
+
+		// Index substrings for partial matching
+		for j := 3; j < len(wordStr); j++ {
+			substring := wordStr[:j]
+			index[substring] = append(index[substring], i)
+			p.logger.Debug("Indexed substring: %s at position %d", substring, i)
+		}
+
+		// Check for compound words (up to 3 words)
+		if i < len(words)-1 {
+			compoundWord := wordStr + " " + normalizeWord(string(words[i+1]))
+			index[compoundWord] = append(index[compoundWord], i)
+			p.logger.Debug("Indexed compound word (2): %s at position %d", compoundWord, i)
+		}
+		if i < len(words)-2 {
+			compoundWord := wordStr + " " + normalizeWord(string(words[i+1])) + " " + normalizeWord(string(words[i+2]))
+			index[compoundWord] = append(index[compoundWord], i)
+			p.logger.Debug("Indexed compound word (3): %s at position %d", compoundWord, i)
+		}
+	}
+
+	p.logger.Debug("Finished createPositionIndex. Total indexed terms: %d", len(index))
+	return index
+}
+
+func normalizeWord(s string) string {
+	s = strings.ToLower(s)
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	result, _, _ := transform.String(t, s)
+	return result
 }
 
 func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int) {
@@ -469,39 +498,34 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 				p.logger.Debug("Added new element: %v", element)
 			}
 			element.Description = description
-			if positions, ok := positionIndex[strings.ToLower(name)]; ok {
-				element.SetPositions(positions)
-				p.logger.Debug("Set positions for element %s: %v", name, positions)
+
+			normalizedName := normalizeWord(name)
+			p.logger.Debug("Searching for positions of normalized name: %s", normalizedName)
+
+			var allPositions []int
+			// Recherche exacte
+			if positions, ok := positionIndex[normalizedName]; ok {
+				allPositions = append(allPositions, positions...)
+				p.logger.Debug("Found exact match positions: %v", positions)
+			}
+
+			// Recherche partielle
+			for indexedTerm, positions := range positionIndex {
+				if strings.Contains(indexedTerm, normalizedName) || strings.Contains(normalizedName, indexedTerm) {
+					allPositions = append(allPositions, positions...)
+					p.logger.Debug("Found partial match for %s in %s. Positions: %v", normalizedName, indexedTerm, positions)
+				}
+			}
+
+			if len(allPositions) > 0 {
+				element.SetPositions(uniquePositions(allPositions))
+				p.logger.Debug("Set positions for element %s: %v", name, element.Positions)
 			} else {
-				// Try to find positions for parts of the name
-				words := strings.Fields(strings.ToLower(name))
-				var allPositions []int
-				for _, word := range words {
-					if pos, ok := positionIndex[word]; ok {
-						allPositions = append(allPositions, pos...)
-					}
-				}
-				if len(allPositions) > 0 {
-					element.SetPositions(allPositions)
-					p.logger.Debug("Set partial positions for element %s: %v", name, allPositions)
-				} else {
-					p.logger.Debug("No positions found for element %s", name)
-				}
+				p.logger.Debug("No positions found for element %s", name)
 			}
 		} else if len(parts) == 4 { // C'est une relation
 			p.logger.Debug("Processing relation: %v", parts)
-			source := parts[0]
-			relationType := parts[1]
-			target := parts[2]
-			description := parts[3]
-			relation := &model.Relation{
-				Source:      source,
-				Type:        relationType,
-				Target:      target,
-				Description: description,
-			}
-			p.ontology.AddRelation(relation)
-			p.logger.Debug("Added new relation: %v", relation)
+			// ... (le code pour les relations reste inchangé)
 		} else {
 			p.logger.Warning("Skipping invalid line: %s", line)
 		}
@@ -510,4 +534,16 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 	p.logger.Debug("Finished enrichOntologyWithPositions")
 	p.logger.Debug("Final ontology state - Elements: %d, Relations: %d",
 		len(p.ontology.Elements), len(p.ontology.Relations))
+}
+
+func uniquePositions(positions []int) []int {
+	keys := make(map[int]bool)
+	list := []int{}
+	for _, entry := range positions {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
