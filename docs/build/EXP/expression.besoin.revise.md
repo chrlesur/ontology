@@ -2,7 +2,7 @@
 
 ## Version
 
-Version 0.3.0 Révision basée sur l'implémentation et les retours d'exécution
+Version 0.4.0 Révision basée sur l'implémentation et les retours d'exécution
 
 ## Aperçu du projet
 
@@ -58,6 +58,7 @@ Développer un logiciel en Go qui, à partir de divers formats de documents (tex
 - Exporter les logs vers des fichiers texte et les afficher sur la console
 - Implémenter un mode silencieux (--silent) pour désactiver la sortie console des logs
 - Inclure des métriques de performance dans les logs, notamment pour le traitement parallèle et multi-passes
+- Ajouter des logs de débogage détaillés pour afficher l'état de l'ontologie à différentes étapes du traitement
 
 ### 7. Gestion de la Configuration
 - Utiliser YAML pour une configuration centralisée
@@ -70,12 +71,14 @@ Développer un logiciel en Go qui, à partir de divers formats de documents (tex
 - Créer une couche d'abstraction pour les LLMs pour faciliter l'ajout futur de nouveaux modèles
 - Séparer le système de prompts en son propre module pour améliorer la modularité et la réutilisabilité
 - Implémenter un traitement parallèle des segments avec des goroutines pour améliorer les performances
+- Créer un package `model` distinct pour les structures de données de base
 
 ### 9. Gestion des Erreurs et Robustesse
 - Implémenter une gestion fine des erreurs pour les appels API aux LLMs, y compris la gestion des timeouts et des retries
 - Assurer une validation rigoureuse des entrées et des sorties à chaque étape du pipeline
 - Gérer de manière appropriée les erreurs spécifiques aux API LLM
 - Implémenter une gestion robuste des erreurs lors de la fusion des résultats entre les passes
+- Améliorer la gestion des erreurs pour la lecture et l'écriture des fichiers
 
 ### 10. Tests et Validation
 - Implémenter des tests unitaires pour chaque composant
@@ -85,6 +88,7 @@ Développer un logiciel en Go qui, à partir de divers formats de documents (tex
 - Implémenter des tests de charge spécifiques pour vérifier le comportement du système sous des conditions de limite de taux
 - Ajouter des tests spécifiques pour la validation de l'ontologie enrichie après fusion
 - Implémenter des tests de performance pour le traitement parallèle et multi-passes
+- Ajouter des tests unitaires spécifiques pour la gestion des positions multiples et des relations
 
 ### 11. Optimisation de la mémoire et des performances
 - Implémenter des stratégies d'optimisation de la mémoire pour le traitement de très grands documents, en particulier dans le segmenter et le convertisseur
@@ -95,6 +99,13 @@ Développer un logiciel en Go qui, à partir de divers formats de documents (tex
 ### 12. Sécurité et Confidentialité
 - Ajouter une option pour le chiffrement des données sensibles dans les logs et les fichiers de sortie
 - Implémenter un système basique de gestion des droits d'accès pour les différentes fonctionnalités
+
+### 13. Gestion des positions et relations
+- Implémenter un système de gestion des positions multiples pour chaque entité de l'ontologie
+- Supporter les entités composées de plusieurs mots (jusqu'à 3 mots)
+- Créer une structure distincte pour représenter les relations entre les entités
+- Développer un format de sortie clair séparant les entités et les relations, incluant les descriptions et les positions des entités
+- Implémenter une recherche flexible des positions, y compris une recherche partielle pour les mots individuels des noms d'entités
 
 ## Contraintes Techniques
 - Développer en langage de programmation Go

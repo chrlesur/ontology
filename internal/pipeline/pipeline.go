@@ -428,23 +428,23 @@ func (p *Pipeline) saveResult(result string, outputPath string) error {
 }
 
 func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
-	index := make(map[string][]int)
-	words := bytes.Fields(content)
-	for i, word := range words {
-		wordStr := strings.ToLower(string(word))
-		index[wordStr] = append(index[wordStr], i)
-
-		// Check for compound words (up to 3 words)
-		if i < len(words)-1 {
-			compoundWord := wordStr + " " + strings.ToLower(string(words[i+1]))
-			index[compoundWord] = append(index[compoundWord], i)
-		}
-		if i < len(words)-2 {
-			compoundWord := wordStr + " " + strings.ToLower(string(words[i+1])) + " " + strings.ToLower(string(words[i+2]))
-			index[compoundWord] = append(index[compoundWord], i)
-		}
-	}
-	return index
+    index := make(map[string][]int)
+    words := bytes.Fields(content)
+    for i, word := range words {
+        wordStr := strings.ToLower(string(word))
+        index[wordStr] = append(index[wordStr], i)
+        
+        // Check for compound words (up to 3 words)
+        if i < len(words)-1 {
+            compoundWord := wordStr + " " + strings.ToLower(string(words[i+1]))
+            index[compoundWord] = append(index[compoundWord], i)
+        }
+        if i < len(words)-2 {
+            compoundWord := wordStr + " " + strings.ToLower(string(words[i+1])) + " " + strings.ToLower(string(words[i+2]))
+            index[compoundWord] = append(index[compoundWord], i)
+        }
+    }
+    return index
 }
 
 func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int) {
