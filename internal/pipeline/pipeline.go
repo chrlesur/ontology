@@ -21,9 +21,6 @@ import (
 	"github.com/chrlesur/Ontology/internal/segmenter"
 
 	"github.com/pkoukk/tiktoken-go"
-	"golang.org/x/text/runes"
-	"golang.org/x/text/transform"
-	"golang.org/x/text/unicode/norm"
 )
 
 type ProgressInfo struct {
@@ -445,23 +442,36 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 		index[wordStr] = append(index[wordStr], i)
 		p.logger.Debug("Indexed normalized word: %s at position %d", wordStr, i)
 
-		// Index substrings for partial matching
-		for j := 3; j < len(wordStr); j++ {
-			substring := wordStr[:j]
-			index[substring] = append(index[substring], i)
-			p.logger.Debug("Indexed substring: %s at position %d", substring, i)
-		}
-
 		// Check for compound words (up to 3 words)
 		if i < len(words)-1 {
 			compoundWord := wordStr + " " + normalizeWord(string(words[i+1]))
 			index[compoundWord] = append(index[compoundWord], i)
 			p.logger.Debug("Indexed compound word (2): %s at position %d", compoundWord, i)
+
+			// Index individual words and their combinations
+			w1 := wordStr
+			w2 := normalizeWord(string(words[i+1]))
+			index[w1] = append(index[w1], i)
+			index[w2] = append(index[w2], i+1)
+			index[w1+" "+w2] = append(index[w1+" "+w2], i)
+			index[w2+" "+w1] = append(index[w2+" "+w1], i)
 		}
 		if i < len(words)-2 {
 			compoundWord := wordStr + " " + normalizeWord(string(words[i+1])) + " " + normalizeWord(string(words[i+2]))
 			index[compoundWord] = append(index[compoundWord], i)
 			p.logger.Debug("Indexed compound word (3): %s at position %d", compoundWord, i)
+
+			// Index individual words and their combinations
+			w1 := wordStr
+			w2 := normalizeWord(string(words[i+1]))
+			w3 := normalizeWord(string(words[i+2]))
+			index[w1] = append(index[w1], i)
+			index[w2] = append(index[w2], i+1)
+			index[w3] = append(index[w3], i+2)
+			index[w1+" "+w2] = append(index[w1+" "+w2], i)
+			index[w2+" "+w3] = append(index[w2+" "+w3], i+1)
+			index[w1+" "+w3] = append(index[w1+" "+w3], i)
+			index[w1+" "+w2+" "+w3] = append(index[w1+" "+w2+" "+w3], i)
 		}
 	}
 
@@ -469,16 +479,8 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 	return index
 }
 
-func normalizeWord(s string) string {
-	s = strings.ToLower(s)
-	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
-	result, _, _ := transform.String(t, s)
-	return result
-}
-
 func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int) {
 	p.logger.Debug("Starting enrichOntologyWithPositions")
-	p.logger.Debug("Enriched result: %s", enrichedResult)
 
 	lines := strings.Split(enrichedResult, "\n")
 	p.logger.Debug("Number of lines to process: %d", len(lines))
@@ -499,23 +501,7 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 			}
 			element.Description = description
 
-			normalizedName := normalizeWord(name)
-			p.logger.Debug("Searching for positions of normalized name: %s", normalizedName)
-
-			var allPositions []int
-			// Recherche exacte
-			if positions, ok := positionIndex[normalizedName]; ok {
-				allPositions = append(allPositions, positions...)
-				p.logger.Debug("Found exact match positions: %v", positions)
-			}
-
-			// Recherche partielle
-			for indexedTerm, positions := range positionIndex {
-				if strings.Contains(indexedTerm, normalizedName) || strings.Contains(normalizedName, indexedTerm) {
-					allPositions = append(allPositions, positions...)
-					p.logger.Debug("Found partial match for %s in %s. Positions: %v", normalizedName, indexedTerm, positions)
-				}
-			}
+			allPositions := p.findPositions(name, positionIndex)
 
 			if len(allPositions) > 0 {
 				element.SetPositions(uniquePositions(allPositions))
@@ -525,15 +511,22 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 			}
 		} else if len(parts) == 4 { // C'est une relation
 			p.logger.Debug("Processing relation: %v", parts)
-			// ... (le code pour les relations reste inchangé)
+			source := parts[0]
+			relationType := parts[1]
+			target := parts[2]
+			description := parts[3]
+			relation := &model.Relation{
+				Source:      source,
+				Type:        relationType,
+				Target:      target,
+				Description: description,
+			}
+			p.ontology.AddRelation(relation)
+			p.logger.Debug("Added new relation: %v", relation)
 		} else {
 			p.logger.Warning("Skipping invalid line: %s", line)
 		}
 	}
-
-	p.logger.Debug("Finished enrichOntologyWithPositions")
-	p.logger.Debug("Final ontology state - Elements: %d, Relations: %d",
-		len(p.ontology.Elements), len(p.ontology.Relations))
 }
 
 func uniquePositions(positions []int) []int {
@@ -546,4 +539,58 @@ func uniquePositions(positions []int) []int {
 		}
 	}
 	return list
+}
+
+func (p *Pipeline) findPositions(word string, index map[string][]int) []int {
+	normalizedWord := normalizeWord(word)
+	p.logger.Debug("Searching for positions of normalized word: [%s]", normalizedWord)
+
+	if positions, ok := index[normalizedWord]; ok {
+		p.logger.Debug("Found exact match positions for [%s]: %v", normalizedWord, positions)
+		return positions
+	}
+
+	words := strings.Fields(normalizedWord)
+	if len(words) > 1 {
+		var allPositions []int
+		for _, w := range words {
+			if positions, ok := index[w]; ok {
+				allPositions = append(allPositions, positions...)
+				p.logger.Debug("Found positions for word %s: %v", w, positions)
+			}
+		}
+		if len(allPositions) > 0 {
+			return allPositions
+		}
+	}
+
+	// Recherche partielle
+	var allPositions []int
+	for indexedWord, positions := range index {
+		if strings.Contains(indexedWord, normalizedWord) || strings.Contains(normalizedWord, indexedWord) {
+			allPositions = append(allPositions, positions...)
+			p.logger.Debug("Found partial match for [%s] in [%s]. Positions: %v", normalizedWord, indexedWord, positions)
+		}
+	}
+
+	if len(allPositions) == 0 {
+		p.logger.Debug("No positions found for [%s]", normalizedWord)
+	}
+
+	return allPositions
+}
+
+func normalizeWord(word string) string {
+	// Convertir en minuscules
+	word = strings.ToLower(word)
+	// Remplacer les underscores par des espaces
+	word = strings.ReplaceAll(word, "_", " ")
+	// Supprimer la ponctuation et les caractères non alphanumériques, sauf les espaces
+	word = strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == ' ' {
+			return r
+		}
+		return -1
+	}, word)
+	return strings.TrimSpace(word)
 }
