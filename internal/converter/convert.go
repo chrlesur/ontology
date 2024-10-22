@@ -24,8 +24,16 @@ func (qsc *QuickStatementConverter) Convert(segment []byte, context string, onto
 
 	var tsvBuilder strings.Builder
 	for _, stmt := range statements {
-		// Écrire la ligne TSV
-		tsvLine := fmt.Sprintf("%s\t%s\t%s\n", stmt.Subject.ID, stmt.Property.ID, stmt.Object)
+		// Vérifier si l'objet contient des positions
+		objectParts := strings.Split(stmt.Object.(string), "@")
+		object := objectParts[0]
+		positions := ""
+		if len(objectParts) > 1 {
+			positions = "@" + objectParts[1]
+		}
+
+		// Écrire la ligne TSV avec les positions si elles existent
+		tsvLine := fmt.Sprintf("%s\t%s\t%s%s\n", stmt.Subject.ID, stmt.Property.ID, object, positions)
 		tsvBuilder.WriteString(tsvLine)
 	}
 

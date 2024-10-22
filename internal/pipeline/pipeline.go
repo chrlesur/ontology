@@ -1,6 +1,7 @@
 package pipeline
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -13,6 +14,7 @@ import (
 	"github.com/chrlesur/Ontology/internal/i18n"
 	"github.com/chrlesur/Ontology/internal/llm"
 	"github.com/chrlesur/Ontology/internal/logger"
+	"github.com/chrlesur/Ontology/internal/model"
 	"github.com/chrlesur/Ontology/internal/parser"
 	"github.com/chrlesur/Ontology/internal/prompt"
 	"github.com/chrlesur/Ontology/internal/segmenter"
@@ -36,6 +38,7 @@ type Pipeline struct {
 	logger           *logger.Logger
 	llm              llm.Client
 	progressCallback ProgressCallback
+	ontology         *model.Ontology
 }
 
 // NewPipeline creates a new instance of the processing pipeline
@@ -49,9 +52,10 @@ func NewPipeline() (*Pipeline, error) {
 	}
 
 	return &Pipeline{
-		config: cfg,
-		logger: log,
-		llm:    client,
+		config:   cfg,
+		logger:   log,
+		llm:      client,
+		ontology: model.NewOntology(),
 	}, nil
 }
 
@@ -61,7 +65,7 @@ func (p *Pipeline) SetProgressCallback(callback ProgressCallback) {
 }
 
 // ExecutePipeline orchestrates the entire workflow
-func (p *Pipeline) ExecutePipeline(input string, output string, passes int, existingOntology string) error {
+func (p *Pipeline) ExecutePipeline(input string, output string, passes int, existingOntology string, ontology *model.Ontology) error {
 	p.logger.Info(i18n.GetMessage("StartingPipeline"))
 	p.logger.Debug("Input: %s, Output: %s, Passes: %d, Existing Ontology: %s", input, output, passes, existingOntology)
 
@@ -146,6 +150,9 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 		p.logger.Error("Failed to parse input: %v", err)
 		return "", err
 	}
+
+	positionIndex := p.createPositionIndex(content)
+
 	contentTokens := len(tke.Encode(string(content), nil, nil))
 	p.logger.Info("Parsed content tokens: %d", contentTokens)
 
@@ -180,7 +187,8 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 				ContextSize: p.config.ContextSize,
 				Model:       p.config.DefaultModel,
 			})
-			result, err := p.processSegment(seg, context, previousResult)
+			// Modifier l'appel à processSegment pour inclure positionIndex
+			result, err := p.processSegment(seg, context, previousResult, positionIndex)
 			if err != nil {
 				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i+1, err)
 				return
@@ -264,7 +272,7 @@ func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {
 	return content, nil
 }
 
-func (p *Pipeline) processSegment(segment []byte, context string, previousResult string) (string, error) {
+func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, positionIndex map[string][]int) (string, error) {
 	p.logger.Debug("Processing segment of length %d", len(segment))
 
 	enrichmentValues := map[string]string{
@@ -278,8 +286,28 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 		return "", fmt.Errorf("ontology enrichment failed: %w", err)
 	}
 
-	p.logger.Debug("Enriched ontology:\n%s", enrichedResult)
+	p.logger.Debug("Enriched result before position enrichment:\n%s", enrichedResult)
+
+	// Enrichir l'ontologie avec les positions
+	p.enrichOntologyWithPositions(enrichedResult, positionIndex)
+
+	p.logger.Debug("Enriched ontology after position enrichment:\n%s", p.ontologyToString())
+
 	return enrichedResult, nil
+}
+
+// Ajoutez cette fonction auxiliaire pour afficher l'ontologie sous forme de chaîne
+func (p *Pipeline) ontologyToString() string {
+	var result strings.Builder
+	result.WriteString("Elements:\n")
+	for _, element := range p.ontology.Elements {
+		result.WriteString(fmt.Sprintf("  %s (%s): %s - Positions: %v\n", element.Name, element.Type, element.Description, element.Positions))
+	}
+	result.WriteString("Relations:\n")
+	for _, relation := range p.ontology.Relations {
+		result.WriteString(fmt.Sprintf("  %s %s %s: %s\n", relation.Source, relation.Type, relation.Target, relation.Description))
+	}
+	return result.String()
 }
 
 func (p *Pipeline) mergeResults(previousResult string, newResults []string) (string, error) {
@@ -315,12 +343,38 @@ func (p *Pipeline) loadExistingOntology(path string) (string, error) {
 }
 
 func (p *Pipeline) saveResult(result string, outputPath string) error {
-	qsc := converter.NewQuickStatementConverter(p.logger)
+	p.logger.Debug("Starting saveResult")
+	p.logger.Debug("Number of elements in ontology: %d", len(p.ontology.Elements))
+	p.logger.Debug("Number of relations in ontology: %d", len(p.ontology.Relations))
 
-	qs, err := qsc.Convert([]byte(result), "", "") // Nous utilisons des chaînes vides pour context et ontology pour l'instant
-	if err != nil {
-		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertQuickStatement"), err)
+	var quickStatements strings.Builder
+
+	// Écrire les éléments
+	p.logger.Debug("Writing elements:")
+	for _, element := range p.ontology.Elements {
+		p.logger.Debug("Raw positions for %s: %v", element.Name, element.Positions)
+		positions := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(element.Positions)), ","), "[]")
+		if line := strings.TrimSpace(fmt.Sprintf("%s\t%s\t%s\t%s", element.Name, element.Type, element.Description, positions)); line != "" {
+			quickStatements.WriteString(line + "\n")
+			p.logger.Debug("Element: %s", line)
+		} else {
+			p.logger.Warning("Skipping empty element: %v", element)
+		}
 	}
+
+	// Écrire les relations
+	p.logger.Debug("Writing relations:")
+	for _, relation := range p.ontology.Relations {
+		if line := strings.TrimSpace(fmt.Sprintf("%s\t%s\t%s\t%s", relation.Source, relation.Type, relation.Target, relation.Description)); line != "" {
+			quickStatements.WriteString(line + "\n")
+			p.logger.Debug("Relation: %s", line)
+		} else {
+			p.logger.Warning("Skipping empty relation: %v", relation)
+		}
+	}
+
+	qs := quickStatements.String()
+	p.logger.Debug("Full TSV content:\n%s", qs)
 
 	dir := filepath.Dir(outputPath)
 	baseName := filepath.Base(outputPath)
@@ -328,34 +382,132 @@ func (p *Pipeline) saveResult(result string, outputPath string) error {
 	nameWithoutExt := strings.TrimSuffix(baseName, ext)
 
 	tsvPath := filepath.Join(dir, nameWithoutExt+".tsv")
-	err = ioutil.WriteFile(tsvPath, []byte(qs), 0644)
+	err := ioutil.WriteFile(tsvPath, []byte(qs), 0644)
 	if err != nil {
+		p.logger.Error("Failed to write TSV file: %v", err)
 		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOutput"), err)
 	}
+	p.logger.Debug("TSV file written: %s", tsvPath)
+
+	qsc := converter.NewQuickStatementConverter(p.logger)
 
 	if p.config.ExportRDF {
+		p.logger.Debug("Exporting RDF")
 		rdf, err := qsc.ConvertToRDF(qs)
 		if err != nil {
+			p.logger.Error("Failed to convert to RDF: %v", err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertRDF"), err)
 		}
 		rdfPath := filepath.Join(dir, nameWithoutExt+".rdf")
 		err = ioutil.WriteFile(rdfPath, []byte(rdf), 0644)
 		if err != nil {
+			p.logger.Error("Failed to write RDF file: %v", err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteRDF"), err)
 		}
+		p.logger.Debug("RDF file written: %s", rdfPath)
 	}
 
 	if p.config.ExportOWL {
+		p.logger.Debug("Exporting OWL")
 		owl, err := qsc.ConvertToOWL(qs)
 		if err != nil {
+			p.logger.Error("Failed to convert to OWL: %v", err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertOWL"), err)
 		}
 		owlPath := filepath.Join(dir, nameWithoutExt+".owl")
 		err = ioutil.WriteFile(owlPath, []byte(owl), 0644)
 		if err != nil {
+			p.logger.Error("Failed to write OWL file: %v", err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOWL"), err)
+		}
+		p.logger.Debug("OWL file written: %s", owlPath)
+	}
+
+	p.logger.Debug("Finished saveResult")
+	return nil
+}
+
+func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
+	index := make(map[string][]int)
+	words := bytes.Fields(content)
+	for i, word := range words {
+		wordStr := strings.ToLower(string(word))
+		index[wordStr] = append(index[wordStr], i)
+
+		// Check for compound words (up to 3 words)
+		if i < len(words)-1 {
+			compoundWord := wordStr + " " + strings.ToLower(string(words[i+1]))
+			index[compoundWord] = append(index[compoundWord], i)
+		}
+		if i < len(words)-2 {
+			compoundWord := wordStr + " " + strings.ToLower(string(words[i+1])) + " " + strings.ToLower(string(words[i+2]))
+			index[compoundWord] = append(index[compoundWord], i)
+		}
+	}
+	return index
+}
+
+func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int) {
+	p.logger.Debug("Starting enrichOntologyWithPositions")
+	p.logger.Debug("Enriched result: %s", enrichedResult)
+
+	lines := strings.Split(enrichedResult, "\n")
+	p.logger.Debug("Number of lines to process: %d", len(lines))
+
+	for i, line := range lines {
+		p.logger.Debug("Processing line %d: %s", i, line)
+		parts := strings.Split(line, "\t")
+		if len(parts) == 3 { // C'est une entité
+			p.logger.Debug("Processing entity: %v", parts)
+			name := parts[0]
+			elementType := parts[1]
+			description := parts[2]
+			element := p.ontology.GetElementByName(name)
+			if element == nil {
+				element = model.NewOntologyElement(name, elementType)
+				p.ontology.AddElement(element)
+				p.logger.Debug("Added new element: %v", element)
+			}
+			element.Description = description
+			if positions, ok := positionIndex[strings.ToLower(name)]; ok {
+				element.SetPositions(positions)
+				p.logger.Debug("Set positions for element %s: %v", name, positions)
+			} else {
+				// Try to find positions for parts of the name
+				words := strings.Fields(strings.ToLower(name))
+				var allPositions []int
+				for _, word := range words {
+					if pos, ok := positionIndex[word]; ok {
+						allPositions = append(allPositions, pos...)
+					}
+				}
+				if len(allPositions) > 0 {
+					element.SetPositions(allPositions)
+					p.logger.Debug("Set partial positions for element %s: %v", name, allPositions)
+				} else {
+					p.logger.Debug("No positions found for element %s", name)
+				}
+			}
+		} else if len(parts) == 4 { // C'est une relation
+			p.logger.Debug("Processing relation: %v", parts)
+			source := parts[0]
+			relationType := parts[1]
+			target := parts[2]
+			description := parts[3]
+			relation := &model.Relation{
+				Source:      source,
+				Type:        relationType,
+				Target:      target,
+				Description: description,
+			}
+			p.ontology.AddRelation(relation)
+			p.logger.Debug("Added new relation: %v", relation)
+		} else {
+			p.logger.Warning("Skipping invalid line: %s", line)
 		}
 	}
 
-	return nil
+	p.logger.Debug("Finished enrichOntologyWithPositions")
+	p.logger.Debug("Final ontology state - Elements: %d, Relations: %d",
+		len(p.ontology.Elements), len(p.ontology.Relations))
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/chrlesur/Ontology/internal/i18n"
 	"github.com/chrlesur/Ontology/internal/logger"
+	"github.com/chrlesur/Ontology/internal/model"
 	"github.com/chrlesur/Ontology/internal/pipeline"
 	"github.com/spf13/cobra"
 )
@@ -68,7 +69,9 @@ var enrichCmd = &cobra.Command{
 			}
 		})
 
-		err = p.ExecutePipeline(absInput, output, passes, existingOntology)
+		ontology := model.NewOntology() // Utiliser le nouveau package model
+
+		err = p.ExecutePipeline(absInput, output, passes, existingOntology, ontology)
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Messages.ErrorExecutingPipeline, err)
 		}
@@ -93,19 +96,66 @@ func init() {
 	enrichCmd.Flags().StringVar(&existingOntology, "existing-ontology", "", i18n.Messages.ExistingOntologyFlagUsage)
 }
 
-func processDirectory(dirPath string) error {
-	return filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, owl, rdf bool) error {
+	log := logger.GetLogger()
+	log.Info(i18n.Messages.StartingEnrichProcess)
+
+	absInput, err := filepath.Abs(input)
+	if err != nil {
+		return fmt.Errorf("error getting absolute path: %w", err)
+	}
+
+	if output == "" {
+		output = generateOutputFilename(absInput, owl, rdf)
+	} else {
+		output, err = filepath.Abs(output)
 		if err != nil {
-			return err
+			return fmt.Errorf("error getting absolute path for output: %w", err)
 		}
-		if info.IsDir() {
-			if !recursive && path != dirPath {
-				return filepath.SkipDir
-			}
-			return nil
+	}
+
+	p, err := pipeline.NewPipeline()
+	if err != nil {
+		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
+	}
+
+	p.SetProgressCallback(func(info pipeline.ProgressInfo) {
+		switch info.CurrentStep {
+		case "Starting Pass":
+			log.Info("Starting pass %d of %d", info.CurrentPass, info.TotalPasses)
+		case "Segmenting":
+			log.Info("Segmenting input into %d parts", info.TotalSegments)
+		case "Processing Segment":
+			log.Debug("Processing segment %d of %d", info.ProcessedSegments, info.TotalSegments)
 		}
-		return processFile(path)
 	})
+
+	onto := model.NewOntology()
+	err = p.ExecutePipeline(absInput, output, passes, existingOntology, onto)
+	if err != nil {
+		return fmt.Errorf("%s: %w", i18n.Messages.ErrorExecutingPipeline, err)
+	}
+
+	log.Info(i18n.Messages.EnrichProcessCompleted)
+	log.Info("File processed: %s, output: %s", absInput, output)
+	return nil
+}
+
+func generateOutputFilename(input string, owl, rdf bool) string {
+	dir := filepath.Dir(input)
+	baseName := filepath.Base(input)
+	baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
+
+	var extension string
+	if owl {
+		extension = ".owl"
+	} else if rdf {
+		extension = ".rdf"
+	} else {
+		extension = ".tsv"
+	}
+
+	return filepath.Join(dir, baseName+extension)
 }
 
 func processFile(filePath string) error {
@@ -133,8 +183,9 @@ func processFile(filePath string) error {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 	}
 
-	// Passer le chemin de sortie à ExecutePipeline
-	err = p.ExecutePipeline(filePath, outputPath, passes, existingOntology)
+	ontology := model.NewOntology()
+
+	err = p.ExecutePipeline(filePath, outputPath, passes, existingOntology, ontology)
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorExecutingPipeline, err)
 	}
@@ -143,19 +194,17 @@ func processFile(filePath string) error {
 	return nil
 }
 
-func generateOutputFilename(input string, owl, rdf bool) string {
-	dir := filepath.Dir(input)
-	baseName := filepath.Base(input)
-	baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
-
-	var extension string
-	if owl {
-		extension = ".owl"
-	} else if rdf {
-		extension = ".rdf"
-	} else {
-		extension = ".tsv"
-	}
-
-	return filepath.Join(dir, baseName+extension)
+func processDirectory(dirPath string) error {
+	return filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if info.IsDir() {
+			if !recursive && path != dirPath {
+				return filepath.SkipDir
+			}
+			return nil
+		}
+		return processFile(path)
+	})
 }
