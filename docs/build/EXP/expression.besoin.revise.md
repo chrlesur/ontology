@@ -2,121 +2,115 @@
 
 ## Version
 
-Version 0.4.0 Révision basée sur l'implémentation et les retours d'exécution détaillés
+Version 0.4.0 Révision basée sur l'implémentation et les retours d'expérience
 
 ## Aperçu du projet
 
-Développer un logiciel en Go qui, à partir de divers formats de documents (texte, PDF, Markdown, HTML, DOCX), crée une ontologie au format QuickStatement pour être compatible avec Wikibase. Le logiciel doit identifier et extraire chaque élément d'information du document d'entrée, tout en gérant efficacement les très grands documents, les variations linguistiques et les termes composés.
+Développer un logiciel en Go qui, à partir de divers formats de documents (texte, PDF, Markdown, HTML, DOCX), crée une ontologie au format QuickStatement compatible avec Wikibase. Le logiciel doit identifier et extraire chaque élément d'information du document d'entrée, tout en gérant efficacement les très grands documents et en permettant un enrichissement itératif de l'ontologie, avec une flexibilité accrue dans la configuration et le traitement des données.
 
 ## Fonctionnalités principales
 
 ### 1. Support Multi-format d'Entrée
 - Accepter les entrées en formats texte, PDF, Markdown, HTML et DOCX
 - Implémenter des analyseurs robustes pour chaque format supporté
+- Pour les PDFs, utiliser la bibliothèque github.com/ledongthuc/pdf pour l'extraction de texte et de métadonnées
 - Prise en charge de très grands documents (dépassant 120 000 tokens)
 - Extraction cohérente des métadonnées à travers les différents formats
 
-### 2. Traitement linguistique et normalisation
-- Implémenter une fonction de normalisation robuste pour les mots et termes
-  - Conversion en minuscules
-  - Remplacement des underscores par des espaces
-  - Suppression de la ponctuation et des caractères non alphanumériques
-  - Gestion appropriée des espaces
-- Développer des méthodes pour gérer les variations linguistiques
-- Évaluer et potentiellement intégrer des bibliothèques de traitement du langage naturel
-
-### 3. Indexation et recherche de positions
-- Créer un système d'indexation sophistiqué
-  - Indexer les mots individuels et leurs combinaisons (jusqu'à 3 mots)
-  - Gérer efficacement les termes composés
-- Implémenter une fonction de recherche de positions avancée
-  - Supporter la recherche exacte et partielle
-  - Gérer efficacement les termes composés et leurs variations
-- Optimiser les performances d'indexation et de recherche pour les grands documents
-
-### 4. Génération et Enrichissement d'une ontologie
+### 2. Génération et Enrichissement d'une ontologie au format QuickStatement / Wikibase
 - Générer une sortie QuickStatement détaillée utilisant le vocabulaire Wikibase
 - Implémenter un processus d'enrichissement d'ontologie multi-passes
+- Utiliser des prompts spécifiques pour l'enrichissement initial et la fusion des résultats
 - Développer une logique de fusion intelligente pour intégrer les nouveaux résultats de manière cohérente
-- Gérer efficacement les positions multiples pour chaque concept
+- Gérer le contexte entre les segments et les passes d'enrichissement
+- Implémenter un traitement complexe des chaînes de caractères pour gérer correctement les caractères d'échappement
 - Assurer une extraction complète des informations des documents d'entrée
+- Découper les documents larges en segments basés sur le nombre de tokens
+- S'assurer que chaque élément de l'ontologie est unitaire entre les segments et que le tout est cohérent
 - Traiter plusieurs documents en utilisant la même ontologie
+- Le résultat de l'exécution du logiciel est un fichier ayant l'extension .tsv (tab separated value)
 - Ajouter des options d'export en formats RDF et OWL
 
-### 5. Intégration LLM
-- Supporter plusieurs LLMs, au minimum OpenAI GPT-4, Claude 3.5 Sonnet, Ollama
-- Implémenter une gestion robuste des limites de taux des API LLM
-- Optimiser les appels API aux LLMs pour réduire les coûts et les temps de traitement
-- Développer des prompts spécifiques pour l'extraction d'entités, de relations et leurs descriptions
+### 3. Segmentation et traitement du contenu
+- Implémenter une segmentation sophistiquée créant des segments cohérents basés sur le nombre de tokens
+- Utiliser tiktoken-go pour le comptage précis des tokens
+- Optimiser la fonction de segmentation pour gérer efficacement de grands volumes de texte
+- Implémenter une gestion efficace de la mémoire pour les très grands documents
+- Assurer une intégration fluide entre le segmenter et le client LLM, en ajustant la taille des segments et la gestion du contexte
 
-### 6. Système de Journalisation et Débogage
+### 4. Intégration LLM
+- Supporter plusieurs LLMs, au minimum OpenAI GPT-4, Claude 3.5 Sonnet, Ollama
+- Implémenter une gestion robuste des limites de taux des API LLM, incluant un système de "token bucket" dans le client Claude (claude.go)
+- Implémenter un backoff exponentiel avec un maximum de 5 tentatives pour les erreurs de limite de taux
+- Gérer les différences entre les APIs d'OpenAI, Claude, et Ollama avec des adaptateurs spécifiques
+- Optimiser les appels API aux LLMs pour réduire les coûts et les temps de traitement
+
+### 5. Système de Prompts
+- Implémenter un système de templates de prompts sophistiqué et flexible
+- Créer une structure PromptTemplate avec des méthodes pour formater les prompts
+- Créer des prompts spécifiques pour l'extraction d'entités, de relations, l'enrichissement d'ontologie et la fusion des résultats
+- Assurer la compatibilité des prompts avec différents LLMs
+
+### 6. Système de Journalisation
 - Implémenter un système de journalisation polyvalent avec support pour les niveaux debug, info, warning et error
 - Ajouter un mode de débogage détaillé activable via une option --debug
-- Implémenter des logs détaillés à chaque étape du processus pour faciliter le débogage
 - Assurer que l'activation du mode debug n'affecte pas significativement les performances en mode normal
+- Exporter les logs vers des fichiers texte et les afficher sur la console
+- Implémenter un mode silencieux (--silent) pour désactiver la sortie console des logs
+- Inclure des métriques de performance dans les logs, notamment pour le traitement parallèle et multi-passes
 
-### 7. Architecture et Modularité
+### 7. Gestion de la Configuration
+- Utiliser YAML pour une configuration centralisée
+- Permettre des surcharges de paramètres par ligne de commande
+- Inclure des options de configuration pour les différents LLMs et leurs modèles spécifiques
+- Implémenter des options de configuration flexibles, y compris le contrôle de l'inclusion des positions dans l'ontologie
+
+### 8. Architecture et Modularité
 - Utiliser Cobra pour la gestion des commandes CLI
 - Implémenter une architecture pipeline pour un traitement efficace des documents
 - Créer une couche d'abstraction pour les LLMs pour faciliter l'ajout futur de nouveaux modèles
-- Concevoir une architecture flexible pour éviter les cycles d'importation entre packages
+- Séparer le système de prompts en son propre module pour améliorer la modularité et la réutilisabilité
+- Implémenter un traitement parallèle des segments avec des goroutines pour améliorer les performances
+- Concevoir une architecture flexible pour faciliter l'ajout de nouvelles options de configuration
 
-### 8. Gestion des Erreurs et Robustesse
-- Implémenter une gestion fine des erreurs pour les appels API aux LLMs
+### 9. Gestion des Erreurs et Robustesse
+- Implémenter une gestion fine des erreurs pour les appels API aux LLMs, y compris la gestion des timeouts et des retries
 - Assurer une validation rigoureuse des entrées et des sorties à chaque étape du pipeline
-- Gérer de manière appropriée les erreurs spécifiques aux API LLM et aux opérations de fichiers
-
-### 9. Optimisation des Performances
-- Optimiser le traitement par lots des grands documents
-- Implémenter des stratégies d'optimisation de la mémoire
-- Utiliser des techniques de streaming et buffering pour les grands fichiers
-- Optimiser l'indexation et la recherche pour les documents volumineux et les termes composés
+- Gérer de manière appropriée les erreurs spécifiques aux API LLM
+- Implémenter une gestion robuste des erreurs lors de la fusion des résultats entre les passes
 
 ### 10. Tests et Validation
 - Implémenter des tests unitaires pour chaque composant
 - Créer des tests de bout en bout pour le pipeline complet
-- Ajouter des tests spécifiques pour la validation de l'ontologie enrichie
+- Ajouter des tests de performance et de charge pour valider le comportement avec de grands volumes de données
+- Inclure des tests spécifiques pour le mode de débogage et les nouvelles fonctionnalités de journalisation
+- Implémenter des tests de charge spécifiques pour vérifier le comportement du système sous des conditions de limite de taux
+- Ajouter des tests spécifiques pour la validation de l'ontologie enrichie après fusion
 - Implémenter des tests de performance pour le traitement parallèle et multi-passes
-- Créer des cas de test pour les scénarios linguistiques complexes (termes composés, variations)
+- Ajouter des tests spécifiques pour vérifier le comportement avec et sans l'inclusion des positions
 
-## Exigences Détaillées
+### 11. Optimisation de la mémoire et des performances
+- Implémenter des stratégies d'optimisation de la mémoire pour le traitement de très grands documents
+- Utiliser des techniques de streaming et de buffering pour minimiser l'utilisation de la mémoire lors du traitement de grands fichiers
+- Optimiser le traitement par lots des grands documents pour éviter les problèmes de mémoire
+- Implémenter des stratégies d'optimisation pour les appels API aux LLMs afin de réduire les coûts et les temps de traitement
 
-Pour tous les modules :
-- Limiter la taille d'un package à maximum 10 méthodes et découper le code logiciel finement
-- Optimiser le code pour la performance, particulièrement pour le traitement de grands documents
-- Assurer une gestion robuste des erreurs à travers l'application
-- Implémenter des logs détaillés pour chaque étape du processus
+### 12. Gestion des positions et relations
+- Implémenter un système de gestion des positions multiples pour chaque entité de l'ontologie
+- Supporter les entités composées de plusieurs mots (jusqu'à 3 mots)
+- Créer une structure distincte pour représenter les relations entre les entités
+- Développer un format de sortie flexible qui peut inclure ou exclure les informations de position selon la configuration
+- Implémenter une recherche flexible des positions, y compris une recherche partielle pour les mots individuels des noms d'entités
 
-### 1. Analyse et Segmentation des Documents
-- Développer des modules séparés pour l'analyse de chaque format supporté
-- Implémenter un mécanisme de segmentation sophistiqué pour décomposer les grands documents
-- Assurer une gestion robuste des erreurs pour les documents mal formés ou incomplets
-- Préserver la structure du document et le contexte à travers les segments
+### 13. Options de configuration flexibles
+- Implémenter un système permettant aux utilisateurs de contrôler l'inclusion ou l'exclusion des informations de position dans l'ontologie générée
+- Permettre la configuration de cette option via la ligne de commande et le fichier de configuration YAML
+- Assurer que toutes les parties du système (pipeline, convertisseur, etc.) respectent cette option de configuration
+- Maintenir la cohérence du traitement des données à travers l'application, que les positions soient incluses ou non
 
-### 2. Traitement Linguistique
-- Implémenter une fonction de normalisation robuste pour les mots et termes
-- Développer des méthodes pour gérer efficacement les variations linguistiques et les termes composés
-- Optimiser les performances de traitement pour les grands volumes de texte
-
-### 3. Indexation et Recherche
-- Créer un système d'indexation efficace pour les mots individuels et les termes composés
-- Implémenter une fonction de recherche flexible supportant la recherche exacte et partielle
-- Optimiser les performances d'indexation et de recherche pour les grands documents
-
-### 4. Enrichissement de l'Ontologie
-- Développer un processus d'enrichissement itératif de l'ontologie
-- Implémenter une gestion efficace des positions multiples pour chaque concept
-- Assurer une fusion cohérente des résultats entre les passes d'enrichissement
-
-### 5. Intégration LLM et Gestion des Prompts
-- Créer une interface commune pour les clients LLM
-- Développer des prompts spécifiques pour l'extraction d'entités, de relations et leurs descriptions
-- Implémenter une gestion robuste des limites de taux d'API et des erreurs
-
-### 6. Pipeline de Traitement Principal
-- Intégrer tous les composants dans un pipeline de traitement cohérent
-- Implémenter un traitement parallèle et multi-passes efficace
-- Assurer une gestion robuste des erreurs et des cas limites
+### 14. Sécurité et Confidentialité
+- Ajouter une option pour le chiffrement des données sensibles dans les logs et les fichiers de sortie
+- Implémenter un système basique de gestion des droits d'accès pour les différentes fonctionnalités
 
 ## Contraintes Techniques
 - Développer en langage de programmation Go
@@ -130,7 +124,7 @@ Pour tous les modules :
 1. Dépôt de code source avec des packages Go bien structurés
 2. Binaires exécutables pour les principaux systèmes d'exploitation (Windows, macOS, Linux)
 3. Suite de tests complète incluant des tests de performance et de stress
-4. Documentation utilisateur et technique détaillée
+4. Documentation utilisateur et technique avec des directives d'optimisation des performances
 5. Fichiers de configuration d'exemple
 6. README avec un guide de démarrage rapide et des instructions d'utilisation de base
 7. Licence GPL3

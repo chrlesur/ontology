@@ -40,10 +40,11 @@ type Pipeline struct {
 	llm              llm.Client
 	progressCallback ProgressCallback
 	ontology         *model.Ontology
+	includePositions bool
 }
 
 // NewPipeline creates a new instance of the processing pipeline
-func NewPipeline() (*Pipeline, error) {
+func NewPipeline(includePositions bool) (*Pipeline, error) {
 	cfg := config.GetConfig()
 	log := logger.GetLogger()
 
@@ -53,10 +54,11 @@ func NewPipeline() (*Pipeline, error) {
 	}
 
 	return &Pipeline{
-		config:   cfg,
-		logger:   log,
-		llm:      client,
-		ontology: model.NewOntology(),
+		config:           cfg,
+		logger:           log,
+		llm:              client,
+		ontology:         model.NewOntology(),
+		includePositions: includePositions,
 	}, nil
 }
 
@@ -101,7 +103,7 @@ func (p *Pipeline) ExecutePipeline(input string, output string, passes int, exis
 		initialTokenCount := len(tke.Encode(result, nil, nil))
 		p.logger.Info("Starting pass %d with initial result token count: %d", i+1, initialTokenCount)
 
-		result, err = p.processSinglePass(input, result)
+		result, err = p.processSinglePass(input, result, p.includePositions)
 		if err != nil {
 			p.logger.Error(i18n.GetMessage("ErrProcessingPass"), i+1, err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrProcessingPass"), err)
@@ -134,7 +136,7 @@ func truncateString(s string, maxLength int) string {
 	return s[:maxLength] + "..."
 }
 
-func (p *Pipeline) processSinglePass(input string, previousResult string) (string, error) {
+func (p *Pipeline) processSinglePass(input string, previousResult string, includePositions bool) (string, error) {
 	// Initialiser le tokenizer
 	tke, err := tiktoken.GetEncoding("cl100k_base")
 	if err != nil {
@@ -188,8 +190,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string) (strin
 				ContextSize: p.config.ContextSize,
 				Model:       p.config.DefaultModel,
 			})
-			// Modifier l'appel à processSegment pour inclure positionIndex
-			result, err := p.processSegment(seg, context, previousResult, positionIndex)
+			result, err := p.processSegment(seg, context, previousResult, positionIndex, includePositions)
 			if err != nil {
 				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i+1, err)
 				return
@@ -273,7 +274,7 @@ func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {
 	return content, nil
 }
 
-func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, positionIndex map[string][]int) (string, error) {
+func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, positionIndex map[string][]int, includePositions bool) (string, error) {
 	p.logger.Debug("Processing segment of length %d", len(segment))
 
 	enrichmentValues := map[string]string{
@@ -287,12 +288,11 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 		return "", fmt.Errorf("ontology enrichment failed: %w", err)
 	}
 
-	p.logger.Debug("Enriched result before position enrichment:\n%s", enrichedResult)
+	p.logger.Debug("Enriched result before ontology enrichment:\n%s", enrichedResult)
 
-	// Enrichir l'ontologie avec les positions
-	p.enrichOntologyWithPositions(enrichedResult, positionIndex)
+	p.enrichOntologyWithPositions(enrichedResult, positionIndex, includePositions)
 
-	p.logger.Debug("Enriched ontology after position enrichment:\n%s", p.ontologyToString())
+	p.logger.Debug("Enriched ontology after enrichment:\n%s", p.ontologyToString())
 
 	return enrichedResult, nil
 }
@@ -390,7 +390,7 @@ func (p *Pipeline) saveResult(result string, outputPath string) error {
 	}
 	p.logger.Debug("TSV file written: %s", tsvPath)
 
-	qsc := converter.NewQuickStatementConverter(p.logger)
+	qsc := converter.NewQuickStatementConverter(p.logger, p.includePositions)
 
 	if p.config.ExportRDF {
 		p.logger.Debug("Exporting RDF")
@@ -479,8 +479,9 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 	return index
 }
 
-func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int) {
-	p.logger.Debug("Starting enrichOntologyWithPositions")
+func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int, includePositions bool) {
+	p.logger.Debug("Starting enrichOntology")
+	p.logger.Debug("Include positions: %v", includePositions)
 
 	lines := strings.Split(enrichedResult, "\n")
 	p.logger.Debug("Number of lines to process: %d", len(lines))
@@ -501,13 +502,14 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 			}
 			element.Description = description
 
-			allPositions := p.findPositions(name, positionIndex)
-
-			if len(allPositions) > 0 {
-				element.SetPositions(uniquePositions(allPositions))
-				p.logger.Debug("Set positions for element %s: %v", name, element.Positions)
-			} else {
-				p.logger.Debug("No positions found for element %s", name)
+			if includePositions {
+				allPositions := p.findPositions(name, positionIndex)
+				if len(allPositions) > 0 {
+					element.SetPositions(uniquePositions(allPositions))
+					p.logger.Debug("Set positions for element %s: %v", name, element.Positions)
+				} else {
+					p.logger.Debug("No positions found for element %s", name)
+				}
 			}
 		} else if len(parts) == 4 { // C'est une relation
 			p.logger.Debug("Processing relation: %v", parts)
@@ -522,11 +524,15 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 				Description: description,
 			}
 			p.ontology.AddRelation(relation)
-			p.logger.Debug("Added new relation: %v", relation)
+			p.logger.Info("Added new relation: %v", relation)
 		} else {
-			p.logger.Warning("Skipping invalid line: %s", line)
+			p.logger.Debug("Skipping invalid line: %s", line)
 		}
 	}
+
+	p.logger.Debug("Finished enrichOntology")
+	p.logger.Debug("Final ontology state - Elements: %d, Relations: %d",
+		len(p.ontology.Elements), len(p.ontology.Relations))
 }
 
 func uniquePositions(positions []int) []int {

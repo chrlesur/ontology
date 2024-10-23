@@ -15,13 +15,15 @@ type Converter interface {
 
 // QuickStatementConverter implements the Converter interface
 type QuickStatementConverter struct {
-	logger *logger.Logger
+	logger           *logger.Logger
+	includePositions bool
 }
 
 // NewQuickStatementConverter creates a new QuickStatementConverter
-func NewQuickStatementConverter(log *logger.Logger) *QuickStatementConverter {
+func NewQuickStatementConverter(log *logger.Logger, includePositions bool) *QuickStatementConverter {
 	return &QuickStatementConverter{
-		logger: log,
+		logger:           log,
+		includePositions: includePositions,
 	}
 }
 

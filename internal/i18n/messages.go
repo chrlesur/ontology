@@ -77,6 +77,9 @@ var Messages = struct {
 	ErrLoadExistingOntology           string
 	ErrSavingResult                   string
 	ErrSegmentContent                 string
+	IncludePositionsFlagUsage         string
+	ContextOutputFlagUsage            string
+	ContextWordsFlagUsage             string
 }{
 	RootCmdShortDesc: "Ontology enrichment tool",
 	RootCmdLongDesc: `Ontology is a command-line tool for enriching ontologies from various document formats.
@@ -150,6 +153,9 @@ It can handle various input formats and use different language models for analys
 	ErrLoadExistingOntology:           "Failed to load existing ontology",
 	ErrSavingResult:                   "Error saving result",
 	ErrSegmentContent:                 "Failed to segment content",
+	IncludePositionsFlagUsage:         "Active to not include position information in the ontology",
+	ContextOutputFlagUsage:            "Enable context output in JSON format",
+	ContextWordsFlagUsage:             "Number of context words before and after each position",
 }
 
 // GetMessage retourne le message correspondant à la clé donnée

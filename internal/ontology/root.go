@@ -11,9 +11,12 @@ import (
 )
 
 var (
-	cfgFile string
-	debug   bool
-	silent  bool
+	cfgFile          string
+	debug            bool
+	silent           bool
+	includePositions bool
+	contextOutput    bool
+	contextWords     int
 )
 
 // rootCmd represents the base command when called without any subcommands
@@ -36,8 +39,11 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", i18n.GetMessage("ConfigFlagUsage"))
-	rootCmd.PersistentFlags().BoolVar(&debug, "debug", false, i18n.GetMessage("DebugFlagUsage"))
-	rootCmd.PersistentFlags().BoolVar(&silent, "silent", false, i18n.GetMessage("SilentFlagUsage"))
+	rootCmd.PersistentFlags().BoolVarP(&debug, "debug", "d", false, i18n.GetMessage("DebugFlagUsage"))
+	rootCmd.PersistentFlags().BoolVarP(&silent, "silent", "s", false, i18n.GetMessage("SilentFlagUsage"))
+	rootCmd.PersistentFlags().BoolVarP(&includePositions, "include-positions", "i", true, i18n.GetMessage("IncludePositionsFlagUsage"))
+	rootCmd.PersistentFlags().BoolVarP(&contextOutput, "context-output", "c", false, i18n.GetMessage("ContextOutputFlagUsage"))
+	rootCmd.PersistentFlags().IntVarP(&contextWords, "context-words", "w", 30, i18n.GetMessage("ContextWordsFlagUsage"))
 
 	rootCmd.Run = rootCmd.HelpFunc()
 }
@@ -51,6 +57,8 @@ func initConfig() {
 
 	// This will load the config from file and environment variables
 	cfg := config.GetConfig()
+	cfg.ContextOutput = contextOutput
+	cfg.ContextWords = contextWords
 
 	// Validate the config
 	if err := cfg.ValidateConfig(); err != nil {

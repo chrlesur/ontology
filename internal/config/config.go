@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strconv"
 	"sync"
 
 	"github.com/chrlesur/Ontology/internal/i18n"
@@ -18,38 +19,44 @@ var (
 
 // Config structure definition
 type Config struct {
-	BaseURI      string `yaml:"base_uri"`
-	OpenAIAPIURL string `yaml:"openai_api_url"`
-	ClaudeAPIURL string `yaml:"claude_api_url"`
-	OllamaAPIURL string `yaml:"ollama_api_url"`
-	OpenAIAPIKey string `yaml:"openai_api_key"`
-	ClaudeAPIKey string `yaml:"claude_api_key"`
-	LogDirectory string `yaml:"log_directory"`
-	LogLevel     string `yaml:"log_level"`
-	MaxTokens    int    `yaml:"max_tokens"`
-	ContextSize  int    `yaml:"context_size"`
-	DefaultLLM   string `yaml:"default_llm"`
-	DefaultModel string `yaml:"default_model"`
-	OntologyName string `yaml:"ontology_name"`
-	ExportRDF    bool   `yaml:"export_rdf"`
-	ExportOWL    bool   `yaml:"export_owl"`
-	Input        string `yaml:"input"`
+	BaseURI          string `yaml:"base_uri"`
+	OpenAIAPIURL     string `yaml:"openai_api_url"`
+	ClaudeAPIURL     string `yaml:"claude_api_url"`
+	OllamaAPIURL     string `yaml:"ollama_api_url"`
+	OpenAIAPIKey     string `yaml:"openai_api_key"`
+	ClaudeAPIKey     string `yaml:"claude_api_key"`
+	LogDirectory     string `yaml:"log_directory"`
+	LogLevel         string `yaml:"log_level"`
+	MaxTokens        int    `yaml:"max_tokens"`
+	ContextSize      int    `yaml:"context_size"`
+	DefaultLLM       string `yaml:"default_llm"`
+	DefaultModel     string `yaml:"default_model"`
+	OntologyName     string `yaml:"ontology_name"`
+	ExportRDF        bool   `yaml:"export_rdf"`
+	ExportOWL        bool   `yaml:"export_owl"`
+	Input            string `yaml:"input"`
+	IncludePositions bool   `yaml:"include_positions"`
+	ContextOutput    bool   `yaml:"context_output"`
+	ContextWords     int    `yaml:"context_words"`
 }
 
 // GetConfig returns the singleton instance of Config
 func GetConfig() *Config {
 	once.Do(func() {
 		instance = &Config{
-			OpenAIAPIURL: "https://api.openai.com/v1/chat/completions",
-			ClaudeAPIURL: "https://api.anthropic.com/v1/messages",
-			OllamaAPIURL: "http://localhost:11434/api/generate",
-			BaseURI:      "http://www.wikidata.org/entity/",
-			LogDirectory: "logs",
-			LogLevel:     "info",
-			MaxTokens:    4000,
-			ContextSize:  500,
-			DefaultLLM:   "openai",
-			DefaultModel: "gpt-3.5-turbo",
+			OpenAIAPIURL:     "https://api.openai.com/v1/chat/completions",
+			ClaudeAPIURL:     "https://api.anthropic.com/v1/messages",
+			OllamaAPIURL:     "http://localhost:11434/api/generate",
+			BaseURI:          "http://www.wikidata.org/entity/",
+			LogDirectory:     "logs",
+			LogLevel:         "info",
+			MaxTokens:        1000,
+			ContextSize:      4000,
+			DefaultLLM:       "claude",
+			DefaultModel:     "claude-3-5-sonnet-20240620",
+			IncludePositions: true,
+			ContextOutput:    false, // Par défaut, la sortie de contexte est désactivée
+			ContextWords:     30,    // Par défaut, 30 mots de contexte
 		}
 		instance.loadConfigFile()
 		instance.loadEnvVariables()
@@ -73,6 +80,14 @@ func (c *Config) loadConfigFile() {
 	err = yaml.Unmarshal(data, c)
 	if err != nil {
 		log.Printf(i18n.GetMessage("ErrParseConfigFile"), err)
+	}
+	if contextOutput := os.Getenv("ONTOLOGY_CONTEXT_OUTPUT"); contextOutput == "true" {
+		c.ContextOutput = true
+	}
+	if contextWords := os.Getenv("ONTOLOGY_CONTEXT_WORDS"); contextWords != "" {
+		if words, err := strconv.Atoi(contextWords); err == nil {
+			c.ContextWords = words
+		}
 	}
 }
 

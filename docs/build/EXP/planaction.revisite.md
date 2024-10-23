@@ -5,6 +5,7 @@
    - Implémenter le système de configuration YAML
    - Mettre en place Cobra pour la gestion des commandes CLI
    - Créer le package d'internationalisation (i18n)
+   - Implémenter des options de configuration flexibles, y compris le contrôle de l'inclusion des positions
 
 2. Système de journalisation
    - Développer le module de journalisation avec différents niveaux de log
@@ -15,72 +16,93 @@
 
 3. Architecture et structure de données
    - Créer un package `model` pour les structures de données de base
-   - Définir la structure `OntologyElement` avec un champ pour les descriptions et les positions multiples
+   - Définir la structure `OntologyElement` avec un champ pour les descriptions et les positions optionnelles
    - Implémenter une structure `Relation` pour représenter les relations entre entités
-   - Concevoir une architecture flexible pour éviter les cycles d'importation entre packages
+   - Concevoir une architecture flexible pour faciliter l'ajout de nouvelles options de configuration
 
-4. Traitement linguistique et normalisation
-   - Implémenter une fonction `normalizeWord` robuste
-     - Conversion en minuscules
-     - Remplacement des underscores par des espaces
-     - Suppression de la ponctuation et des caractères non alphanumériques
-     - Gestion des espaces en début et fin de chaîne
-   - Développer des méthodes pour gérer les variations linguistiques
-   - Évaluer l'utilisation de bibliothèques de traitement du langage naturel
+4. Gestion des erreurs et robustesse
+   - Créer un système centralisé de gestion des erreurs
+   - Implémenter la logique de retry avec backoff exponentiel
+   - Développer des mécanismes de validation pour les entrées et sorties
+   - Implémenter une gestion d'erreurs spécifique pour les API LLM et les opérations de fichiers
 
-5. Indexation et recherche de positions
-   - Améliorer la fonction `createPositionIndex`
-     - Indexer les mots individuels et leurs combinaisons (jusqu'à 3 mots)
-     - Gérer toutes les combinaisons possibles de mots composés
-   - Créer une fonction `findPositions` sophistiquée
-     - Implémenter une recherche exacte et partielle
-     - Gérer efficacement les termes composés
-   - Optimiser les performances d'indexation et de recherche
+5. Système de prompts
+   - Créer la structure PromptTemplate
+   - Implémenter les méthodes de formatage des prompts
+   - Développer des templates pour l'extraction d'entités, de relations et leurs descriptions
+   - Créer des prompts spécifiques pour l'enrichissement d'ontologie et la fusion des résultats
 
-6. Enrichissement de l'ontologie
-   - Mettre à jour `enrichOntologyWithPositions`
-     - Utiliser `findPositions` pour localiser les concepts
-     - Améliorer la gestion des entités et des relations
-   - Implémenter une gestion robuste des positions multiples
+6. Analyse et segmentation des documents
+   - Implémenter le parsing pour chaque format de document supporté
+   - Développer le mécanisme de segmentation avec tiktoken-go pour le comptage précis des tokens
+   - Améliorer la fonction `createPositionIndex` pour capturer les entités composées de plusieurs mots (jusqu'à 3 mots)
+   - Implémenter une logique de recherche flexible pour les positions des entités, y compris la recherche partielle
+   - Assurer que le système de positionnement fonctionne correctement que les positions soient incluses ou non dans le résultat final
+   - Créer le système de gestion des métadonnées
+   - Optimiser la gestion de la mémoire pour les grands documents
 
-7. Système de prompts et intégration LLM
-   - Créer des templates de prompts flexibles
-   - Implémenter les clients pour différents LLMs (OpenAI, Claude, Ollama)
-   - Développer un système de gestion des limites de taux d'API
-   - Optimiser les appels API pour réduire les coûts et les temps de traitement
+7. Intégration LLM
+   - Créer une interface commune pour les clients LLM
+   - Implémenter les clients pour OpenAI, Claude, et Ollama
+   - Développer le système de "token bucket" pour la gestion des limites de taux
+   - Mettre en place les adaptateurs spécifiques pour chaque API LLM
+   - Optimiser les appels API aux LLMs pour réduire les coûts et les temps de traitement
 
-8. Pipeline de traitement principal
-   - Intégrer tous les composants dans un pipeline cohérent
+8. Gestion du contexte et enrichissement d'ontologie
+   - Implémenter la gestion du contexte entre les segments
+   - Développer le système d'optimisation du contexte pour les LLMs
+   - Modifier la fonction `enrichOntologyWithPositions` pour gérer à la fois l'inclusion et l'exclusion des positions
+   - Implémenter la gestion des positions multiples pour chaque entité (si l'option est activée)
+   - Créer la logique d'enrichissement itératif de l'ontologie
+
+9. Pipeline de traitement principal
+   - Intégrer tous les composants développés dans un pipeline cohérent
    - Implémenter le traitement par lots pour les grands documents
-   - Développer un système de traitement multi-passes
-   - Mettre en place un traitement parallèle des segments
+   - Développer le système de traitement multi-passes
+   - Adapter le pipeline pour respecter l'option d'inclusion/exclusion des positions
+   - Mettre en place le traitement parallèle des segments
+   - Implémenter la logique de fusion des résultats après chaque passe
 
-9. Optimisation des performances
-   - Optimiser l'indexation et la recherche pour les grands documents
-   - Implémenter des stratégies d'optimisation de la mémoire
-   - Utiliser des techniques de streaming et buffering pour les grands fichiers
+10. Optimisation des performances
+    - Optimiser les appels API aux LLMs
+    - Implémenter des stratégies d'optimisation de la mémoire
+    - Utiliser des techniques de streaming et buffering pour les grands fichiers
+    - Optimiser le traitement parallèle et multi-passes
+    - Optimiser la fonction `createPositionIndex` pour les documents volumineux
 
-10. Logging et débogage avancés
-    - Implémenter un système de logging détaillé à chaque étape du processus
-    - Ajouter des logs pour afficher l'état de l'ontologie et de l'index à différentes étapes
-    - Développer des outils de débogage pour les scénarios complexes
+11. Logging et débogage
+    - Implémenter un système de logging détaillé à travers tout le processus
+    - Ajouter des logs de débogage pour afficher l'état de l'ontologie à différentes étapes du traitement
+    - Implémenter des métriques de performance pour le suivi du traitement
 
-11. Fonctionnalités d'export
-    - Implémenter l'export en format RDF et OWL
-    - Créer un format de sortie clair séparant les entités et les relations
+12. Fonctionnalités d'export
+    - Implémenter l'export en format RDF
+    - Développer l'export en format OWL
+    - Créer un format de sortie flexible qui peut inclure ou exclure les informations de position selon la configuration
 
-12. Tests et validation
+13. Interface CLI complète
+    - Finaliser l'interface de ligne de commande
+    - Implémenter le mode interactif
+    - Ajouter toutes les options de configuration via les flags, y compris l'option pour inclure/exclure les positions
+
+14. Tests et validation
     - Créer des tests unitaires pour chaque composant
     - Développer des tests d'intégration pour le pipeline complet
-    - Implémenter des tests spécifiques pour la gestion des positions multiples et des termes composés
-    - Créer des cas de test pour les scénarios linguistiques complexes
+    - Implémenter des tests de performance et de charge
+    - Créer des tests spécifiques pour le mode debug et les limites de taux
+    - Ajouter des tests pour la validation de l'ontologie enrichie après fusion
+    - Implémenter des tests de performance pour le traitement parallèle et multi-passes
+    - Ajouter des tests spécifiques pour vérifier le comportement avec et sans l'inclusion des positions
 
-13. Documentation et finalisation
-    - Rédiger une documentation technique détaillée
-    - Créer des guides utilisateur et développeur
-    - Préparer des sessions de formation sur les aspects complexes du système
+15. Sécurité et confidentialité
+    - Implémenter le chiffrement des données sensibles
+    - Développer le système basique de gestion des droits d'accès
 
-14. Révision et optimisation finale
-    - Effectuer une revue complète du code
-    - Optimiser les performances globales du système
-    - Réaliser des tests de charge et de stress
+16. Documentation et finalisation
+    - Rédiger la documentation utilisateur et technique
+    - Créer le README avec guide de démarrage rapide
+    - Préparer les fichiers de configuration d'exemple
+    - Documenter en détail le processus d'enrichissement itératif de l'ontologie
+    - Inclure une documentation spécifique sur l'option d'inclusion/exclusion des positions
+    - Générer les binaires pour différents systèmes d'exploitation
+    - Préparer des guides ou des sessions de formation pour les développeurs sur la gestion du contexte, la fusion des résultats, et les nouvelles structures de données

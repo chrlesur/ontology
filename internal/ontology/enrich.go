@@ -53,7 +53,7 @@ var enrichCmd = &cobra.Command{
 			}
 		}
 
-		p, err := pipeline.NewPipeline()
+		p, err := pipeline.NewPipeline(includePositions)
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 		}
@@ -96,7 +96,7 @@ func init() {
 	enrichCmd.Flags().StringVar(&existingOntology, "existing-ontology", "", i18n.Messages.ExistingOntologyFlagUsage)
 }
 
-func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, owl, rdf bool) error {
+func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, owl, rdf bool, includePositions bool) error {
 	log := logger.GetLogger()
 	log.Info(i18n.Messages.StartingEnrichProcess)
 
@@ -114,7 +114,7 @@ func ExecuteEnrichCommand(input, output string, passes int, existingOntology str
 		}
 	}
 
-	p, err := pipeline.NewPipeline()
+	p, err := pipeline.NewPipeline(includePositions)
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 	}
@@ -178,7 +178,7 @@ func processFile(filePath string) error {
 		outputPath = filepath.Join(dir, baseName+extension)
 	}
 
-	p, err := pipeline.NewPipeline()
+	p, err := pipeline.NewPipeline(includePositions)
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 	}
