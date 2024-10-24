@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"unicode"
@@ -31,6 +32,12 @@ type ProgressInfo struct {
 	ProcessedSegments int
 }
 
+type PositionRange struct {
+	Start   int
+	End     int
+	Element string
+}
+
 type ProgressCallback func(ProgressInfo)
 
 // Pipeline represents the main processing pipeline
@@ -41,10 +48,12 @@ type Pipeline struct {
 	progressCallback ProgressCallback
 	ontology         *model.Ontology
 	includePositions bool
+	contextOutput    bool
+	contextWords     int
 }
 
 // NewPipeline creates a new instance of the processing pipeline
-func NewPipeline(includePositions bool) (*Pipeline, error) {
+func NewPipeline(includePositions bool, contextOutput bool, contextWords int) (*Pipeline, error) {
 	cfg := config.GetConfig()
 	log := logger.GetLogger()
 
@@ -59,6 +68,8 @@ func NewPipeline(includePositions bool) (*Pipeline, error) {
 		llm:              client,
 		ontology:         model.NewOntology(),
 		includePositions: includePositions,
+		contextOutput:    contextOutput,
+		contextWords:     contextWords,
 	}, nil
 }
 
@@ -74,6 +85,7 @@ func (p *Pipeline) ExecutePipeline(input string, output string, passes int, exis
 
 	var result string
 	var err error
+	var finalContent []byte
 
 	// Initialiser le tokenizer
 	tke, err := tiktoken.GetEncoding("cl100k_base")
@@ -103,28 +115,25 @@ func (p *Pipeline) ExecutePipeline(input string, output string, passes int, exis
 		initialTokenCount := len(tke.Encode(result, nil, nil))
 		p.logger.Info("Starting pass %d with initial result token count: %d", i+1, initialTokenCount)
 
-		result, err = p.processSinglePass(input, result, p.includePositions)
+		result, newContent, err := p.processSinglePass(input, result, p.includePositions)
 		if err != nil {
 			p.logger.Error(i18n.GetMessage("ErrProcessingPass"), i+1, err)
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrProcessingPass"), err)
 		}
 
+		finalContent = newContent // Sauvegarder le contenu de la dernière passe
+
 		newTokenCount := len(tke.Encode(result, nil, nil))
 		p.logger.Info("Completed pass %d, new result token count: %d", i+1, newTokenCount)
 		p.logger.Info("Token count change in pass %d: %d", i+1, newTokenCount-initialTokenCount)
-
-		// Optionally, you can add a log to show a snippet of the result
-		// p.logger.Debug("Result snippet after pass %d: %s", i+1, truncateString(result, 100))
 	}
-
-	err = p.saveResult(result, output)
+	err = p.saveResult(result, output, finalContent)
 	if err != nil {
 		p.logger.Error(i18n.GetMessage("ErrSavingResult"), err)
 		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrSavingResult"), err)
 	}
 
-	finalTokenCount := len(tke.Encode(result, nil, nil))
-	p.logger.Info("Pipeline completed. Final result token count: %d", finalTokenCount)
+	p.logger.Info("Pipeline completed.")
 	return nil
 }
 
@@ -136,12 +145,12 @@ func truncateString(s string, maxLength int) string {
 	return s[:maxLength] + "..."
 }
 
-func (p *Pipeline) processSinglePass(input string, previousResult string, includePositions bool) (string, error) {
+func (p *Pipeline) processSinglePass(input string, previousResult string, includePositions bool) (string, []byte, error) {
 	// Initialiser le tokenizer
 	tke, err := tiktoken.GetEncoding("cl100k_base")
 	if err != nil {
 		p.logger.Error("Failed to initialize tokenizer: %v", err)
-		return "", fmt.Errorf("failed to initialize tokenizer: %w", err)
+		return "", nil, fmt.Errorf("failed to initialize tokenizer: %w", err)
 	}
 
 	inputTokens := len(tke.Encode(input, nil, nil))
@@ -151,7 +160,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 	content, err := p.parseInput(input)
 	if err != nil {
 		p.logger.Error("Failed to parse input: %v", err)
-		return "", err
+		return "", nil, err
 	}
 
 	positionIndex := p.createPositionIndex(content)
@@ -166,7 +175,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 	})
 	if err != nil {
 		p.logger.Error("Failed to segment content: %v", err)
-		return "", fmt.Errorf("%s: %w", i18n.GetMessage("ErrSegmentContent"), err)
+		return "", nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrSegmentContent"), err)
 	}
 	p.logger.Info("Number of segments: %d", len(segments))
 
@@ -213,13 +222,13 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 	mergedResult, err := p.mergeResults(previousResult, results)
 	if err != nil {
 		p.logger.Error("Failed to merge segment results: %v", err)
-		return "", fmt.Errorf("failed to merge segment results: %w", err)
+		return "", nil, fmt.Errorf("failed to merge segment results: %w", err)
 	}
 
 	mergedResultTokens := len(tke.Encode(mergedResult, nil, nil))
 	p.logger.Info("Merged result tokens: %d", mergedResultTokens)
 
-	return mergedResult, nil
+	return mergedResult, content, nil
 }
 
 func (p *Pipeline) parseInput(input string) ([]byte, error) {
@@ -343,7 +352,8 @@ func (p *Pipeline) loadExistingOntology(path string) (string, error) {
 	return string(content), nil
 }
 
-func (p *Pipeline) saveResult(result string, outputPath string) error {
+// Sauvegarde des resultats
+func (p *Pipeline) saveResult(result string, outputPath string, newContent []byte) error {
 	p.logger.Debug("Starting saveResult")
 	p.logger.Debug("Number of elements in ontology: %d", len(p.ontology.Elements))
 	p.logger.Debug("Number of relations in ontology: %d", len(p.ontology.Relations))
@@ -382,6 +392,7 @@ func (p *Pipeline) saveResult(result string, outputPath string) error {
 	ext := filepath.Ext(baseName)
 	nameWithoutExt := strings.TrimSuffix(baseName, ext)
 
+	// Sauvegarder le fichier TSV
 	tsvPath := filepath.Join(dir, nameWithoutExt+".tsv")
 	err := ioutil.WriteFile(tsvPath, []byte(qs), 0644)
 	if err != nil {
@@ -422,6 +433,61 @@ func (p *Pipeline) saveResult(result string, outputPath string) error {
 			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOWL"), err)
 		}
 		p.logger.Debug("OWL file written: %s", owlPath)
+	}
+
+	// Générer et sauvegarder le JSON de contexte si l'option est activée
+	if p.contextOutput {
+		p.logger.Info("Context output is enabled. Generating context JSON.")
+		words := strings.Fields(string(newContent))
+		p.logger.Debug("Total words in new content: %d", len(words))
+
+		positionRanges := p.getAllPositionsFromNewContent(words)
+		p.logger.Info("Total position ranges collected: %d", len(positionRanges))
+
+		// Vérification supplémentaire pour s'assurer que toutes les positions sont incluses
+		for _, element := range p.ontology.Elements {
+			for _, pos := range element.Positions {
+				found := false
+				for _, pr := range positionRanges {
+					if pr.Start <= pos && pos <= pr.End {
+						found = true
+						break
+					}
+				}
+				if !found {
+					positionRanges = append(positionRanges, PositionRange{
+						Start:   pos,
+						End:     pos + len(strings.Fields(element.Name)) - 1,
+						Element: element.Name,
+					})
+				}
+			}
+		}
+
+		mergedPositions := mergeOverlappingPositions(positionRanges)
+		p.logger.Info("Merged position ranges: %d", len(mergedPositions))
+
+		// Convertir les PositionRange en positions simples pour GenerateContextJSON
+		validPositions := make([]int, len(mergedPositions))
+		for i, pr := range mergedPositions {
+			validPositions[i] = pr.Start
+		}
+
+		contextJSON, err := GenerateContextJSON(newContent, validPositions, p.contextWords, mergedPositions)
+		if err != nil {
+			p.logger.Error("Failed to generate context JSON: %v", err)
+			return fmt.Errorf("failed to generate context JSON: %w", err)
+		}
+		p.logger.Debug("Context JSON generated successfully. Length: %d bytes", len(contextJSON))
+
+		contextFile := filepath.Join(dir, nameWithoutExt+"_context.json")
+		if err := ioutil.WriteFile(contextFile, []byte(contextJSON), 0644); err != nil {
+			p.logger.Error("Failed to write context JSON file: %v", err)
+			return fmt.Errorf("failed to write context JSON file: %w", err)
+		}
+		p.logger.Info("Context JSON saved to: %s", contextFile)
+	} else {
+		p.logger.Debug("Context output is disabled. Skipping context JSON generation.")
 	}
 
 	p.logger.Debug("Finished saveResult")
@@ -599,4 +665,79 @@ func normalizeWord(word string) string {
 		return -1
 	}, word)
 	return strings.TrimSpace(word)
+}
+
+// getAllPositions retourne toutes les positions des éléments de l'ontologie
+func (p *Pipeline) getAllPositions() []int {
+	var allPositions []int
+	for _, element := range p.ontology.Elements {
+		allPositions = append(allPositions, element.Positions...)
+	}
+	p.logger.Debug("Total positions collected: %d", len(allPositions))
+	return allPositions
+}
+
+func (p *Pipeline) getAllPositionsFromNewContent(words []string) []PositionRange {
+	var allPositions []PositionRange
+	for _, element := range p.ontology.Elements {
+		elementWords := strings.Fields(strings.ToLower(element.Name))
+		// Utiliser les positions déjà connues dans l'ontologie
+		for _, pos := range element.Positions {
+			if pos >= 0 && pos < len(words) {
+				end := min(pos+len(elementWords), len(words)) - 1
+				allPositions = append(allPositions, PositionRange{
+					Start:   pos,
+					End:     end,
+					Element: element.Name,
+				})
+			}
+		}
+		// Rechercher également de nouvelles occurrences
+		for i := 0; i <= len(words)-len(elementWords); i++ {
+			match := true
+			for j, ew := range elementWords {
+				if strings.ToLower(words[i+j]) != ew {
+					match = false
+					break
+				}
+			}
+			if match {
+				allPositions = append(allPositions, PositionRange{
+					Start:   i,
+					End:     i + len(elementWords) - 1,
+					Element: element.Name,
+				})
+			}
+		}
+	}
+	p.logger.Debug("Total position ranges collected from new content: %d", len(allPositions))
+	return allPositions
+}
+
+func mergeOverlappingPositions(positions []PositionRange) []PositionRange {
+	if len(positions) == 0 {
+		return positions
+	}
+
+	sort.Slice(positions, func(i, j int) bool {
+		return positions[i].Start < positions[j].Start
+	})
+
+	merged := []PositionRange{positions[0]}
+
+	for _, current := range positions[1:] {
+		last := &merged[len(merged)-1]
+		if current.Start <= last.End+1 {
+			if current.End > last.End {
+				last.End = current.End
+			}
+			if len(current.Element) > len(last.Element) {
+				last.Element = current.Element
+			}
+		} else {
+			merged = append(merged, current)
+		}
+	}
+
+	return merged
 }
