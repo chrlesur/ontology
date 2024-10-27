@@ -314,7 +314,7 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 
 	p.logger.Debug("Enriched result length: %d, preview: %s", len(normalizedResult), truncateString(normalizedResult, 100))
 
-	p.enrichOntologyWithPositions(normalizedResult, positionIndex, includePositions)
+	p.enrichOntologyWithPositions(normalizedResult, positionIndex, includePositions, string(segment))
 
 	return normalizedResult, nil
 }
@@ -524,21 +524,21 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 	words := bytes.Fields(content)
 
 	for i, word := range words {
-		normalizedWord := normalizeWord(string(word))
-		index[normalizedWord] = append(index[normalizedWord], i)
+		variants := generateArticleVariants(string(word))
+		for _, variant := range variants {
+			normalizedVariant := normalizeWord(variant)
+			index[normalizedVariant] = append(index[normalizedVariant], i)
+		}
 	}
 
-	// Indexer également les paires et triplets de mots consécutifs
+	// Indexer les paires et triplets de mots
 	for i := 0; i < len(words)-1; i++ {
-		w1 := normalizeWord(string(words[i]))
-		w2 := normalizeWord(string(words[i+1]))
-		compound2 := w1 + " " + w2
-		index[compound2] = append(index[compound2], i)
+		pair := normalizeWord(string(words[i])) + " " + normalizeWord(string(words[i+1]))
+		index[pair] = append(index[pair], i)
 
-		if i+2 < len(words) {
-			w3 := normalizeWord(string(words[i+2]))
-			compound3 := compound2 + " " + w3
-			index[compound3] = append(index[compound3], i)
+		if i < len(words)-2 {
+			triplet := pair + " " + normalizeWord(string(words[i+2]))
+			index[triplet] = append(index[triplet], i)
 		}
 	}
 
@@ -546,7 +546,7 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 	return index
 }
 
-func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int, includePositions bool) {
+func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int, includePositions bool, content string) {
 	p.logger.Debug("Starting enrichOntologyWithPositions")
 	p.logger.Debug("Include positions: %v", includePositions)
 	p.logger.Debug("Position index size: %d", len(positionIndex))
@@ -574,7 +574,7 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 
 			if includePositions {
 				p.logger.Debug("Searching for positions of entity: %s", name)
-				allPositions := p.findPositions(name, positionIndex)
+				allPositions := p.findPositions(name, positionIndex, content)
 				p.logger.Debug("Found %d positions for entity %s: %v", len(allPositions), name, allPositions)
 				if len(allPositions) > 0 {
 					uniquePos := uniquePositions(allPositions)
@@ -627,67 +627,114 @@ func uniquePositions(positions []int) []int {
 	return list
 }
 
-func (p *Pipeline) findPositions(word string, index map[string][]int) []int {
-	// Séparer l'entité en ses composants (nom, type, etc.)
+func (p *Pipeline) findPositions(word string, index map[string][]int, content string) []int {
 	parts := strings.Split(word, "\t")
-	entityName := normalizeWord(parts[0]) // On utilise seulement le premier élément comme nom de l'entité
+	entityName := parts[0]
 
 	p.logger.Debug("Searching for positions of entity: %s", entityName)
 
-	// Recherche exacte
-	if positions, ok := index[entityName]; ok {
-		p.logger.Debug("Found exact match positions: %v", positions)
+	allVariants := generateArticleVariants(entityName)
+	var allPositions []int
+
+	for _, variant := range allVariants {
+		normalizedVariant := normalizeWord(variant)
+		p.logger.Debug("Trying variant: %s", normalizedVariant)
+
+		// Recherche exacte d'abord
+		if positions, ok := index[normalizedVariant]; ok {
+			p.logger.Debug("Found exact match positions for %s: %v", variant, positions)
+			allPositions = append(allPositions, positions...)
+			continue
+		}
+
+		// Utiliser la recherche approximative seulement pour la variante originale
+		if variant == entityName {
+			positions := p.findApproximatePositions(normalizedVariant, content)
+			if len(positions) > 0 {
+				p.logger.Debug("Found approximate positions for %s: %v", variant, positions)
+				allPositions = append(allPositions, positions...)
+			}
+		}
+	}
+
+	// Dédupliquer et trier les positions trouvées
+	uniquePositions := uniqueIntSlice(allPositions)
+	sort.Ints(uniquePositions)
+
+	if len(uniquePositions) > 0 {
+		p.logger.Debug("Found total unique positions for %s: %v", entityName, uniquePositions)
+	} else {
+		p.logger.Debug("No positions found for entity: %s", entityName)
+	}
+
+	return uniquePositions
+}
+
+func (p *Pipeline) findSequentialPositions(words []string, index map[string][]int) []int {
+	var positions []int
+	if firstWordPositions, ok := index[words[0]]; ok {
+		for _, startPos := range firstWordPositions {
+			match := true
+			for i, word := range words[1:] {
+				expectedPos := startPos + i + 1
+				if wordPositions, ok := index[word]; !ok || !contains(wordPositions, expectedPos) {
+					match = false
+					break
+				}
+			}
+			if match {
+				positions = append(positions, startPos)
+			}
+		}
+	}
+	return positions
+}
+
+func (p *Pipeline) findApproximatePositions(entityName string, content string) []int {
+	words := strings.Fields(strings.ToLower(entityName))
+	contentLower := strings.ToLower(content)
+	var positions []int
+
+	// Recherche exacte de la phrase complète
+	if index := strings.Index(contentLower, strings.Join(words, " ")); index != -1 {
+		positions = append(positions, index)
+		p.logger.Debug("Found exact match for %s at position %d", entityName, index)
 		return positions
 	}
 
-	words := strings.Fields(entityName)
-	if len(words) > 1 {
-		// Recherche de la séquence exacte pour les entités multi-mots
-		var sequencePositions []int
-		firstWordPositions, ok := index[words[0]]
-		if ok {
-			for _, startPos := range firstWordPositions {
-				match := true
-				for i, w := range words[1:] {
-					expectedPos := startPos + i + 1
-					if positions, ok := index[w]; !ok || !contains(positions, expectedPos) {
-						match = false
-						break
-					}
-				}
-				if match {
-					sequencePositions = append(sequencePositions, startPos)
-				}
+	// Recherche approximative
+	contentWords := strings.Fields(contentLower)
+	maxDistance := 5 // Nombre maximum de mots entre les termes recherchés
+
+	for i := 0; i < len(contentWords); i++ {
+		if matchFound, endPos := p.checkApproximateMatch(words, contentWords[i:], maxDistance); matchFound {
+			positions = append(positions, i)
+			matchedPhrase := strings.Join(contentWords[i:i+endPos+1], " ")
+			p.logger.Debug("Found approximate match for %s at position %d: %s", entityName, i, matchedPhrase)
+		}
+	}
+
+	return positions
+}
+
+func (p *Pipeline) checkApproximateMatch(searchWords, contentWords []string, maxDistance int) (bool, int) {
+	wordIndex := 0
+	distanceCount := 0
+	for i, word := range contentWords {
+		if strings.Contains(word, searchWords[wordIndex]) {
+			wordIndex++
+			distanceCount = 0
+			if wordIndex == len(searchWords) {
+				return true, i
+			}
+		} else {
+			distanceCount++
+			if distanceCount > maxDistance {
+				return false, -1
 			}
 		}
-		if len(sequencePositions) > 0 {
-			p.logger.Debug("Found sequence positions for multi-word entity: %v", sequencePositions)
-			return sequencePositions
-		}
 	}
-
-	p.logger.Debug("No positions found for entity: %s", entityName)
-	return nil
-}
-
-func contains(slice []int, val int) bool {
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
-}
-
-func normalizeWord(word string) string {
-	// Convertir en minuscules et supprimer les caractères non alphanumériques
-	word = strings.Map(func(r rune) rune {
-		if unicode.IsLetter(r) || unicode.IsNumber(r) || unicode.IsSpace(r) {
-			return unicode.ToLower(r)
-		}
-		return -1
-	}, word)
-	return strings.TrimSpace(word)
+	return false, -1
 }
 
 // getAllPositions retourne toutes les positions des éléments de l'ontologie
@@ -765,8 +812,23 @@ func mergeOverlappingPositions(positions []PositionRange) []PositionRange {
 	return merged
 }
 
-func normalizeString(s string) string {
-	return strings.ToLower(strings.TrimSpace(s))
+func contains(slice []int, val int) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
+}
+
+func normalizeWord(word string) string {
+	// Conserver les apostrophes
+	return strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == '\'' {
+			return unicode.ToLower(r)
+		}
+		return ' '
+	}, word)
 }
 
 func normalizeTSV(input string) string {
@@ -786,4 +848,36 @@ func normalizeTSV(input string) string {
 		}
 	}
 	return strings.Join(normalizedLines, "\n")
+}
+
+func generateArticleVariants(word string) []string {
+	variants := []string{word}
+	lowercaseWord := strings.ToLower(word)
+
+	// Ajouter des variantes avec et sans apostrophe
+	if !strings.HasPrefix(lowercaseWord, "l'") && !strings.HasPrefix(lowercaseWord, "d'") {
+		variants = append(variants, "l'"+lowercaseWord, "d'"+lowercaseWord, "l "+lowercaseWord, "d "+lowercaseWord)
+	}
+
+	// Ajouter une variante sans underscore si le mot en contient
+	if strings.Contains(word, "_") {
+		spaceVariant := strings.ReplaceAll(word, "_", " ")
+		variants = append(variants, spaceVariant)
+		variants = append(variants, "l'"+spaceVariant, "d'"+spaceVariant, "l "+spaceVariant, "d "+spaceVariant)
+	}
+
+	return variants
+}
+
+// Fonction utilitaire pour dédupliquer une slice d'entiers
+func uniqueIntSlice(intSlice []int) []int {
+	keys := make(map[int]bool)
+	var list []int
+	for _, entry := range intSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
