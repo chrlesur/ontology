@@ -39,8 +39,13 @@ For each entity, provide:
 Format your response as a list of entities, one per line, using tabs to separate fields like this:
 EntityName\tEntityType\tDescription/Context
 
-Ensure that your extractions are relevant to creating an ontology and avoid including irrelevant or trivial information.
-Use the original document language. Do it silently with no comment.
+Ensure that:
+your extractions are relevant to creating an ontology and avoid including irrelevant or trivial information.
+All spaces in entity names are replaced with underscores
+Your extractions are relevant to creating an ontology
+You avoid including irrelevant or trivial information
+You use the original document language
+You provide the output silently with no additional comments
 `)
 
 	RelationExtractionPrompt = NewPromptTemplate(`
@@ -62,7 +67,13 @@ Format your response as a list of relationships, one per line, using tabs to sep
 SourceEntity\tRelationshipType\tTargetEntity\tDescription/Context
 
 Focus on meaningful relationships that contribute to the structure of the ontology. Avoid trivial or overly generic relationships.
-Use the original document language. Do it silently with no comment.
+Ensure that:
+
+All spaces in entity names are replaced with underscores
+Your extractions are relevant to creating an ontology
+You avoid including irrelevant or trivial information
+You use the original document language
+You provide the output silently with no additional comments
 `)
 
 	OntologyEnrichmentPrompt = NewPromptTemplate(`
@@ -88,8 +99,13 @@ Fournissez l'ontologie enrichie et raffinée dans le format suivant :
 - Pour les entités : Nom_Entité\tType_Entité\tDescription
 - Pour les relations : Entité_Source\tType_Relation\tEntité_Cible\tDescription
 
-Assurez-vous que chaque élément de l'ontologie est pertinent et contribue à une représentation complète et cohérente du domaine.
-Utilisez la langue originale du document. Répondez silencieusement, sans commentaires additionnels.
+Assurez-vous que :
+
+Tous les espaces dans les noms d'entités sont remplacés par des underscores.
+Vos extractions sont pertinentes pour la création d'une ontologie
+Vous évitez d'inclure des informations non pertinentes ou triviales
+Vous utilisez la langue originale du document
+Vous fournissez le résultat silencieusement sans commentaires supplémentaires
 `)
 
 	OntologyMergePrompt = NewPromptTemplate(`
@@ -103,7 +119,8 @@ Nouvelles informations à intégrer :
 
 Directives pour la fusion :
 1. Intégrez toutes les nouvelles entités et relations pertinentes de la nouvelle ontologie.
-2. En cas de conflit ou de duplication, conservez l'information la plus complète ou la plus à jour.
+2. En cas de conflit ou de duplication, identifie les concepts qui sont essentiellement identiques ou très proches sémantiquement. Pour chaque groupe de concepts similaires, choisis le nom le plus approprié et représentatif.
+Fusionne les descriptions en une seule, plus complète. Combine toutes les positions textuelles en une seule liste, sans doublons, triée par ordre croissant.
 3. Assurez-vous que les relations entre les entités restent cohérentes.
 4. Si une nouvelle information contredit une ancienne, privilégiez la nouvelle mais notez la contradiction si elle est significative.
 5. Maintenez la structure et le format de l'ontologie existante.

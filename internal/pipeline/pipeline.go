@@ -146,6 +146,8 @@ func truncateString(s string, maxLength int) string {
 }
 
 func (p *Pipeline) processSinglePass(input string, previousResult string, includePositions bool) (string, []byte, error) {
+	p.logger.Debug("Starting processSinglePass with input length: %d, previous result length: %d", len(input), len(previousResult))
+
 	// Initialiser le tokenizer
 	tke, err := tiktoken.GetEncoding("cl100k_base")
 	if err != nil {
@@ -162,8 +164,10 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 		p.logger.Error("Failed to parse input: %v", err)
 		return "", nil, err
 	}
+	p.logger.Debug("Parsed input content length: %d bytes", len(content))
 
 	positionIndex := p.createPositionIndex(content)
+	p.logger.Debug("Position index created. Number of entries: %d", len(positionIndex))
 
 	contentTokens := len(tke.Encode(string(content), nil, nil))
 	p.logger.Info("Parsed content tokens: %d", contentTokens)
@@ -190,16 +194,22 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 	var wg sync.WaitGroup
 	for i, segment := range segments {
 		wg.Add(1)
-		go func(i int, seg []byte) {
+		go func(i int, seg segmenter.SegmentInfo) {
 			defer wg.Done()
-			segmentTokens := len(tke.Encode(string(seg), nil, nil))
-			p.logger.Debug("Processing segment %d/%d, tokens: %d", i+1, len(segments), segmentTokens)
+			segmentTokens := len(tke.Encode(string(seg.Content), nil, nil))
+			p.logger.Debug("Processing segment %d/%d, Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
+				i+1, len(segments), seg.Start, seg.End, len(seg.Content), segmentTokens,
+				truncateString(string(seg.Content), 100))
+
 			context := segmenter.GetContext(segments, i, segmenter.SegmentConfig{
 				MaxTokens:   p.config.MaxTokens,
 				ContextSize: p.config.ContextSize,
 				Model:       p.config.DefaultModel,
 			})
-			result, err := p.processSegment(seg, context, previousResult, positionIndex, includePositions)
+			p.logger.Debug("Context for segment %d/%d, Length: %d bytes, Preview: %s",
+				i+1, len(segments), len(context), truncateString(context, 100))
+
+			result, err := p.processSegment(seg.Content, context, previousResult, positionIndex, includePositions)
 			if err != nil {
 				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i+1, err)
 				return
@@ -227,7 +237,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 
 	mergedResultTokens := len(tke.Encode(mergedResult, nil, nil))
 	p.logger.Info("Merged result tokens: %d", mergedResultTokens)
-
+	p.logger.Debug("processSinglePass completed. Merged result length: %d", len(mergedResult))
 	return mergedResult, content, nil
 }
 
@@ -284,7 +294,9 @@ func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {
 }
 
 func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, positionIndex map[string][]int, includePositions bool) (string, error) {
-	p.logger.Debug("Processing segment of length %d", len(segment))
+	p.logger.Debug("Processing segment of length %d, context length %d, previous result length %d", len(segment), len(context), len(previousResult))
+	p.logger.Debug("Segment content: %s", truncateString(string(segment), 200))
+	p.logger.Debug("Context preview: %s", truncateString(context, 200))
 
 	enrichmentValues := map[string]string{
 		"text":            string(segment),
@@ -297,13 +309,14 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 		return "", fmt.Errorf("ontology enrichment failed: %w", err)
 	}
 
-	p.logger.Debug("Enriched result before ontology enrichment:\n%s", enrichedResult)
+	// Normaliser le résultat enrichi
+	normalizedResult := normalizeTSV(enrichedResult)
 
-	p.enrichOntologyWithPositions(enrichedResult, positionIndex, includePositions)
+	p.logger.Debug("Enriched result length: %d, preview: %s", len(normalizedResult), truncateString(normalizedResult, 100))
 
-	p.logger.Debug("Enriched ontology after enrichment:\n%s", p.ontologyToString())
+	p.enrichOntologyWithPositions(normalizedResult, positionIndex, includePositions)
 
-	return enrichedResult, nil
+	return normalizedResult, nil
 }
 
 // Ajoutez cette fonction auxiliaire pour afficher l'ontologie sous forme de chaîne
@@ -321,8 +334,11 @@ func (p *Pipeline) ontologyToString() string {
 }
 
 func (p *Pipeline) mergeResults(previousResult string, newResults []string) (string, error) {
+	p.logger.Debug("Starting mergeResults. Previous result length: %d, Number of new results: %d", len(previousResult), len(newResults))
+
 	// Combiner tous les nouveaux résultats
 	combinedNewResults := strings.Join(newResults, "\n")
+	p.logger.Debug("Combined new results length: %d", len(combinedNewResults))
 
 	// Préparer les valeurs pour le prompt de fusion
 	mergeValues := map[string]string{
@@ -336,7 +352,12 @@ func (p *Pipeline) mergeResults(previousResult string, newResults []string) (str
 		return "", fmt.Errorf("ontology merge failed: %w", err)
 	}
 
-	return mergedResult, nil
+	// Normaliser le résultat fusionné
+	normalizedMergedResult := normalizeTSV(mergedResult)
+
+	p.logger.Debug("Merged result length: %d, preview: %s", len(normalizedMergedResult), truncateString(normalizedMergedResult, 100))
+
+	return normalizedMergedResult, nil
 }
 
 func (p *Pipeline) combineResults(results []string) (string, error) {
@@ -489,7 +510,10 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 	} else {
 		p.logger.Debug("Context output is disabled. Skipping context JSON generation.")
 	}
-
+	p.logger.Debug("Elements with positions:")
+	for _, element := range p.ontology.Elements {
+		p.logger.Debug("Element: %s, Type: %s, Positions: %v", element.Name, element.Type, element.Positions)
+	}
 	p.logger.Debug("Finished saveResult")
 	return nil
 }
@@ -498,46 +522,23 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 	p.logger.Debug("Starting createPositionIndex")
 	index := make(map[string][]int)
 	words := bytes.Fields(content)
-	p.logger.Debug("Number of words in content: %d", len(words))
 
 	for i, word := range words {
-		wordStr := normalizeWord(string(word))
-		p.logger.Debug("Processing word: %s, Normalized: %s", string(word), wordStr)
+		normalizedWord := normalizeWord(string(word))
+		index[normalizedWord] = append(index[normalizedWord], i)
+	}
 
-		// Index the original word
-		index[wordStr] = append(index[wordStr], i)
-		p.logger.Debug("Indexed normalized word: %s at position %d", wordStr, i)
+	// Indexer également les paires et triplets de mots consécutifs
+	for i := 0; i < len(words)-1; i++ {
+		w1 := normalizeWord(string(words[i]))
+		w2 := normalizeWord(string(words[i+1]))
+		compound2 := w1 + " " + w2
+		index[compound2] = append(index[compound2], i)
 
-		// Check for compound words (up to 3 words)
-		if i < len(words)-1 {
-			compoundWord := wordStr + " " + normalizeWord(string(words[i+1]))
-			index[compoundWord] = append(index[compoundWord], i)
-			p.logger.Debug("Indexed compound word (2): %s at position %d", compoundWord, i)
-
-			// Index individual words and their combinations
-			w1 := wordStr
-			w2 := normalizeWord(string(words[i+1]))
-			index[w1] = append(index[w1], i)
-			index[w2] = append(index[w2], i+1)
-			index[w1+" "+w2] = append(index[w1+" "+w2], i)
-			index[w2+" "+w1] = append(index[w2+" "+w1], i)
-		}
-		if i < len(words)-2 {
-			compoundWord := wordStr + " " + normalizeWord(string(words[i+1])) + " " + normalizeWord(string(words[i+2]))
-			index[compoundWord] = append(index[compoundWord], i)
-			p.logger.Debug("Indexed compound word (3): %s at position %d", compoundWord, i)
-
-			// Index individual words and their combinations
-			w1 := wordStr
-			w2 := normalizeWord(string(words[i+1]))
+		if i+2 < len(words) {
 			w3 := normalizeWord(string(words[i+2]))
-			index[w1] = append(index[w1], i)
-			index[w2] = append(index[w2], i+1)
-			index[w3] = append(index[w3], i+2)
-			index[w1+" "+w2] = append(index[w1+" "+w2], i)
-			index[w2+" "+w3] = append(index[w2+" "+w3], i+1)
-			index[w1+" "+w3] = append(index[w1+" "+w3], i)
-			index[w1+" "+w2+" "+w3] = append(index[w1+" "+w2+" "+w3], i)
+			compound3 := compound2 + " " + w3
+			index[compound3] = append(index[compound3], i)
 		}
 	}
 
@@ -546,57 +547,70 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 }
 
 func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int, includePositions bool) {
-	p.logger.Debug("Starting enrichOntology")
+	p.logger.Debug("Starting enrichOntologyWithPositions")
 	p.logger.Debug("Include positions: %v", includePositions)
+	p.logger.Debug("Position index size: %d", len(positionIndex))
 
 	lines := strings.Split(enrichedResult, "\n")
 	p.logger.Debug("Number of lines to process: %d", len(lines))
 
 	for i, line := range lines {
 		p.logger.Debug("Processing line %d: %s", i, line)
-		parts := strings.Split(line, "\t")
-		if len(parts) == 3 { // C'est une entité
-			p.logger.Debug("Processing entity: %v", parts)
+		parts := strings.Fields(line)
+		if len(parts) >= 3 { // Vérifie s'il y a au moins 3 parties
 			name := parts[0]
 			elementType := parts[1]
-			description := parts[2]
+			description := strings.Join(parts[2:], " ")
+
 			element := p.ontology.GetElementByName(name)
 			if element == nil {
 				element = model.NewOntologyElement(name, elementType)
 				p.ontology.AddElement(element)
 				p.logger.Debug("Added new element: %v", element)
+			} else {
+				p.logger.Debug("Updated existing element: %v", element)
 			}
 			element.Description = description
 
 			if includePositions {
+				p.logger.Debug("Searching for positions of entity: %s", name)
 				allPositions := p.findPositions(name, positionIndex)
+				p.logger.Debug("Found %d positions for entity %s: %v", len(allPositions), name, allPositions)
 				if len(allPositions) > 0 {
-					element.SetPositions(uniquePositions(allPositions))
-					p.logger.Debug("Set positions for element %s: %v", name, element.Positions)
+					uniquePos := uniquePositions(allPositions)
+					element.SetPositions(uniquePos)
+					p.logger.Debug("Set %d unique positions for element %s: %v", len(uniquePos), name, uniquePos)
 				} else {
 					p.logger.Debug("No positions found for element %s", name)
 				}
 			}
-		} else if len(parts) == 4 { // C'est une relation
-			p.logger.Debug("Processing relation: %v", parts)
-			source := parts[0]
-			relationType := parts[1]
-			target := parts[2]
-			description := parts[3]
-			relation := &model.Relation{
-				Source:      source,
-				Type:        relationType,
-				Target:      target,
-				Description: description,
+
+			if len(parts) >= 4 { // C'est une relation
+				p.logger.Debug("Processing relation: %v", parts)
+				source := parts[0]
+				relationType := parts[1]
+				target := parts[2]
+				relationDescription := strings.Join(parts[3:], " ")
+				relation := &model.Relation{
+					Source:      source,
+					Type:        relationType,
+					Target:      target,
+					Description: relationDescription,
+				}
+				p.ontology.AddRelation(relation)
+				p.logger.Info("Added new relation: %v", relation)
 			}
-			p.ontology.AddRelation(relation)
-			p.logger.Info("Added new relation: %v", relation)
 		} else {
 			p.logger.Debug("Skipping invalid line: %s", line)
 		}
 	}
 
-	p.logger.Debug("Finished enrichOntology")
+	p.logger.Debug("Ontology after enrichment:")
+	for _, element := range p.ontology.Elements {
+		p.logger.Debug("Element: %s, Type: %s, Description: %s, Positions: %v",
+			element.Name, element.Type, element.Description, element.Positions)
+	}
+	p.logger.Debug("Finished enrichOntologyWithPositions")
 	p.logger.Debug("Final ontology state - Elements: %d, Relations: %d",
 		len(p.ontology.Elements), len(p.ontology.Relations))
 }
@@ -614,53 +628,62 @@ func uniquePositions(positions []int) []int {
 }
 
 func (p *Pipeline) findPositions(word string, index map[string][]int) []int {
-	normalizedWord := normalizeWord(word)
-	p.logger.Debug("Searching for positions of normalized word: [%s]", normalizedWord)
+	// Séparer l'entité en ses composants (nom, type, etc.)
+	parts := strings.Split(word, "\t")
+	entityName := normalizeWord(parts[0]) // On utilise seulement le premier élément comme nom de l'entité
 
-	if positions, ok := index[normalizedWord]; ok {
-		p.logger.Debug("Found exact match positions for [%s]: %v", normalizedWord, positions)
+	p.logger.Debug("Searching for positions of entity: %s", entityName)
+
+	// Recherche exacte
+	if positions, ok := index[entityName]; ok {
+		p.logger.Debug("Found exact match positions: %v", positions)
 		return positions
 	}
 
-	words := strings.Fields(normalizedWord)
+	words := strings.Fields(entityName)
 	if len(words) > 1 {
-		var allPositions []int
-		for _, w := range words {
-			if positions, ok := index[w]; ok {
-				allPositions = append(allPositions, positions...)
-				p.logger.Debug("Found positions for word %s: %v", w, positions)
+		// Recherche de la séquence exacte pour les entités multi-mots
+		var sequencePositions []int
+		firstWordPositions, ok := index[words[0]]
+		if ok {
+			for _, startPos := range firstWordPositions {
+				match := true
+				for i, w := range words[1:] {
+					expectedPos := startPos + i + 1
+					if positions, ok := index[w]; !ok || !contains(positions, expectedPos) {
+						match = false
+						break
+					}
+				}
+				if match {
+					sequencePositions = append(sequencePositions, startPos)
+				}
 			}
 		}
-		if len(allPositions) > 0 {
-			return allPositions
+		if len(sequencePositions) > 0 {
+			p.logger.Debug("Found sequence positions for multi-word entity: %v", sequencePositions)
+			return sequencePositions
 		}
 	}
 
-	// Recherche partielle
-	var allPositions []int
-	for indexedWord, positions := range index {
-		if strings.Contains(indexedWord, normalizedWord) || strings.Contains(normalizedWord, indexedWord) {
-			allPositions = append(allPositions, positions...)
-			p.logger.Debug("Found partial match for [%s] in [%s]. Positions: %v", normalizedWord, indexedWord, positions)
+	p.logger.Debug("No positions found for entity: %s", entityName)
+	return nil
+}
+
+func contains(slice []int, val int) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
 		}
 	}
-
-	if len(allPositions) == 0 {
-		p.logger.Debug("No positions found for [%s]", normalizedWord)
-	}
-
-	return allPositions
+	return false
 }
 
 func normalizeWord(word string) string {
-	// Convertir en minuscules
-	word = strings.ToLower(word)
-	// Remplacer les underscores par des espaces
-	word = strings.ReplaceAll(word, "_", " ")
-	// Supprimer la ponctuation et les caractères non alphanumériques, sauf les espaces
+	// Convertir en minuscules et supprimer les caractères non alphanumériques
 	word = strings.Map(func(r rune) rune {
-		if unicode.IsLetter(r) || unicode.IsNumber(r) || r == ' ' {
-			return r
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || unicode.IsSpace(r) {
+			return unicode.ToLower(r)
 		}
 		return -1
 	}, word)
@@ -740,4 +763,27 @@ func mergeOverlappingPositions(positions []PositionRange) []PositionRange {
 	}
 
 	return merged
+}
+
+func normalizeString(s string) string {
+	return strings.ToLower(strings.TrimSpace(s))
+}
+
+func normalizeTSV(input string) string {
+	lines := strings.Split(input, "\n")
+	var normalizedLines []string
+	for _, line := range lines {
+		// Remplacer les séquences de "\t" par un seul espace
+		line = strings.ReplaceAll(line, "\\t", " ")
+		// Remplacer les tabulations réelles par un espace
+		line = strings.ReplaceAll(line, "\t", " ")
+		// Diviser la ligne en champs en utilisant un ou plusieurs espaces comme séparateur
+		fields := strings.Fields(line)
+		if len(fields) >= 3 {
+			// Reconstruire la ligne TSV avec des tabulations
+			normalizedLine := strings.Join(fields[:2], "\t") + "\t" + strings.Join(fields[2:], " ")
+			normalizedLines = append(normalizedLines, normalizedLine)
+		}
+	}
+	return strings.Join(normalizedLines, "\n")
 }

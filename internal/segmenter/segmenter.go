@@ -25,7 +25,13 @@ type SegmentConfig struct {
 }
 
 // Segment divides the content into segments of maxTokens
-func Segment(content []byte, cfg SegmentConfig) ([][]byte, error) {
+type SegmentInfo struct {
+	Content []byte
+	Start   int
+	End     int
+}
+
+func Segment(content []byte, cfg SegmentConfig) ([]SegmentInfo, error) {
 	log.Debug(i18n.Messages.LogSegmentationStarted)
 	log.Debug(fmt.Sprintf("Segmentation config: MaxTokens=%d, ContextSize=%d, Model=%s", cfg.MaxTokens, cfg.ContextSize, cfg.Model))
 	log.Debug(fmt.Sprintf("Content length: %d bytes", len(content)))
@@ -39,18 +45,27 @@ func Segment(content []byte, cfg SegmentConfig) ([][]byte, error) {
 		return nil, err
 	}
 
-	var segments [][]byte
+	var segments []SegmentInfo
 	sentences := splitIntoSentences(content)
 	currentSegment := new(bytes.Buffer)
 	currentTokenCount := 0
+	currentStart := 0
 
 	for _, sentence := range sentences {
 		sentenceTokens := CountTokens(sentence, tokenizer)
 
 		if currentTokenCount+sentenceTokens > cfg.MaxTokens {
 			if currentSegment.Len() > 0 {
-				segments = append(segments, currentSegment.Bytes())
-				log.Debug(fmt.Sprintf("Segment created with %d tokens", currentTokenCount))
+				segmentContent := content[currentStart : currentStart+currentSegment.Len()]
+				segments = append(segments, SegmentInfo{
+					Content: segmentContent,
+					Start:   currentStart,
+					End:     currentStart + currentSegment.Len(),
+				})
+				log.Debug(fmt.Sprintf("Segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
+					currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount,
+					truncateString(string(segmentContent), 100)))
+				currentStart = currentStart + currentSegment.Len()
 				currentSegment.Reset()
 				currentTokenCount = 0
 			}
@@ -60,22 +75,36 @@ func Segment(content []byte, cfg SegmentConfig) ([][]byte, error) {
 		currentTokenCount += sentenceTokens
 
 		if currentTokenCount >= cfg.MaxTokens {
-			segments = append(segments, currentSegment.Bytes())
-			log.Debug(fmt.Sprintf("Segment created with %d tokens", currentTokenCount))
+			segmentContent := content[currentStart : currentStart+currentSegment.Len()]
+			segments = append(segments, SegmentInfo{
+				Content: segmentContent,
+				Start:   currentStart,
+				End:     currentStart + currentSegment.Len(),
+			})
+			log.Debug(fmt.Sprintf("Segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
+				currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount,
+				truncateString(string(segmentContent), 100)))
+			currentStart = currentStart + currentSegment.Len()
 			currentSegment.Reset()
 			currentTokenCount = 0
 		}
 	}
 
 	if currentSegment.Len() > 0 {
-		segments = append(segments, currentSegment.Bytes())
-		log.Debug(fmt.Sprintf("Final segment created with %d tokens", currentTokenCount))
+		segmentContent := content[currentStart : currentStart+currentSegment.Len()]
+		segments = append(segments, SegmentInfo{
+			Content: segmentContent,
+			Start:   currentStart,
+			End:     currentStart + currentSegment.Len(),
+		})
+		log.Debug(fmt.Sprintf("Final segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
+			currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount,
+			truncateString(string(segmentContent), 100)))
 	}
 
 	log.Info(fmt.Sprintf(i18n.Messages.LogSegmentationCompleted, len(segments)))
 	return segments, nil
 }
-
 func splitIntoSentences(content []byte) [][]byte {
 	var sentences [][]byte
 	var currentSentence []byte
@@ -121,37 +150,44 @@ func CalibrateTokenCount(count int, model string) int {
 }
 
 // GetContext returns the context of previous segments
-func GetContext(segments [][]byte, currentIndex int, cfg SegmentConfig) string {
-	log.Debug(i18n.Messages.LogContextGeneration)
-	if currentIndex == 0 {
-		return ""
-	}
-
-	tokenizer, err := getTokenizer(cfg.Model)
-	if err != nil {
-		log.Error(i18n.Messages.ErrTokenizerInitialization, err)
-		return ""
-	}
+func GetContext(segments []SegmentInfo, currentIndex int, cfg SegmentConfig) string {
+	log.Debug("GetContext called for segment %d/%d", currentIndex+1, len(segments))
 
 	var context bytes.Buffer
 	tokenCount := 0
+	segmentsUsed := 0
 
-	for i := currentIndex - 1; i >= 0; i-- {
-		segmentTokens := CountTokens(segments[i], tokenizer)
+	tokenizer, err := getTokenizer(cfg.Model)
+	if err != nil {
+		log.Error("Failed to get tokenizer: %v", err)
+		return ""
+	}
 
+	for i := currentIndex - 1; i >= 0 && tokenCount < cfg.ContextSize; i-- {
+		segmentTokens := CountTokens(segments[i].Content, tokenizer)
 		if tokenCount+segmentTokens > cfg.ContextSize {
 			break
 		}
-
 		// Prepend this segment to the context
-		temp := make([]byte, len(segments[i]))
-		copy(temp, segments[i])
+		temp := make([]byte, len(segments[i].Content)+1)
+		copy(temp[1:], segments[i].Content)
+		temp[0] = '\n'
 		context.Write(temp)
-		context.WriteByte('\n')
-
 		tokenCount += segmentTokens
+		segmentsUsed++
 	}
 
-	log.Debug(fmt.Sprintf("Generated context with %d tokens", tokenCount))
+	log.Debug("Generated context for segment %d/%d. Segments used: %d, Token count: %d, Context length: %d bytes",
+		currentIndex+1, len(segments), segmentsUsed, tokenCount, context.Len())
+	log.Debug("Context preview for segment %d: %s",
+		currentIndex+1, truncateString(context.String(), 100))
+
 	return context.String()
+}
+
+func truncateString(s string, maxLength int) string {
+	if len(s) <= maxLength {
+		return s
+	}
+	return s[:maxLength] + "..."
 }

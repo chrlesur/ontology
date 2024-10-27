@@ -55,7 +55,7 @@ func NewClaudeClient(apiKey string, model string) (*ClaudeClient, error) {
 // Translate sends a prompt to the Claude API and returns the response
 func (c *ClaudeClient) Translate(prompt string, context string) (string, error) {
 	log.Debug(i18n.Messages.TranslationStarted, "Claude", c.model)
-	log.Debug("Prompt length: %d, Context length: %d", len(prompt), len(context))
+	log.Debug("Starting Translate. Prompt length: %d, Context length: %d", len(prompt), len(context))
 
 	var result string
 	var err error
@@ -86,6 +86,8 @@ func (c *ClaudeClient) Translate(prompt string, context string) (string, error) 
 	}
 
 	log.Error(i18n.Messages.TranslationFailed, err)
+	log.Debug("Translation completed. Result length: %d", len(result))
+
 	return "", fmt.Errorf("%w: %v", ErrTranslationFailed, err)
 }
 
@@ -120,7 +122,7 @@ func (c *ClaudeClient) makeRequest(prompt string, context string) (string, error
 	req.Header.Set("x-api-key", c.apiKey)
 	req.Header.Set("anthropic-version", "2023-06-01")
 
-	log.Debug("Sending request to Claude API")
+	//log.Debug("Sending request to Claude API : %s", prompt)
 	resp, err := c.client.Do(req)
 	if err != nil {
 		log.Error("Error sending request: %v", err)
@@ -156,7 +158,7 @@ func (c *ClaudeClient) makeRequest(prompt string, context string) (string, error
 		return "", fmt.Errorf("no content in response")
 	}
 
-	//log.Debug("Successfully received and parsed response from Claude API : %s", response.Content[0].Text)
+	log.Debug("Successfully received and parsed response from Claude API.")
 	return response.Content[0].Text, nil
 }
 
@@ -164,7 +166,6 @@ func (c *ClaudeClient) makeRequest(prompt string, context string) (string, error
 func (c *ClaudeClient) ProcessWithPrompt(promptTemplate *prompt.PromptTemplate, values map[string]string) (string, error) {
 	log.Debug("Processing prompt with Claude")
 	formattedPrompt := promptTemplate.Format(values)
-	log.Debug("Formatted prompt: %s", formattedPrompt)
 
 	// Utilisez la méthode Translate existante pour envoyer le prompt formatté
 	return c.Translate(formattedPrompt, "")

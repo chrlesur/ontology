@@ -25,7 +25,7 @@ type Ontology struct {
 
 // SetPositions définit les positions de l'élément
 func (e *OntologyElement) SetPositions(positions []int) {
-	e.Positions = positions
+    e.Positions = positions
 }
 
 // NewOntologyElement crée un nouvel élément d'ontologie
