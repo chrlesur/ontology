@@ -16,6 +16,7 @@ import (
 	"github.com/chrlesur/Ontology/internal/i18n"
 	"github.com/chrlesur/Ontology/internal/llm"
 	"github.com/chrlesur/Ontology/internal/logger"
+	"github.com/chrlesur/Ontology/internal/metadata"
 	"github.com/chrlesur/Ontology/internal/model"
 	"github.com/chrlesur/Ontology/internal/parser"
 	"github.com/chrlesur/Ontology/internal/prompt"
@@ -50,6 +51,7 @@ type Pipeline struct {
 	includePositions bool
 	contextOutput    bool
 	contextWords     int
+	inputPath        string
 }
 
 // NewPipeline creates a new instance of the processing pipeline
@@ -80,6 +82,7 @@ func (p *Pipeline) SetProgressCallback(callback ProgressCallback) {
 
 // ExecutePipeline orchestrates the entire workflow
 func (p *Pipeline) ExecutePipeline(input string, output string, passes int, existingOntology string, ontology *model.Ontology) error {
+	p.inputPath = input
 	p.logger.Info(i18n.GetMessage("StartingPipeline"))
 	p.logger.Debug("Input: %s, Output: %s, Passes: %d, Existing Ontology: %s", input, output, passes, existingOntology)
 
@@ -360,11 +363,6 @@ func (p *Pipeline) mergeResults(previousResult string, newResults []string) (str
 	return normalizedMergedResult, nil
 }
 
-func (p *Pipeline) combineResults(results []string) (string, error) {
-	combined := strings.Join(results, "\n")
-	return combined, nil
-}
-
 func (p *Pipeline) loadExistingOntology(path string) (string, error) {
 	content, err := ioutil.ReadFile(path)
 	if err != nil {
@@ -514,6 +512,41 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 	for _, element := range p.ontology.Elements {
 		p.logger.Debug("Element: %s, Type: %s, Positions: %v", element.Name, element.Type, element.Positions)
 	}
+
+	// Utiliser = au lieu de := pour les variables déjà déclarées
+	dir = filepath.Dir(outputPath)
+	baseName = filepath.Base(outputPath)
+	ext = filepath.Ext(baseName)
+	nameWithoutExt = strings.TrimSuffix(baseName, ext)
+
+	// Créer et sauvegarder les métadonnées
+	metadataGen := metadata.NewGenerator()
+
+	// Chemin du fichier d'ontologie
+	ontologyFile := filepath.Base(outputPath)
+
+	// Chemin du fichier de contexte (si activé)
+	var contextFile string
+	if p.contextOutput {
+		contextFile = nameWithoutExt + "_context.json"
+	}
+
+	// Générer les métadonnées
+	meta, err := metadataGen.GenerateMetadata(p.inputPath, ontologyFile, contextFile)
+	if err != nil {
+		p.logger.Error("Failed to generate metadata: %v", err)
+		return fmt.Errorf("failed to generate metadata: %w", err)
+	}
+
+	// Sauvegarder les métadonnées
+	metaFilePath := filepath.Join(dir, metadataGen.GetMetadataFilename(p.inputPath))
+	if err := metadataGen.SaveMetadata(meta, metaFilePath); err != nil {
+		p.logger.Error("Failed to save metadata: %v", err)
+		return fmt.Errorf("failed to save metadata: %w", err)
+	}
+
+	p.logger.Info("Metadata saved to: %s", metaFilePath)
+
 	p.logger.Debug("Finished saveResult")
 	return nil
 }

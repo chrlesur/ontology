@@ -1,25 +1,37 @@
-Qualification_Juridique	Concept	Processus de détermination du statut légal d'une situation ou d'un individu	1
-Agent_Service_Public	Concept	Personne travaillant pour un service public	23,47,189,24,48,62,81,117,120,154,177,190,208,244,443
-Principe_Neutralité	Concept	Principe imposant l'impartialité dans l'exercice des fonctions publiques	26,318
-Conseil_État	Organisation	Juridiction administrative suprême française	13,83,246
-Fédération_Française_Football	Organisation	Organisation régissant le football en France	51,52,54
-Ordre_Public	Concept	Ensemble des règles assurant le fonctionnement de la société	24,48,62,81,117,120,154,177,190,208,244,443
-Rapporteur_Public	Rôle	Membre du tribunal administratif donnant un avis sur les décisions à prendre	116,119,153,207
-Hijab	Objet	Voile couvrant les cheveux et le cou porté par certaines femmes musulmanes	88,213,314,361
-Joueuse_Internationale	Rôle	Joueuse de football représentant son pays en compétitions internationales	8,12,31,82,115,118,152,157,172,206,219,245,302,327,356,360,389,394,406,441,455,248,315,370,267,412,102,193,236,254,72
-Joueuse_Licenciée	Rôle	Joueuse de football inscrite auprès de la fédération	64,110,372,444,18,40,89,97,182,72,315,370
-Ministre_Intérieur	Rôle	Membre du gouvernement chargé de la sécurité intérieure	303,328,341,381,398
-Ministre_Égalité	Rôle	Membre du gouvernement chargé de l'égalité entre les femmes et les hommes	303,328,341,381,398
-Laïcité	Concept	Principe de séparation de l'État et de la religion	324
-Controverse	Concept	Débat ou discussion publique sur un sujet polémique	464
-Qualification_Juridique	Détermine	Statut_Légal	La qualification juridique détermine le statut légal d'une situation
-Conseil_État	Applique	Principe_Neutralité	Le Conseil d'État applique le principe de neutralité aux agents du service public
-Fédération_Française_Football	Peut_Restreindre	Expression_Opinions	La FFF peut restreindre l'expression d'opinions pour préserver l'ordre public
-Rapporteur_Public	Donne_Avis	Décision_Juridique	Le rapporteur public donne son avis sur les décisions juridiques à prendre
-Conseil_État	Décide	Interdiction_Hijab	Le Conseil d'État a décidé d'interdire le hijab pour certaines catégories de joueuses
-Ministre_Intérieur	Soutient	Interdiction_Générale_Hijab	Le ministre de l'Intérieur soutient une interdiction générale du hijab
-Ministre_Égalité	Soutient	Autorisation_Hijab	La ministre de l'Égalité soutient le droit de porter le hijab
-Controverse	Concerne	Port_Hijab	Une controverse existe concernant le port du hijab dans le football
-Joueuse_Internationale	Est_Considérée_Comme	Agent_Service_Public	Les joueuses internationales sont considérées comme des agents du service public
-Joueuse_Licenciée	N'est_Pas_Considérée_Comme	Agent_Service_Public	Les joueuses licenciées ne sont pas considérées comme des agents du service public
-Décision_Juridique	Peut_Générer	Controverse	Les décisions juridiques peuvent générer des controverses publiques
+Conseil_d'État	Organisation	Interdiction_du_hijab Pour prévenir l'atteinte à l'ordre public	13,83,246
+Qualification_juridique	Concept	Statut_juridique Des personnes ou situations	1
+Agent_du_service_public	Concept	Personne travaillant pour un service public	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
+Principe_de_neutralité	Concept	Obligation de neutralité dans le service public	26,318
+Fédération_française_de_football	Organisation	Expression_d'opinions Pour prévenir les risques d'atteinte à l'ordre public	298
+Ordre_public	Concept	Notion juridique assurant le bon fonctionnement de la société	176,378
+Hijab	Objet	Voile couvrant les cheveux porté par certaines femmes musulmanes	213
+Rapporteur_public	Rôle	Conseil_d'État Sur les décisions à prendre	153,207
+Tribunal_administratif	Organisation	Juridiction traitant des litiges avec l'administration	125
+Internationale	Rôle	Agent_du_service_public Par le Conseil d'État	65
+Simple_licencié	Rôle	Agent_du_service_public Par le Conseil d'État	29,30,31,32,33,34,162,163,164,165,166,167,226,227,228,229,230,231
+Ministre_de_l'Intérieur	Rôle	Port_du_hijab En invoquant le principe de neutralité et la laïcité	328
+Ministre_de_l'égalité	Rôle	Droit_de_porter_le_hijab Pour les joueuses de football	336,337,338,339,340,341,393,394,395,396,397,398
+Laïcité	Concept	Principe de séparation de l'État et de la religion	2028
+Conseil_d'État	Organisation	Haute	juridiction administrative française
+Qualification_juridique	Concept	Processus	de détermination du statut juridique
+Agent_du_service_public	Concept	Personne	travaillant pour un service public
+Principe_de_neutralité	Concept	Obligation	de neutralité dans le service public
+Fédération_française_de_football	Organisation	Organisation	régissant le football en France
+Ordre_public	Concept	Notion	juridique assurant le bon fonctionnement de la société
+Hijab	Objet	Voile	couvrant les cheveux porté par certaines femmes musulmanes
+Rapporteur_public	Rôle	Membre	du tribunal administratif donnant son avis sur les affaires
+Tribunal_administratif	Organisation	Juridiction	traitant des litiges avec l'administration
+Internationale	Rôle	Joueuse	de football représentant son pays
+Simple_licencié	Rôle	Joueur	de football amateur
+Ministre_de_l'Intérieur	Rôle	Membre	du gouvernement chargé de la sécurité intérieure
+Ministre_de_l'égalité	Rôle	Membre	du gouvernement chargé de l'égalité femmes-hommes
+Laïcité	Concept	Principe	de séparation de l'État et de la religion
+Conseil_d'État	Applique	Principe_de_neutralité	Pour les agents du service public
+Conseil_d'État	Valide	Interdiction_du_hijab	Pour prévenir l'atteinte à l'ordre public
+Rapporteur_public	Donne_avis	Conseil_d'État	Sur les décisions à prendre
+Fédération_française_de_football	Peut_restreindre	Expression_d'opinions	Pour prévenir les risques d'atteinte à l'ordre public
+Qualification_juridique	Détermine	Statut_juridique	Des personnes ou situations
+Ministre_de_l'Intérieur	S'oppose	Port_du_hijab	En invoquant le principe de neutralité et la laïcité
+Ministre_de_l'égalité	Soutient	Droit_de_porter_le_hijab	Pour les joueuses de football
+Internationale	Est_considérée_comme	Agent_du_service_public	Par le Conseil d'État
+Simple_licencié	N'est_pas_considéré_comme	Agent_du_service_public	Par le Conseil d'État

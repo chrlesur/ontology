@@ -1,0 +1,9 @@
+{
+  "source_file": "mini.txt",
+  "directory": "/Users/clr/PROJECTS/Ontology/test",
+  "file_date": "2024-10-29T08:54:33.959030889+01:00",
+  "sha256_hash": "9dd8a6ed9b76124c05e37f916dcee7931904290097cd80fc7f60d54c4b20eb32",
+  "ontology_file": "mini.tsv",
+  "context_file": "mini_context.json",
+  "processing_date": "2024-10-29T16:21:23.885584+01:00"
+}
