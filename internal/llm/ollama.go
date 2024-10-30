@@ -1,5 +1,3 @@
-// internal/llm/ollama.go
-
 package llm
 
 import (
@@ -15,24 +13,21 @@ import (
 	"github.com/chrlesur/Ontology/internal/prompt"
 )
 
-// OllamaClient implements the Client interface for Ollama
 type OllamaClient struct {
 	model  string
 	client *http.Client
 	config *config.Config
 }
 
-// supportedOllamaModels defines the list of supported Ollama models
 var supportedOllamaModels = map[string]bool{
-	"llama3.2:3B":       true,
-	"llama3.1:8B":       true,
-	"mistral-nemo:12B":  true,
-	"mixtral:7B":        true,
-	"mistral:7B":        true,
-	"mistral-small:22B": true,
+	"llama3.2":      true,
+	"llama3.1":      true,
+	"mistral-nemo":  true,
+	"mixtral":       true,
+	"mistral":       true,
+	"mistral-small": true,
 }
 
-// NewOllamaClient creates a new Ollama client
 func NewOllamaClient(model string) (*OllamaClient, error) {
 	log.Debug("Creating new Ollama client with model: %s", model)
 	if !supportedOllamaModels[model] {
@@ -42,35 +37,46 @@ func NewOllamaClient(model string) (*OllamaClient, error) {
 
 	return &OllamaClient{
 		model:  model,
-		client: &http.Client{Timeout: 30 * time.Second},
+		client: &http.Client{Timeout: 60 * time.Second},
 		config: config.GetConfig(),
 	}, nil
 }
 
-// Translate sends a prompt to the Ollama API and returns the response
 func (c *OllamaClient) Translate(prompt string, context string) (string, error) {
 	log.Debug(i18n.Messages.TranslationStarted, "Ollama", c.model)
-	log.Debug("Prompt length: %d, Context length: %d", len(prompt), len(context))
+	log.Debug("Starting Translate. Prompt length: %d, Context length: %d", len(prompt), len(context))
 
 	var result string
 	var err error
 	maxRetries := 5
-	baseDelay := time.Second
+	baseDelay := time.Second * 60
+	maxDelay := time.Minute * 5
 
-	for attempt := 1; attempt <= maxRetries; attempt++ {
-		log.Debug("Attempt %d of %d", attempt, maxRetries)
+	for attempt := 0; attempt < maxRetries; attempt++ {
+		log.Debug("Attempt %d of %d", attempt+1, maxRetries)
 		result, err = c.makeRequest(prompt, context)
 		if err == nil {
-			log.Info(i18n.Messages.TranslationCompleted, "Ollama", c.model)
-			log.Debug("Translation successful, result length: %d", len(result))
+			log.Debug(i18n.Messages.TranslationCompleted, "Ollama", c.model)
 			return result, nil
 		}
 
-		log.Warning(i18n.Messages.TranslationRetry, attempt, err)
-		time.Sleep(time.Duration(attempt) * baseDelay)
+		if !isRateLimitError(err) {
+			log.Warning(i18n.Messages.TranslationRetry, attempt+1, err)
+			time.Sleep(time.Duration(attempt+1) * time.Second)
+			continue
+		}
+
+		delay := baseDelay * time.Duration(1<<uint(attempt))
+		if delay > maxDelay {
+			delay = maxDelay
+		}
+		log.Warning(i18n.Messages.RateLimitExceeded, delay)
+		time.Sleep(delay)
 	}
 
 	log.Error(i18n.Messages.TranslationFailed, err)
+	log.Debug("Translation completed. Result length: %d", len(result))
+
 	return "", fmt.Errorf("%w: %v", ErrTranslationFailed, err)
 }
 
@@ -89,7 +95,6 @@ func (c *OllamaClient) makeRequest(prompt string, context string) (string, error
 		return "", fmt.Errorf("error marshalling request: %w", err)
 	}
 
-	log.Debug("Ollama API Request Body: %s", requestBody)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		log.Error("Error creating request: %v", err)
@@ -98,7 +103,6 @@ func (c *OllamaClient) makeRequest(prompt string, context string) (string, error
 
 	req.Header.Set("Content-Type", "application/json")
 
-	log.Debug("Sending request to Ollama API")
 	resp, err := c.client.Do(req)
 	if err != nil {
 		log.Error("Error sending request: %v", err)
@@ -127,16 +131,13 @@ func (c *OllamaClient) makeRequest(prompt string, context string) (string, error
 		return "", fmt.Errorf("error unmarshalling response: %w", err)
 	}
 
-	log.Debug("Successfully received and parsed response from Ollama API: %s", response.Response)
+	log.Debug("Successfully received and parsed response from Ollama API.")
 	return response.Response, nil
 }
 
-// ProcessWithPrompt processes a prompt template with the given values and sends it to the Ollama API
 func (c *OllamaClient) ProcessWithPrompt(promptTemplate *prompt.PromptTemplate, values map[string]string) (string, error) {
 	log.Debug("Processing prompt with Ollama")
 	formattedPrompt := promptTemplate.Format(values)
-	log.Debug("Formatted prompt: %s", formattedPrompt)
 
-	// Utilisez la méthode Translate existante pour envoyer le prompt formatté
 	return c.Translate(formattedPrompt, "")
 }

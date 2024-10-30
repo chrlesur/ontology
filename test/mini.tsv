@@ -1,37 +1,19 @@
-Conseil_d'État	Organisation	Interdiction_du_hijab Pour prévenir l'atteinte à l'ordre public	13,83,246
-Qualification_juridique	Concept	Statut_juridique Des personnes ou situations	1
-Agent_du_service_public	Concept	Personne travaillant pour un service public	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
-Principe_de_neutralité	Concept	Obligation de neutralité dans le service public	26,318
-Fédération_française_de_football	Organisation	Expression_d'opinions Pour prévenir les risques d'atteinte à l'ordre public	298
-Ordre_public	Concept	Notion juridique assurant le bon fonctionnement de la société	176,378
-Hijab	Objet	Voile couvrant les cheveux porté par certaines femmes musulmanes	213
-Rapporteur_public	Rôle	Conseil_d'État Sur les décisions à prendre	153,207
-Tribunal_administratif	Organisation	Juridiction traitant des litiges avec l'administration	125
-Internationale	Rôle	Agent_du_service_public Par le Conseil d'État	65
-Simple_licencié	Rôle	Agent_du_service_public Par le Conseil d'État	29,30,31,32,33,34,162,163,164,165,166,167,226,227,228,229,230,231
-Ministre_de_l'Intérieur	Rôle	Port_du_hijab En invoquant le principe de neutralité et la laïcité	328
-Ministre_de_l'égalité	Rôle	Droit_de_porter_le_hijab Pour les joueuses de football	336,337,338,339,340,341,393,394,395,396,397,398
-Laïcité	Concept	Principe de séparation de l'État et de la religion	2028
-Conseil_d'État	Organisation	Haute	juridiction administrative française
-Qualification_juridique	Concept	Processus	de détermination du statut juridique
-Agent_du_service_public	Concept	Personne	travaillant pour un service public
-Principe_de_neutralité	Concept	Obligation	de neutralité dans le service public
-Fédération_française_de_football	Organisation	Organisation	régissant le football en France
-Ordre_public	Concept	Notion	juridique assurant le bon fonctionnement de la société
-Hijab	Objet	Voile	couvrant les cheveux porté par certaines femmes musulmanes
-Rapporteur_public	Rôle	Membre	du tribunal administratif donnant son avis sur les affaires
-Tribunal_administratif	Organisation	Juridiction	traitant des litiges avec l'administration
-Internationale	Rôle	Joueuse	de football représentant son pays
-Simple_licencié	Rôle	Joueur	de football amateur
-Ministre_de_l'Intérieur	Rôle	Membre	du gouvernement chargé de la sécurité intérieure
-Ministre_de_l'égalité	Rôle	Membre	du gouvernement chargé de l'égalité femmes-hommes
-Laïcité	Concept	Principe	de séparation de l'État et de la religion
-Conseil_d'État	Applique	Principe_de_neutralité	Pour les agents du service public
-Conseil_d'État	Valide	Interdiction_du_hijab	Pour prévenir l'atteinte à l'ordre public
-Rapporteur_public	Donne_avis	Conseil_d'État	Sur les décisions à prendre
-Fédération_française_de_football	Peut_restreindre	Expression_d'opinions	Pour prévenir les risques d'atteinte à l'ordre public
-Qualification_juridique	Détermine	Statut_juridique	Des personnes ou situations
-Ministre_de_l'Intérieur	S'oppose	Port_du_hijab	En invoquant le principe de neutralité et la laïcité
-Ministre_de_l'égalité	Soutient	Droit_de_porter_le_hijab	Pour les joueuses de football
-Internationale	Est_considérée_comme	Agent_du_service_public	Par le Conseil d'État
-Simple_licencié	N'est_pas_considéré_comme	Agent_du_service_public	Par le Conseil d'État
+Voici	l'ontologie	enrichie et raffinée :
+*	qualifiction_juridique_dun_agent_public	ministre de l'intérieur a considéré qu'il faut interdire le hijab à tout le monde	0
+Notez	que	j'ai remplacé les espaces dans les noms d'entités par des underscores et mis les entités et les relations en minuscule sans caractère spécial et accent.
+Voici	l'ontologie	enrichie	et raffinée :
+*	qualifiction_juridique_dun_agent_public	ype_entite\la	qualification juridique d'un agent du service public
+*	qualifiction_juridique_dun_licencie	ype_entite\la	qualification juridique d'un licencié
+*	hijab	ype_entite\l'acte	de porter un hijab
+*	conseil_d_etat	ype_entite\le	Conseil d'État
+*	fédération_française_de_football	ype_entite\la	Fédération française de football
+*	rapporteur_public	ype_entite\le	rapporteur public
+*	ministre_de_l_intérieur	ype_entite\le	ministre de l'intérieur
+*	ministre_chargé_de_l_egalité	ype_entite\le	ministre chargé de l'égalité entre les femmes et les hommes
+*	conseil_d_etat	est_un\rapporteur_public\le	rapporteur public est un membre du Conseil d'État
+*	fédération_française_de_football\a_justifié_l_interdiction_du_hijab_conseil_d_etat\le	Conseil	d'État a validé l'interdiction du hijab
+*	rapporteur_public\a_soutenu_le_même_raisonnement_pour_les_internationales_quand_il_fautait_un_risque_d_atteinte_a_l_ordre_public\rapporteur_public\rapporteur	public	avait soutenu le même raisonnement pour les internationales que quand il y a un risque d'atteinte à l'ordre public
+*	rapporteur_public\a_soutenu_le_même_raisonnement_pour_les_internationales_quand_il_n_y_a_pas_de_risque_d_atteinte_a_l_ordre_public\rapporteur_public\rapporteur	public	avait soutenu le même raisonnement pour les internationales quand il n'y a pas de risque d'atteinte à l'ordre public
+*	ministre_chargé_de_l_egalité\a_estimé_que_les_joueuses_ont_le_droit_de_porter_le_hijab\ministre	chargé	de l'égalité\réponse ministérielle selon laquelle les joueuses ont le droit de porter un hijab
+*	ministre_de_l_intérieur\a_consideré_qu'il_faut_interdire_le_hijab_a_tout_le_monde\le	ministre	de l'intérieur a considéré qu'il faut interdire le hijab à tout le monde
+Notez	que	j'ai	remplacé les espaces dans les noms d'entités par des underscores et mis les entités et les relations en minuscule sans caractère spécial et accent.

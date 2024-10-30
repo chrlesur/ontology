@@ -66,6 +66,12 @@ Pour tous les modules :
 - Implémenter une interface commune pour tous les analyseurs afin de standardiser le processus d'extraction
 - Préserver la structure du document et le contexte à travers les segments
 - Implémenter un système de gestion des métadonnées du document (auteur, date de création, version, etc.). Les métadonnées doivent pouvoir être données en paramètre de ligne de commande.
+- Limiter le nombre de requêtes simultanées au LLM (par exemple, 5 requêtes en parallèle).
+- Optimiser la recherche de positions pour gérer les cas comme "l'article 55 de la Constitution".
+- Améliorer la gestion des entités avec underscores et variations d'articles.
+- Implémenter une recherche approximative plus robuste pour les entités complexes.
+- Assurer une meilleure gestion des apostrophes et des variations lexicales.
+
 
 ### 2. Conversion QuickStatement TSV
 

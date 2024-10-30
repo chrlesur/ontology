@@ -43,36 +43,54 @@ type ProgressCallback func(ProgressInfo)
 
 // Pipeline represents the main processing pipeline
 type Pipeline struct {
-	config           *config.Config
-	logger           *logger.Logger
-	llm              llm.Client
-	progressCallback ProgressCallback
-	ontology         *model.Ontology
-	includePositions bool
-	contextOutput    bool
-	contextWords     int
-	inputPath        string
+	config                   *config.Config
+	logger                   *logger.Logger
+	llm                      llm.Client
+	progressCallback         ProgressCallback
+	ontology                 *model.Ontology
+	includePositions         bool
+	contextOutput            bool
+	contextWords             int
+	inputPath                string
+	entityExtractionPrompt   string
+	relationExtractionPrompt string
+	ontologyEnrichmentPrompt string
+	ontologyMergePrompt      string
 }
 
 // NewPipeline creates a new instance of the processing pipeline
-func NewPipeline(includePositions bool, contextOutput bool, contextWords int) (*Pipeline, error) {
-	cfg := config.GetConfig()
-	log := logger.GetLogger()
+func NewPipeline(includePositions bool, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llmType, llmModel string) (*Pipeline, error) {
+    cfg := config.GetConfig()
+    log := logger.GetLogger()
 
-	client, err := llm.GetClient(cfg.DefaultLLM, cfg.DefaultModel)
-	if err != nil {
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrInitLLMClient"), err)
-	}
+    // Utilisez les valeurs de la ligne de commande si elles sont fournies, sinon utilisez les valeurs de la configuration
+    selectedLLM := cfg.DefaultLLM
+    selectedModel := cfg.DefaultModel
+    if llmType != "" {
+        selectedLLM = llmType
+    }
+    if llmModel != "" {
+        selectedModel = llmModel
+    }
 
-	return &Pipeline{
-		config:           cfg,
-		logger:           log,
-		llm:              client,
-		ontology:         model.NewOntology(),
-		includePositions: includePositions,
-		contextOutput:    contextOutput,
-		contextWords:     contextWords,
-	}, nil
+    client, err := llm.GetClient(selectedLLM, selectedModel)
+    if err != nil {
+        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrInitLLMClient"), err)
+    }
+
+    return &Pipeline{
+        config:           cfg,
+        logger:           log,
+        llm:              client,
+        ontology:         model.NewOntology(),
+        includePositions: includePositions,
+        contextOutput:    contextOutput,
+        contextWords:     contextWords,
+        entityExtractionPrompt: entityPrompt,
+        relationExtractionPrompt: relationPrompt,
+        ontologyEnrichmentPrompt: enrichmentPrompt,
+        ontologyMergePrompt: mergePrompt,
+    }, nil
 }
 
 // SetProgressCallback sets the callback function for progress updates
@@ -195,10 +213,17 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 
 	results := make([]string, len(segments))
 	var wg sync.WaitGroup
+	sem := make(chan struct{}, 5) // Sémaphore pour limiter à 5 goroutines concurrentes
+
 	for i, segment := range segments {
 		wg.Add(1)
 		go func(i int, seg segmenter.SegmentInfo) {
 			defer wg.Done()
+
+			// Acquérir une place dans le sémaphore
+			sem <- struct{}{}
+			defer func() { <-sem }() // Libérer la place à la fin
+
 			segmentTokens := len(tke.Encode(string(seg.Content), nil, nil))
 			p.logger.Debug("Processing segment %d/%d, Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
 				i+1, len(segments), seg.Start, seg.End, len(seg.Content), segmentTokens,
@@ -302,9 +327,10 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 	p.logger.Debug("Context preview: %s", truncateString(context, 200))
 
 	enrichmentValues := map[string]string{
-		"text":            string(segment),
-		"context":         context,
-		"previous_result": previousResult,
+		"text":              string(segment),
+		"context":           context,
+		"previous_result":   previousResult,
+		"additional_prompt": p.ontologyEnrichmentPrompt,
 	}
 
 	enrichedResult, err := p.llm.ProcessWithPrompt(prompt.OntologyEnrichmentPrompt, enrichmentValues)
@@ -322,20 +348,6 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 	return normalizedResult, nil
 }
 
-// Ajoutez cette fonction auxiliaire pour afficher l'ontologie sous forme de chaîne
-func (p *Pipeline) ontologyToString() string {
-	var result strings.Builder
-	result.WriteString("Elements:\n")
-	for _, element := range p.ontology.Elements {
-		result.WriteString(fmt.Sprintf("  %s (%s): %s - Positions: %v\n", element.Name, element.Type, element.Description, element.Positions))
-	}
-	result.WriteString("Relations:\n")
-	for _, relation := range p.ontology.Relations {
-		result.WriteString(fmt.Sprintf("  %s %s %s: %s\n", relation.Source, relation.Type, relation.Target, relation.Description))
-	}
-	return result.String()
-}
-
 func (p *Pipeline) mergeResults(previousResult string, newResults []string) (string, error) {
 	p.logger.Debug("Starting mergeResults. Previous result length: %d, Number of new results: %d", len(previousResult), len(newResults))
 
@@ -347,6 +359,7 @@ func (p *Pipeline) mergeResults(previousResult string, newResults []string) (str
 	mergeValues := map[string]string{
 		"previous_ontology": previousResult,
 		"new_ontology":      combinedNewResults,
+		"additional_prompt": p.ontologyMergePrompt,
 	}
 
 	// Utiliser le LLM pour fusionner les résultats

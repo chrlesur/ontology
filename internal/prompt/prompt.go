@@ -17,11 +17,17 @@ func NewPromptTemplate(template string) *PromptTemplate {
 
 // Format remplit le template avec les valeurs fournies
 func (pt *PromptTemplate) Format(values map[string]string) string {
-	result := pt.Template
-	for key, value := range values {
-		result = strings.Replace(result, fmt.Sprintf("{%s}", key), value, -1)
-	}
-	return result
+    result := pt.Template
+    for key, value := range values {
+        result = strings.Replace(result, fmt.Sprintf("{%s}", key), value, -1)
+    }
+    
+    // Ajouter le prompt supplémentaire s'il existe
+    if additionalPrompt, ok := values["additional_prompt"]; ok && additionalPrompt != "" {
+        result += "\n\nAdditional instructions:\n" + additionalPrompt
+    }
+    
+    return result
 }
 
 // Définition des templates de prompts

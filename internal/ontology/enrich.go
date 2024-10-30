@@ -10,19 +10,24 @@ import (
 	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/chrlesur/Ontology/internal/model"
 	"github.com/chrlesur/Ontology/internal/pipeline"
+
 	"github.com/spf13/cobra"
 )
 
 var (
-	output           string
-	format           string
-	llm              string
-	llmModel         string
-	passes           int
-	rdf              bool
-	owl              bool
-	recursive        bool
-	existingOntology string
+	output                   string
+	format                   string
+	llm                      string
+	llmModel                 string
+	passes                   int
+	rdf                      bool
+	owl                      bool
+	recursive                bool
+	existingOntology         string
+	entityExtractionPrompt   string
+	relationExtractionPrompt string
+	ontologyEnrichmentPrompt string
+	ontologyMergePrompt      string
 )
 
 // enrichCmd represents the enrich command
@@ -53,7 +58,7 @@ var enrichCmd = &cobra.Command{
 			}
 		}
 
-		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords)
+		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel)
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 		}
@@ -94,9 +99,14 @@ func init() {
 	enrichCmd.Flags().BoolVar(&owl, "owl", false, i18n.Messages.OWLFlagUsage)
 	enrichCmd.Flags().BoolVar(&recursive, "recursive", false, i18n.Messages.RecursiveFlagUsage)
 	enrichCmd.Flags().StringVar(&existingOntology, "existing-ontology", "", i18n.Messages.ExistingOntologyFlagUsage)
+
+	enrichCmd.Flags().StringVarP(&entityExtractionPrompt, "entity-prompt", "e", "", "Additional prompt for entity extraction")
+	enrichCmd.Flags().StringVarP(&relationExtractionPrompt, "relation-prompt", "r", "", "Additional prompt for relation extraction")
+	enrichCmd.Flags().StringVarP(&ontologyEnrichmentPrompt, "enrichment-prompt", "n", "", "Additional prompt for ontology enrichment")
+	enrichCmd.Flags().StringVarP(&ontologyMergePrompt, "merge-prompt", "m", "", "Additional prompt for ontology merging")
 }
 
-func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, owl, rdf, includePositions, contextOutput bool, contextWords int) error {
+func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, owl, rdf, includePositions, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt string) error {
 	log := logger.GetLogger()
 	log.Info(i18n.Messages.StartingEnrichProcess)
 
@@ -114,7 +124,7 @@ func ExecuteEnrichCommand(input, output string, passes int, existingOntology str
 		}
 	}
 
-	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords)
+	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llm, llmModel)
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 	}
@@ -178,10 +188,10 @@ func processFile(filePath string) error {
 		outputPath = filepath.Join(dir, baseName+extension)
 	}
 
-	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords)
-    if err != nil {
-        return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
-    }
+	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel)
+	if err != nil {
+		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
+	}
 
 	ontology := model.NewOntology()
 
