@@ -1,19 +1,21 @@
-Voici	l'ontologie	enrichie et raffinée :
-*	qualifiction_juridique_dun_agent_public	ministre de l'intérieur a considéré qu'il faut interdire le hijab à tout le monde	0
-Notez	que	j'ai remplacé les espaces dans les noms d'entités par des underscores et mis les entités et les relations en minuscule sans caractère spécial et accent.
-Voici	l'ontologie	enrichie	et raffinée :
-*	qualifiction_juridique_dun_agent_public	ype_entite\la	qualification juridique d'un agent du service public
-*	qualifiction_juridique_dun_licencie	ype_entite\la	qualification juridique d'un licencié
-*	hijab	ype_entite\l'acte	de porter un hijab
-*	conseil_d_etat	ype_entite\le	Conseil d'État
-*	fédération_française_de_football	ype_entite\la	Fédération française de football
-*	rapporteur_public	ype_entite\le	rapporteur public
-*	ministre_de_l_intérieur	ype_entite\le	ministre de l'intérieur
-*	ministre_chargé_de_l_egalité	ype_entite\le	ministre chargé de l'égalité entre les femmes et les hommes
-*	conseil_d_etat	est_un\rapporteur_public\le	rapporteur public est un membre du Conseil d'État
-*	fédération_française_de_football\a_justifié_l_interdiction_du_hijab_conseil_d_etat\le	Conseil	d'État a validé l'interdiction du hijab
-*	rapporteur_public\a_soutenu_le_même_raisonnement_pour_les_internationales_quand_il_fautait_un_risque_d_atteinte_a_l_ordre_public\rapporteur_public\rapporteur	public	avait soutenu le même raisonnement pour les internationales que quand il y a un risque d'atteinte à l'ordre public
-*	rapporteur_public\a_soutenu_le_même_raisonnement_pour_les_internationales_quand_il_n_y_a_pas_de_risque_d_atteinte_a_l_ordre_public\rapporteur_public\rapporteur	public	avait soutenu le même raisonnement pour les internationales quand il n'y a pas de risque d'atteinte à l'ordre public
-*	ministre_chargé_de_l_egalité\a_estimé_que_les_joueuses_ont_le_droit_de_porter_le_hijab\ministre	chargé	de l'égalité\réponse ministérielle selon laquelle les joueuses ont le droit de porter un hijab
-*	ministre_de_l_intérieur\a_consideré_qu'il_faut_interdire_le_hijab_a_tout_le_monde\le	ministre	de l'intérieur a considéré qu'il faut interdire le hijab à tout le monde
-Notez	que	j'ai	remplacé les espaces dans les noms d'entités par des underscores et mis les entités et les relations en minuscule sans caractère spécial et accent.
+qualification_juridique	entité	principe_de_neutralité la qualification juridique détermine l'application du principe de neutralité.	1
+conseil_d_etat	entité	interdiction_du_hijab le conseil d'état valide l'interdiction du hijab pour prévenir l'ordre public.
+agent_du_service_public	entité	un agent du service public est une personne employée par une administration publique.	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
+fédération_française_de_football	entité	fédération française de football est l'organe gouvernant du football en france.	298
+rapporteur_public	entité	interdiction_du_hijab_pour_les_internationales le rapporteur public a suggéré l'interdiction du hijab pour les joueuses internationales.	153,207
+ministre_de_l_interieur	entité	interdiction_généralisée_du_hijab le ministre de l'intérieur est en faveur de l'interdiction généralisée du hijab.
+ministre_chargée_de_l_egalité	entité	hijab_pour_internationales la ministre chargée de l'égalité autorise le hijab même pour les joueuses internationales.
+rapprteur_public	autorise	hijab_pour_simples_licenciées le rapporteur public a autorisé le hijab pour les simples licenciées.
+qualification_juridique	entité	la	qualification juridique joue un rôle primordial dans l'application des principes légaux.
+conseil_d_etat	entité	le	conseil d'état est l'organe chargé de conseiller le gouvernement sur des questions légales et de juger les affaires administratives.
+agent_du_service_public	entité	un	agent du service public est une personne employée par une administration publique.
+fédération_française_de_football	entité	fédération	française de football est l'organe gouvernant du football en france.
+rapporteur_public	entité	l'un	des membres du tribunal administratif chargé de donner un avis sur la décision à prendre.
+ministre_de_l_interieur	entité	le	ministre de l'intérieur est un membre du gouvernement responsable de l'ordre public et de la sécurité intérieure.
+ministre_chargée_de_l_egalité	entité	le	ministre chargé de l'égalité entre les femmes et les hommes est responsable des politiques de promotion de l'égalité.
+qualification_juridique	a_pour_rôle	principe_de_neutralité	la qualification juridique détermine l'application du principe de neutralité.
+conseil_d_etat	valide	interdiction_du_hijab	le conseil d'état valide l'interdiction du hijab pour prévenir l'ordre public.
+rapporteur_public	suggère	interdiction_du_hijab_pour_les_internationales	le rapporteur public a suggéré l'interdiction du hijab pour les joueuses internationales.
+rapprteur_public	autorise	hijab_pour_simples_licenciées	le rapporteur public a autorisé le hijab pour les simples licenciées.
+ministre_de_l_interieur	suggère	interdiction_généralisée_du_hijab	le ministre de l'intérieur est en faveur de l'interdiction généralisée du hijab.
+ministre_chargée_de_l_egalité	autorise	hijab_pour_internationales	la ministre chargée de l'égalité autorise le hijab même pour les joueuses internationales.

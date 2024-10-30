@@ -38,6 +38,10 @@ type Config struct {
 	IncludePositions bool   `yaml:"include_positions"`
 	ContextOutput    bool   `yaml:"context_output"`
 	ContextWords     int    `yaml:"context_words"`
+	AIYOUAPIURL      string `yaml:"aiyou_api_url"`
+	AIYOUAssistantID string `yaml:"aiyou_assistant_id"`
+	AIYOUEmail       string `yaml:"aiyou_email"`
+	AIYOUPassword    string `yaml:"aiyou_password"`
 }
 
 // GetConfig returns the singleton instance of Config
@@ -55,8 +59,10 @@ func GetConfig() *Config {
 			DefaultLLM:       "claude",
 			DefaultModel:     "claude-3-5-sonnet-20240620",
 			IncludePositions: true,
-			ContextOutput:    false, // Par défaut, la sortie de contexte est désactivée
-			ContextWords:     30,    // Par défaut, 30 mots de contexte
+			ContextOutput:    false,                           // Par défaut, la sortie de contexte est désactivée
+			ContextWords:     30,                              // Par défaut, 30 mots de contexte
+			AIYOUAssistantID: "asst_q2YbeHKeSxBzNr43KhIESkqj", // Secnumcloud
+			AIYOUAPIURL:      "https://ai.dragonflygroup.fr/api",
 		}
 		instance.loadConfigFile()
 		instance.loadEnvVariables()

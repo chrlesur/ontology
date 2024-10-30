@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/chrlesur/Ontology/internal/config"
 	"github.com/chrlesur/Ontology/internal/i18n"
 	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/chrlesur/Ontology/internal/model"
@@ -40,7 +41,21 @@ var enrichCmd = &cobra.Command{
 		input := args[0]
 		log := logger.GetLogger()
 		log.Info(i18n.Messages.StartingEnrichProcess)
+		aiyouAssistantID, _ := cmd.Flags().GetString("aiyou-assistant-id")
+		aiyouEmail, _ := cmd.Flags().GetString("aiyou-email")
+		aiyouPassword, _ := cmd.Flags().GetString("aiyou-password")
 
+		// Mettre à jour la configuration si les flags sont fournis
+		cfg := config.GetConfig() // Obtenez l'instance de configuration
+		if aiyouAssistantID != "" {
+			cfg.AIYOUAssistantID = aiyouAssistantID
+		}
+		if aiyouEmail != "" {
+			cfg.AIYOUEmail = aiyouEmail
+		}
+		if aiyouPassword != "" {
+			cfg.AIYOUPassword = aiyouPassword
+		}
 		// Utiliser le chemin absolu pour l'entrée
 		absInput, err := filepath.Abs(input)
 		if err != nil {

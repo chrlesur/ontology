@@ -18,6 +18,8 @@ func GetClient(llmType string, model string) (Client, error) {
 		return NewClaudeClient(cfg.ClaudeAPIKey, model)
 	case "ollama":
 		return NewOllamaClient(model)
+	case "aiyou":
+        return NewAIYOUClient(cfg.AIYOUAssistantID, cfg.AIYOUEmail, cfg.AIYOUPassword)
 	default:
 		return nil, fmt.Errorf("%w: %s", ErrInvalidLLMType, llmType)
 	}

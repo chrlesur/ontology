@@ -44,7 +44,9 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&includePositions, "include-positions", "i", true, i18n.GetMessage("IncludePositionsFlagUsage"))
 	rootCmd.PersistentFlags().BoolVarP(&contextOutput, "context-output", "c", false, i18n.GetMessage("ContextOutputFlagUsage"))
 	rootCmd.PersistentFlags().IntVarP(&contextWords, "context-words", "w", 30, i18n.GetMessage("ContextWordsFlagUsage"))
-
+	rootCmd.PersistentFlags().StringP("aiyou-assistant-id","a", "", "AI.YOU Assistant ID")
+    rootCmd.PersistentFlags().String("aiyou-email", "", "AI.YOU Email")
+    rootCmd.PersistentFlags().String("aiyou-password", "", "AI.YOU Password")
 	rootCmd.Run = rootCmd.HelpFunc()
 }
 

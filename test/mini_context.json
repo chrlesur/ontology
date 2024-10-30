@@ -1,6 +1,48 @@
-[{"position": 0,"before": [],
-    "after": ["qualification","juridique","sert","de","premier","plan.","Dans","le","cas","des","internationales,","le","Conseil","d'État","nous","dit","que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans"],
-    "element": "*",
+[{"position": 1,"before": ["La"],
+    "after": ["juridique","sert","de","premier","plan.","Dans","le","cas","des","internationales,","le","Conseil","d'État","nous","dit","que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans","le"],
+    "element": "qualification_juridique",
+    "length": 1
+  },
+  {
+    "position": 16,
+    "before": ["La","qualification","juridique","sert","de","premier","plan.","Dans","le","cas","des","internationales,","le","Conseil","d'État","nous"],
+    "after": ["que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans","le","cas","des","simples","licenciés,","il","nous","dit","que","ce","ne","sont","pas","des","agents","du"],
+    "element": "agent_du_service_public",
+    "length": 6
+  },
+  {
+    "position": 40,
+    "before": ["des","internationales,","le","Conseil","d'État","nous","dit","que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans","le","cas","des","simples","licenciés,","il","nous","dit","que"],
+    "after": ["ne","sont","pas","des","agents","du","service","public.","Mais","la","Fédération","française","de","football,","pour","prévenir","les","risques","d'atteinte","à","l'ordre","public,","est","en","droit","de","restreindre","l'expression","d'opinions","religieuses,"],
+    "element": "agent_du_service_public",
+    "length": 6
+  },
+  {
+    "position": 153,
+    "before": ["membre","du","tribunal","administratif","qui","donne","son","avis","sur","la","décision","à","prendre,","une","sorte","de","point","de","vue","sur","la","loi","dans","l'intérêt","général","et","du","droit.","Or,","le"],
+    "after": ["public","avait","soutenu","le","même","raisonnement","pour","les","internationales,","mais","pas","pour","les","simples","licenciés.","Il","disait","que","le","risque","d'atteinte","à","l'ordre","public","n'est","pas","avéré.","Comme","ce","ne"],
+    "element": "rapporteur_public",
+    "length": 1
+  },
+  {
+    "position": 182,
+    "before": ["le","rapporteur","public","avait","soutenu","le","même","raisonnement","pour","les","internationales,","mais","pas","pour","les","simples","licenciés.","Il","disait","que","le","risque","d'atteinte","à","l'ordre","public","n'est","pas","avéré.","Comme"],
+    "after": ["ne","sont","pas","des","agents","du","service","public,","il","n'y","a","pas","lieu","de","les","empêcher","de","manifester","leur","identité","religieuse.","Et","donc","le","rapporteur","public","avait","dit","interdiction","du"],
+    "element": "agent_du_service_public",
+    "length": 6
+  },
+  {
+    "position": 207,
+    "before": ["public","n'est","pas","avéré.","Comme","ce","ne","sont","pas","des","agents","du","service","public,","il","n'y","a","pas","lieu","de","les","empêcher","de","manifester","leur","identité","religieuse.","Et","donc","le"],
+    "after": ["public","avait","dit","interdiction","du","hijab","pour","les","joueuses","internationales","dans","le","cadre","des","sélections","de","la","FFF,","mais","autorisation","pour","les","joueuses","simples","licenciées","parce","qu'il","n'y","a","pas"],
+    "element": "rapporteur_public",
+    "length": 1
+  },
+  {
+    "position": 298,
+    "before": ["vient","de","voir,","pour","la","première","fois,","un","raisonnement","juridique","avec","une","qualification","et","ensuite","un","régime","qui","s'applique.","Avant","la","pause,","je","vous","montre","quelques","réactions","et","ensuite","les"],
+    "after": ["de","cette","affaire.","Le","ministre","de","l'Intérieur,","à","l'époque,","était","très","opposé","au","port","du","hijab,","se","référant","au","principe","de","neutralité","et","à","la","laïcité.","Et","donc,","le","ministre"],
+    "element": "fédération_française_de_football",
     "length": 1
   }
 ]
