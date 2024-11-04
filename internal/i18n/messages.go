@@ -20,8 +20,7 @@ var Messages = struct {
 	LLMFlagUsage                      string
 	LLMModelFlagUsage                 string
 	PassesFlagUsage                   string
-	RDFFlagUsage                      string
-	OWLFlagUsage                      string
+
 	RecursiveFlagUsage                string
 	InitializingApplication           string
 	StartingEnrichProcess             string
@@ -96,8 +95,6 @@ It can handle various input formats and use different language models for analys
 	LLMFlagUsage:                      "language model to use for analysis",
 	LLMModelFlagUsage:                 "specific model for the chosen LLM",
 	PassesFlagUsage:                   "number of passes for ontology enrichment",
-	RDFFlagUsage:                      "export ontology in RDF format",
-	OWLFlagUsage:                      "export ontology in OWL format",
 	RecursiveFlagUsage:                "process input directory recursively",
 	InitializingApplication:           "Initializing Ontology application",
 	StartingEnrichProcess:             "Starting ontology enrichment process",

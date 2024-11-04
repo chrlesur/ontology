@@ -1,48 +1,139 @@
 [{"position": 1,"before": ["La"],
     "after": ["juridique","sert","de","premier","plan.","Dans","le","cas","des","internationales,","le","Conseil","d'État","nous","dit","que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans","le"],
-    "element": "qualification_juridique",
+    "element": "Qualification_juridique",
+    "length": 1
+  },
+  {
+    "position": 13,
+    "before": ["La","qualification","juridique","sert","de","premier","plan.","Dans","le","cas","des","internationales,","le"],
+    "after": ["d'État","nous","dit","que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans","le","cas","des","simples","licenciés,","il","nous","dit","que","ce","ne","sont","pas"],
+    "element": "Conseil_d'État",
     "length": 1
   },
   {
     "position": 16,
     "before": ["La","qualification","juridique","sert","de","premier","plan.","Dans","le","cas","des","internationales,","le","Conseil","d'État","nous"],
     "after": ["que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans","le","cas","des","simples","licenciés,","il","nous","dit","que","ce","ne","sont","pas","des","agents","du"],
-    "element": "agent_du_service_public",
+    "element": "Agent_du_service_public",
     "length": 6
+  },
+  {
+    "position": 26,
+    "before": ["La","qualification","juridique","sert","de","premier","plan.","Dans","le","cas","des","internationales,","le","Conseil","d'État","nous","dit","que","ce","sont","les","agents","du","service","public,","donc"],
+    "after": ["de","neutralité","applicable.","Dans","le","cas","des","simples","licenciés,","il","nous","dit","que","ce","ne","sont","pas","des","agents","du","service","public.","Mais","la","Fédération","française","de","football,","pour","prévenir"],
+    "element": "Principe_de_neutralité",
+    "length": 1
   },
   {
     "position": 40,
     "before": ["des","internationales,","le","Conseil","d'État","nous","dit","que","ce","sont","les","agents","du","service","public,","donc","principe","de","neutralité","applicable.","Dans","le","cas","des","simples","licenciés,","il","nous","dit","que"],
     "after": ["ne","sont","pas","des","agents","du","service","public.","Mais","la","Fédération","française","de","football,","pour","prévenir","les","risques","d'atteinte","à","l'ordre","public,","est","en","droit","de","restreindre","l'expression","d'opinions","religieuses,"],
-    "element": "agent_du_service_public",
+    "element": "Agent_du_service_public",
     "length": 6
+  },
+  {
+    "position": 83,
+    "before": ["de","football,","pour","prévenir","les","risques","d'atteinte","à","l'ordre","public,","est","en","droit","de","restreindre","l'expression","d'opinions","religieuses,","philosophiques","ou","politiques.","Et","donc,","pour","prévenir","l'atteinte","à","l'ordre","public,","le"],
+    "after": ["d'État","valide","l'interdiction","du","hijab.","Ce","qui","est","vraiment","intéressant,","c'est","que","sur","ce","dernier","point,","il","y","a","un","personnage","que","vous","allez","croiser","souvent","en","droit","administratif,","qui"],
+    "element": "Conseil_d'État",
+    "length": 1
   },
   {
     "position": 153,
     "before": ["membre","du","tribunal","administratif","qui","donne","son","avis","sur","la","décision","à","prendre,","une","sorte","de","point","de","vue","sur","la","loi","dans","l'intérêt","général","et","du","droit.","Or,","le"],
     "after": ["public","avait","soutenu","le","même","raisonnement","pour","les","internationales,","mais","pas","pour","les","simples","licenciés.","Il","disait","que","le","risque","d'atteinte","à","l'ordre","public","n'est","pas","avéré.","Comme","ce","ne"],
-    "element": "rapporteur_public",
+    "element": "Rapporteur_public",
+    "length": 1
+  },
+  {
+    "position": 176,
+    "before": ["l'intérêt","général","et","du","droit.","Or,","le","rapporteur","public","avait","soutenu","le","même","raisonnement","pour","les","internationales,","mais","pas","pour","les","simples","licenciés.","Il","disait","que","le","risque","d'atteinte","à"],
+    "after": ["public","n'est","pas","avéré.","Comme","ce","ne","sont","pas","des","agents","du","service","public,","il","n'y","a","pas","lieu","de","les","empêcher","de","manifester","leur","identité","religieuse.","Et","donc","le"],
+    "element": "Ordre_public",
     "length": 1
   },
   {
     "position": 182,
     "before": ["le","rapporteur","public","avait","soutenu","le","même","raisonnement","pour","les","internationales,","mais","pas","pour","les","simples","licenciés.","Il","disait","que","le","risque","d'atteinte","à","l'ordre","public","n'est","pas","avéré.","Comme"],
     "after": ["ne","sont","pas","des","agents","du","service","public,","il","n'y","a","pas","lieu","de","les","empêcher","de","manifester","leur","identité","religieuse.","Et","donc","le","rapporteur","public","avait","dit","interdiction","du"],
-    "element": "agent_du_service_public",
+    "element": "Agent_du_service_public",
     "length": 6
   },
   {
     "position": 207,
     "before": ["public","n'est","pas","avéré.","Comme","ce","ne","sont","pas","des","agents","du","service","public,","il","n'y","a","pas","lieu","de","les","empêcher","de","manifester","leur","identité","religieuse.","Et","donc","le"],
     "after": ["public","avait","dit","interdiction","du","hijab","pour","les","joueuses","internationales","dans","le","cadre","des","sélections","de","la","FFF,","mais","autorisation","pour","les","joueuses","simples","licenciées","parce","qu'il","n'y","a","pas"],
-    "element": "rapporteur_public",
+    "element": "Rapporteur_public",
     "length": 1
+  },
+  {
+    "position": 211,
+    "before": ["Comme","ce","ne","sont","pas","des","agents","du","service","public,","il","n'y","a","pas","lieu","de","les","empêcher","de","manifester","leur","identité","religieuse.","Et","donc","le","rapporteur","public","avait","dit"],
+    "after": ["du","hijab","pour","les","joueuses","internationales","dans","le","cadre","des","sélections","de","la","FFF,","mais","autorisation","pour","les","joueuses","simples","licenciées","parce","qu'il","n'y","a","pas","de","véritable","risque","d'atteinte"],
+    "element": "Joueuse_internationale",
+    "length": 6
+  },
+  {
+    "position": 225,
+    "before": ["lieu","de","les","empêcher","de","manifester","leur","identité","religieuse.","Et","donc","le","rapporteur","public","avait","dit","interdiction","du","hijab","pour","les","joueuses","internationales","dans","le","cadre","des","sélections","de","la"],
+    "after": ["mais","autorisation","pour","les","joueuses","simples","licenciées","parce","qu'il","n'y","a","pas","de","véritable","risque","d'atteinte","à","l'ordre","public.","Le","Conseil","d'État","n'a","pas","suivi","cet","avis","et","a","opté"],
+    "element": "Joueuse_licenciée",
+    "length": 6
+  },
+  {
+    "position": 246,
+    "before": ["joueuses","internationales","dans","le","cadre","des","sélections","de","la","FFF,","mais","autorisation","pour","les","joueuses","simples","licenciées","parce","qu'il","n'y","a","pas","de","véritable","risque","d'atteinte","à","l'ordre","public.","Le"],
+    "after": ["d'État","n'a","pas","suivi","cet","avis","et","a","opté","pour","la","même","solution","que","pour","les","joueuses","internationales.","Donc","là","on","vient","de","voir,","pour","la","première","fois,","un","raisonnement"],
+    "element": "Conseil_d'État",
+    "length": 1
+  },
+  {
+    "position": 258,
+    "before": ["pour","les","joueuses","simples","licenciées","parce","qu'il","n'y","a","pas","de","véritable","risque","d'atteinte","à","l'ordre","public.","Le","Conseil","d'État","n'a","pas","suivi","cet","avis","et","a","opté","pour","la"],
+    "after": ["solution","que","pour","les","joueuses","internationales.","Donc","là","on","vient","de","voir,","pour","la","première","fois,","un","raisonnement","juridique","avec","une","qualification","et","ensuite","un","régime","qui","s'applique.","Avant","la"],
+    "element": "Joueuse_internationale",
+    "length": 6
   },
   {
     "position": 298,
     "before": ["vient","de","voir,","pour","la","première","fois,","un","raisonnement","juridique","avec","une","qualification","et","ensuite","un","régime","qui","s'applique.","Avant","la","pause,","je","vous","montre","quelques","réactions","et","ensuite","les"],
     "after": ["de","cette","affaire.","Le","ministre","de","l'Intérieur,","à","l'époque,","était","très","opposé","au","port","du","hijab,","se","référant","au","principe","de","neutralité","et","à","la","laïcité.","Et","donc,","le","ministre"],
-    "element": "fédération_française_de_football",
+    "element": "Fédération_française_de_football",
     "length": 1
+  },
+  {
+    "position": 318,
+    "before": ["la","pause,","je","vous","montre","quelques","réactions","et","ensuite","les","enseignements","de","cette","affaire.","Le","ministre","de","l'Intérieur,","à","l'époque,","était","très","opposé","au","port","du","hijab,","se","référant","au"],
+    "after": ["de","neutralité","et","à","la","laïcité.","Et","donc,","le","ministre","de","l'Intérieur","considérait","que","l'interdiction","devait","être","généralisée.","D'un","autre","côté,","la","ministre","chargée","de","l'égalité","entre","les","femmes","et"],
+    "element": "Principe_de_neutralité",
+    "length": 1
+  },
+  {
+    "position": 328,
+    "before": ["enseignements","de","cette","affaire.","Le","ministre","de","l'Intérieur,","à","l'époque,","était","très","opposé","au","port","du","hijab,","se","référant","au","principe","de","neutralité","et","à","la","laïcité.","Et","donc,","le"],
+    "after": ["de","l'Intérieur","considérait","que","l'interdiction","devait","être","généralisée.","D'un","autre","côté,","la","ministre","chargée","de","l'égalité","entre","les","femmes","et","les","hommes","estimait","que","les","joueuses","ont","le","droit","de"],
+    "element": "Ministre_de_l'Intérieur",
+    "length": 1
+  },
+  {
+    "position": 336,
+    "before": ["à","l'époque,","était","très","opposé","au","port","du","hijab,","se","référant","au","principe","de","neutralité","et","à","la","laïcité.","Et","donc,","le","ministre","de","l'Intérieur","considérait","que","l'interdiction","devait","être"],
+    "after": ["D'un","autre","côté,","la","ministre","chargée","de","l'égalité","entre","les","femmes","et","les","hommes","estimait","que","les","joueuses","ont","le","droit","de","porter","le","hijab.","Donc","là,","même","gouvernement,","même"],
+    "element": "Ministre_chargé_de_l'égalité",
+    "length": 6
+  },
+  {
+    "position": 378,
+    "before": ["et","les","hommes","estimait","que","les","joueuses","ont","le","droit","de","porter","le","hijab.","Donc","là,","même","gouvernement,","même","couleur","politique,","ça","se","discute,","en","tout","cas","même","gouvernement,","et"],
+    "after": ["avez","un","ministre","qui","dit","qu'il","faudrait","interdire","à","tout","le","monde,","elles","n'ont","pas","le","droit,","et","la","ministre","chargée","de","l'égalité","qui","dit","qu'elles","ont","le","droit,","y"],
+    "element": "Ordre_public",
+    "length": 1
+  },
+  {
+    "position": 393,
+    "before": ["là,","même","gouvernement,","même","couleur","politique,","ça","se","discute,","en","tout","cas","même","gouvernement,","et","vous","avez","un","ministre","qui","dit","qu'il","faudrait","interdire","à","tout","le","monde,","elles","n'ont"],
+    "after": ["le","droit,","et","la","ministre","chargée","de","l'égalité","qui","dit","qu'elles","ont","le","droit,","y","compris","les","internationales.","On","va","revenir","sur","ces","deux","réactions,","mais","vous","voyez","déjà","qu'une"],
+    "element": "Ministre_chargé_de_l'égalité",
+    "length": 6
   }
 ]

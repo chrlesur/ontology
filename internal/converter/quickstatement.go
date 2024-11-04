@@ -9,8 +9,6 @@ import (
 // Converter defines the interface for QuickStatement conversion
 type Converter interface {
 	Convert(segment []byte, context string, ontology string) (string, error)
-	ConvertToRDF(quickstatement string) (string, error)
-	ConvertToOWL(quickstatement string) (string, error)
 }
 
 // QuickStatementConverter implements the Converter interface

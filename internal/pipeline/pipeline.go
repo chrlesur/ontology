@@ -12,7 +12,6 @@ import (
 	"unicode"
 
 	"github.com/chrlesur/Ontology/internal/config"
-	"github.com/chrlesur/Ontology/internal/converter"
 	"github.com/chrlesur/Ontology/internal/i18n"
 	"github.com/chrlesur/Ontology/internal/llm"
 	"github.com/chrlesur/Ontology/internal/logger"
@@ -60,37 +59,37 @@ type Pipeline struct {
 
 // NewPipeline creates a new instance of the processing pipeline
 func NewPipeline(includePositions bool, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llmType, llmModel string) (*Pipeline, error) {
-    cfg := config.GetConfig()
-    log := logger.GetLogger()
+	cfg := config.GetConfig()
+	log := logger.GetLogger()
 
-    // Utilisez les valeurs de la ligne de commande si elles sont fournies, sinon utilisez les valeurs de la configuration
-    selectedLLM := cfg.DefaultLLM
-    selectedModel := cfg.DefaultModel
-    if llmType != "" {
-        selectedLLM = llmType
-    }
-    if llmModel != "" {
-        selectedModel = llmModel
-    }
+	// Utilisez les valeurs de la ligne de commande si elles sont fournies, sinon utilisez les valeurs de la configuration
+	selectedLLM := cfg.DefaultLLM
+	selectedModel := cfg.DefaultModel
+	if llmType != "" {
+		selectedLLM = llmType
+	}
+	if llmModel != "" {
+		selectedModel = llmModel
+	}
 
-    client, err := llm.GetClient(selectedLLM, selectedModel)
-    if err != nil {
-        return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrInitLLMClient"), err)
-    }
+	client, err := llm.GetClient(selectedLLM, selectedModel)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrInitLLMClient"), err)
+	}
 
-    return &Pipeline{
-        config:           cfg,
-        logger:           log,
-        llm:              client,
-        ontology:         model.NewOntology(),
-        includePositions: includePositions,
-        contextOutput:    contextOutput,
-        contextWords:     contextWords,
-        entityExtractionPrompt: entityPrompt,
-        relationExtractionPrompt: relationPrompt,
-        ontologyEnrichmentPrompt: enrichmentPrompt,
-        ontologyMergePrompt: mergePrompt,
-    }, nil
+	return &Pipeline{
+		config:                   cfg,
+		logger:                   log,
+		llm:                      client,
+		ontology:                 model.NewOntology(),
+		includePositions:         includePositions,
+		contextOutput:            contextOutput,
+		contextWords:             contextWords,
+		entityExtractionPrompt:   entityPrompt,
+		relationExtractionPrompt: relationPrompt,
+		ontologyEnrichmentPrompt: enrichmentPrompt,
+		ontologyMergePrompt:      mergePrompt,
+	}, nil
 }
 
 // SetProgressCallback sets the callback function for progress updates
@@ -272,8 +271,11 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 func (p *Pipeline) parseInput(input string) ([]byte, error) {
 	info, err := os.Stat(input)
 	if err != nil {
+		p.logger.Error("Error accessing input file: %v", err)
 		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrAccessInput"), err)
 	}
+
+	p.logger.Debug("File info: Size: %d, ModTime: %s", info.Size(), info.ModTime())
 
 	if info.IsDir() {
 		return p.parseDirectory(input)
@@ -282,11 +284,13 @@ func (p *Pipeline) parseInput(input string) ([]byte, error) {
 	ext := filepath.Ext(input)
 	parser, err := parser.GetParser(ext)
 	if err != nil {
+		p.logger.Error("Error getting parser for extension %s: %v", ext, err)
 		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrUnsupportedFormat"), err)
 	}
 
 	content, err := parser.Parse(input)
 	if err != nil {
+		p.logger.Error("Error parsing file: %v", err)
 		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrParseFile"), err)
 	}
 
@@ -432,40 +436,6 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOutput"), err)
 	}
 	p.logger.Debug("TSV file written: %s", tsvPath)
-
-	qsc := converter.NewQuickStatementConverter(p.logger, p.includePositions)
-
-	if p.config.ExportRDF {
-		p.logger.Debug("Exporting RDF")
-		rdf, err := qsc.ConvertToRDF(qs)
-		if err != nil {
-			p.logger.Error("Failed to convert to RDF: %v", err)
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertRDF"), err)
-		}
-		rdfPath := filepath.Join(dir, nameWithoutExt+".rdf")
-		err = ioutil.WriteFile(rdfPath, []byte(rdf), 0644)
-		if err != nil {
-			p.logger.Error("Failed to write RDF file: %v", err)
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteRDF"), err)
-		}
-		p.logger.Debug("RDF file written: %s", rdfPath)
-	}
-
-	if p.config.ExportOWL {
-		p.logger.Debug("Exporting OWL")
-		owl, err := qsc.ConvertToOWL(qs)
-		if err != nil {
-			p.logger.Error("Failed to convert to OWL: %v", err)
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrConvertOWL"), err)
-		}
-		owlPath := filepath.Join(dir, nameWithoutExt+".owl")
-		err = ioutil.WriteFile(owlPath, []byte(owl), 0644)
-		if err != nil {
-			p.logger.Error("Failed to write OWL file: %v", err)
-			return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOWL"), err)
-		}
-		p.logger.Debug("OWL file written: %s", owlPath)
-	}
 
 	// Générer et sauvegarder le JSON de contexte si l'option est activée
 	if p.contextOutput {

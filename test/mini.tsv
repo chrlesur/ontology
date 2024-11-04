@@ -1,21 +1,35 @@
-qualification_juridique	entité	principe_de_neutralité la qualification juridique détermine l'application du principe de neutralité.	1
-conseil_d_etat	entité	interdiction_du_hijab le conseil d'état valide l'interdiction du hijab pour prévenir l'ordre public.
-agent_du_service_public	entité	un agent du service public est une personne employée par une administration publique.	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
-fédération_française_de_football	entité	fédération française de football est l'organe gouvernant du football en france.	298
-rapporteur_public	entité	interdiction_du_hijab_pour_les_internationales le rapporteur public a suggéré l'interdiction du hijab pour les joueuses internationales.	153,207
-ministre_de_l_interieur	entité	interdiction_généralisée_du_hijab le ministre de l'intérieur est en faveur de l'interdiction généralisée du hijab.
-ministre_chargée_de_l_egalité	entité	hijab_pour_internationales la ministre chargée de l'égalité autorise le hijab même pour les joueuses internationales.
-rapprteur_public	autorise	hijab_pour_simples_licenciées le rapporteur public a autorisé le hijab pour les simples licenciées.
-qualification_juridique	entité	la	qualification juridique joue un rôle primordial dans l'application des principes légaux.
-conseil_d_etat	entité	le	conseil d'état est l'organe chargé de conseiller le gouvernement sur des questions légales et de juger les affaires administratives.
-agent_du_service_public	entité	un	agent du service public est une personne employée par une administration publique.
-fédération_française_de_football	entité	fédération	française de football est l'organe gouvernant du football en france.
-rapporteur_public	entité	l'un	des membres du tribunal administratif chargé de donner un avis sur la décision à prendre.
-ministre_de_l_interieur	entité	le	ministre de l'intérieur est un membre du gouvernement responsable de l'ordre public et de la sécurité intérieure.
-ministre_chargée_de_l_egalité	entité	le	ministre chargé de l'égalité entre les femmes et les hommes est responsable des politiques de promotion de l'égalité.
-qualification_juridique	a_pour_rôle	principe_de_neutralité	la qualification juridique détermine l'application du principe de neutralité.
-conseil_d_etat	valide	interdiction_du_hijab	le conseil d'état valide l'interdiction du hijab pour prévenir l'ordre public.
-rapporteur_public	suggère	interdiction_du_hijab_pour_les_internationales	le rapporteur public a suggéré l'interdiction du hijab pour les joueuses internationales.
-rapprteur_public	autorise	hijab_pour_simples_licenciées	le rapporteur public a autorisé le hijab pour les simples licenciées.
-ministre_de_l_interieur	suggère	interdiction_généralisée_du_hijab	le ministre de l'intérieur est en faveur de l'interdiction généralisée du hijab.
-ministre_chargée_de_l_egalité	autorise	hijab_pour_internationales	la ministre chargée de l'égalité autorise le hijab même pour les joueuses internationales.
+Conseil_d'État	Organisation	Interdiction_du_hijab Pour les joueuses de football	13,83,246
+Fédération_française_de_football	Organisation	Expression_d'opinions Pour prévenir les risques d'atteinte à l'ordre public	298
+Rapporteur_public	Rôle	Décision_juridique Dans l'intérêt général et du droit	153,207
+Ministre_de_l'Intérieur	Rôle	Port_du_hijab En se référant au principe de neutralité et à la laïcité	328
+Ministre_chargé_de_l'égalité	Rôle	Droit_de_porter_le_hijab Pour les joueuses de football	336,337,338,339,340,341,393,394,395,396,397,398
+Qualification_juridique	Concept	Régime_applicable Dans le raisonnement juridique	1
+Agent_du_service_public	Statut	Personne travaillant pour un service public	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
+Principe_de_neutralité	Concept	Principe d'impartialité dans le service public	26,318
+Ordre_public	Concept	Ensemble de règles assurant le bon fonctionnement de la société	176,378
+Hijab	Objet	Voile couvrant les cheveux porté par certaines femmes musulmanes	213
+Laïcité	Concept	Principe de séparation de l'État et de la religion	2032
+Joueuse_internationale	Statut	Agent_du_service_public Selon le Conseil d'État	211,212,213,214,215,216,258,259,260,261,262,263
+Joueuse_licenciée	Statut	Agent_du_service_public Selon le Conseil d'État	225,226,227,228,229,230
+Conseil_d'État	Organisation	Haute	juridiction administrative française
+Fédération_française_de_football	Organisation	Organisation	gérant le football en France
+Rapporteur_public	Rôle	Membre	du tribunal administratif donnant son avis sur la décision à prendre
+Ministre_de_l'Intérieur	Rôle	Membre	du gouvernement en charge de l'intérieur
+Ministre_chargé_de_l'égalité	Rôle	Membre	du gouvernement en charge de l'égalité entre les femmes et les hommes
+Qualification_juridique	Concept	Processus	de détermination du statut juridique
+Agent_du_service_public	Statut	Personne	travaillant pour un service public
+Principe_de_neutralité	Concept	Principe	d'impartialité dans le service public
+Ordre_public	Concept	Ensemble	de règles assurant le bon fonctionnement de la société
+Hijab	Objet	Voile	couvrant les cheveux porté par certaines femmes musulmanes
+Laïcité	Concept	Principe	de séparation de l'État et de la religion
+Joueuse_internationale	Statut	Joueuse	de football représentant son pays
+Joueuse_licenciée	Statut	Joueuse	de football inscrite à un club
+Conseil_d'État	Applique	Principe_de_neutralité	Pour les agents du service public
+Fédération_française_de_football	Peut_restreindre	Expression_d'opinions	Pour prévenir les risques d'atteinte à l'ordre public
+Conseil_d'État	Valide	Interdiction_du_hijab	Pour les joueuses de football
+Rapporteur_public	Donne_avis	Décision_juridique	Dans l'intérêt général et du droit
+Qualification_juridique	Détermine	Régime_applicable	Dans le raisonnement juridique
+Ministre_de_l'Intérieur	S'oppose	Port_du_hijab	En se référant au principe de neutralité et à la laïcité
+Ministre_chargé_de_l'égalité	Soutient	Droit_de_porter_le_hijab	Pour les joueuses de football
+Joueuse_internationale	Est_considérée_comme	Agent_du_service_public	Selon le Conseil d'État
+Joueuse_licenciée	N'est_pas_considérée_comme	Agent_du_service_public	Selon le Conseil d'État

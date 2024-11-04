@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const Version = "0.6.0"
+
 var (
 	cfgFile          string
 	debug            bool
@@ -21,9 +23,19 @@ var (
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "ontology",
-	Short: i18n.GetMessage("RootCmdShortDesc"),
-	Long:  i18n.GetMessage("RootCmdLongDesc"),
+	Use:     "ontology",
+	Short:   i18n.GetMessage("RootCmdShortDesc"),
+	Long:    i18n.GetMessage("RootCmdLongDesc"),
+	Version: Version,
+}
+
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print the version number of Ontology",
+	Long:  `All software has versions. This is Ontology's.`,
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("Ontology version %s\n", Version)
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -44,10 +56,12 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&includePositions, "include-positions", "i", true, i18n.GetMessage("IncludePositionsFlagUsage"))
 	rootCmd.PersistentFlags().BoolVarP(&contextOutput, "context-output", "c", false, i18n.GetMessage("ContextOutputFlagUsage"))
 	rootCmd.PersistentFlags().IntVarP(&contextWords, "context-words", "w", 30, i18n.GetMessage("ContextWordsFlagUsage"))
-	rootCmd.PersistentFlags().StringP("aiyou-assistant-id","a", "", "AI.YOU Assistant ID")
-    rootCmd.PersistentFlags().String("aiyou-email", "", "AI.YOU Email")
-    rootCmd.PersistentFlags().String("aiyou-password", "", "AI.YOU Password")
+	rootCmd.PersistentFlags().StringP("aiyou-assistant-id", "a", "", "AI.YOU Assistant ID")
+	rootCmd.PersistentFlags().String("aiyou-email", "", "AI.YOU Email")
+	rootCmd.PersistentFlags().String("aiyou-password", "", "AI.YOU Password")
 	rootCmd.Run = rootCmd.HelpFunc()
+
+	rootCmd.AddCommand(versionCmd)
 }
 
 // initConfig reads in config file and ENV variables if set.
@@ -80,5 +94,5 @@ func initConfig() {
 		log.SetLevel(logLevel)
 	}
 
-	log.Info(i18n.GetMessage("InitializingApplication"))
+	log.Debug(i18n.GetMessage("InitializingApplication"))
 }

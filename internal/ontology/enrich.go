@@ -2,7 +2,6 @@ package ontology
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -21,8 +20,6 @@ var (
 	llm                      string
 	llmModel                 string
 	passes                   int
-	rdf                      bool
-	owl                      bool
 	recursive                bool
 	existingOntology         string
 	entityExtractionPrompt   string
@@ -64,7 +61,7 @@ var enrichCmd = &cobra.Command{
 
 		// Déterminer le nom de fichier de sortie si non spécifié
 		if output == "" {
-			output = generateOutputFilename(absInput, owl, rdf)
+			output = generateOutputFilename(absInput)
 		} else {
 			// Si output est spécifié, s'assurer qu'il est absolu
 			output, err = filepath.Abs(output)
@@ -110,8 +107,6 @@ func init() {
 	enrichCmd.Flags().StringVar(&llm, "llm", "", i18n.Messages.LLMFlagUsage)
 	enrichCmd.Flags().StringVar(&llmModel, "llm-model", "", i18n.Messages.LLMModelFlagUsage)
 	enrichCmd.Flags().IntVar(&passes, "passes", 1, i18n.Messages.PassesFlagUsage)
-	enrichCmd.Flags().BoolVar(&rdf, "rdf", false, i18n.Messages.RDFFlagUsage)
-	enrichCmd.Flags().BoolVar(&owl, "owl", false, i18n.Messages.OWLFlagUsage)
 	enrichCmd.Flags().BoolVar(&recursive, "recursive", false, i18n.Messages.RecursiveFlagUsage)
 	enrichCmd.Flags().StringVar(&existingOntology, "existing-ontology", "", i18n.Messages.ExistingOntologyFlagUsage)
 
@@ -121,7 +116,7 @@ func init() {
 	enrichCmd.Flags().StringVarP(&ontologyMergePrompt, "merge-prompt", "m", "", "Additional prompt for ontology merging")
 }
 
-func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, owl, rdf, includePositions, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt string) error {
+func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, includePositions, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt string) error {
 	log := logger.GetLogger()
 	log.Info(i18n.Messages.StartingEnrichProcess)
 
@@ -131,7 +126,7 @@ func ExecuteEnrichCommand(input, output string, passes int, existingOntology str
 	}
 
 	if output == "" {
-		output = generateOutputFilename(absInput, owl, rdf)
+		output = generateOutputFilename(absInput)
 	} else {
 		output, err = filepath.Abs(output)
 		if err != nil {
@@ -166,70 +161,10 @@ func ExecuteEnrichCommand(input, output string, passes int, existingOntology str
 	return nil
 }
 
-func generateOutputFilename(input string, owl, rdf bool) string {
+func generateOutputFilename(input string) string {
 	dir := filepath.Dir(input)
 	baseName := filepath.Base(input)
 	baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
 
-	var extension string
-	if owl {
-		extension = ".owl"
-	} else if rdf {
-		extension = ".rdf"
-	} else {
-		extension = ".tsv"
-	}
-
-	return filepath.Join(dir, baseName+extension)
-}
-
-func processFile(filePath string) error {
-	outputPath := output
-	if outputPath == "" {
-		// Générer le nom de fichier de sortie dans le même répertoire que le fichier d'entrée
-		dir := filepath.Dir(filePath)
-		baseName := filepath.Base(filePath)
-		baseName = strings.TrimSuffix(baseName, filepath.Ext(baseName))
-
-		var extension string
-		if owl {
-			extension = ".owl"
-		} else if rdf {
-			extension = ".rdf"
-		} else {
-			extension = ".tsv"
-		}
-
-		outputPath = filepath.Join(dir, baseName+extension)
-	}
-
-	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel)
-	if err != nil {
-		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
-	}
-
-	ontology := model.NewOntology()
-
-	err = p.ExecutePipeline(filePath, outputPath, passes, existingOntology, ontology)
-	if err != nil {
-		return fmt.Errorf("%s: %w", i18n.Messages.ErrorExecutingPipeline, err)
-	}
-
-	log.Info(fmt.Sprintf("File processed: %s, output: %s", filePath, outputPath))
-	return nil
-}
-
-func processDirectory(dirPath string) error {
-	return filepath.Walk(dirPath, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if info.IsDir() {
-			if !recursive && path != dirPath {
-				return filepath.SkipDir
-			}
-			return nil
-		}
-		return processFile(path)
-	})
+	return filepath.Join(dir, baseName+".tsv")
 }

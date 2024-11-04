@@ -32,8 +32,6 @@ type Config struct {
 	DefaultLLM       string `yaml:"default_llm"`
 	DefaultModel     string `yaml:"default_model"`
 	OntologyName     string `yaml:"ontology_name"`
-	ExportRDF        bool   `yaml:"export_rdf"`
-	ExportOWL        bool   `yaml:"export_owl"`
 	Input            string `yaml:"input"`
 	IncludePositions bool   `yaml:"include_positions"`
 	ContextOutput    bool   `yaml:"context_output"`
