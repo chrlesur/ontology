@@ -1,9 +1,4 @@
-
 # Ontology
-
-![Build Status](https://img.shields.io/badge/build-passing-brightgreen)
-![Code Coverage](https://img.shields.io/badge/coverage-85%25-yellowgreen)
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
 
 Ontology is a command-line tool for enriching ontologies from various document formats. It supports multiple input formats and can utilize different language models for analysis.
 
@@ -101,9 +96,13 @@ Flags:
 - `--llm`: Language model to use for analysis
 - `--llm-model`: Specific model for the chosen LLM
 - `--passes`: Number of passes for ontology enrichment
-- `--rdf`: Export ontology in RDF format
-- `--owl`: Export ontology in OWL format
 - `--recursive`: Process input directory recursively
+
+To check the version of Ontology:
+
+```
+ontology version
+```
 
 For more examples and detailed usage instructions, see the [Usage Guide](docs/usage.md).
 

@@ -1,35 +1,36 @@
-Conseil_d'État	Organisation	Interdiction_du_hijab Pour les joueuses de football	13,83,246
+Conseil_d'État	Organisation	Interdiction_du_hijab Pour prévenir l'atteinte à l'ordre public	13,83,246
 Fédération_française_de_football	Organisation	Expression_d'opinions Pour prévenir les risques d'atteinte à l'ordre public	298
-Rapporteur_public	Rôle	Décision_juridique Dans l'intérêt général et du droit	153,207
-Ministre_de_l'Intérieur	Rôle	Port_du_hijab En se référant au principe de neutralité et à la laïcité	328
-Ministre_chargé_de_l'égalité	Rôle	Droit_de_porter_le_hijab Pour les joueuses de football	336,337,338,339,340,341,393,394,395,396,397,398
-Qualification_juridique	Concept	Régime_applicable Dans le raisonnement juridique	1
-Agent_du_service_public	Statut	Personne travaillant pour un service public	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
-Principe_de_neutralité	Concept	Principe d'impartialité dans le service public	26,318
-Ordre_public	Concept	Ensemble de règles assurant le bon fonctionnement de la société	176,378
-Hijab	Objet	Voile couvrant les cheveux porté par certaines femmes musulmanes	213
-Laïcité	Concept	Principe de séparation de l'État et de la religion	2032
-Joueuse_internationale	Statut	Agent_du_service_public Selon le Conseil d'État	211,212,213,214,215,216,258,259,260,261,262,263
-Joueuse_licenciée	Statut	Agent_du_service_public Selon le Conseil d'État	225,226,227,228,229,230
-Conseil_d'État	Organisation	Haute	juridiction administrative française
-Fédération_française_de_football	Organisation	Organisation	gérant le football en France
-Rapporteur_public	Rôle	Membre	du tribunal administratif donnant son avis sur la décision à prendre
-Ministre_de_l'Intérieur	Rôle	Membre	du gouvernement en charge de l'intérieur
-Ministre_chargé_de_l'égalité	Rôle	Membre	du gouvernement en charge de l'égalité entre les femmes et les hommes
-Qualification_juridique	Concept	Processus	de détermination du statut juridique
+Rapporteur_public	Rôle	Autorisation_du_hijab Pour les joueuses licenciées	116,119,153,207
+Ministre_de_l'Intérieur	Rôle	Interdiction_du_hijab Pour toutes les joueuses	303,328
+Ministre_chargé_de_l'égalité	Rôle	Autorisation_du_hijab Pour toutes les joueuses	336,337,338,339,340,341,393,394,395,396,397,398
+Qualification_juridique	Concept	Statut_juridique Des joueuses de football	1
+Agent_du_service_public	Statut	Principe_de_neutralité Dans l'exercice de leurs fonctions	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
+Principe_de_neutralité	Concept	Obligation de neutralité dans le service public	26,318
+Ordre_public	Concept	Ensemble des règles assurant le bon fonctionnement de la société	61,80,176,243,378
+Hijab	Objet	Voile couvrant les cheveux et le cou porté par certaines femmes musulmanes	88,213,314,361
+Laïcité	Concept	Principe de séparation de l'État et de la religion	324
+Joueuse_internationale	Statut	Joueuse de football représentant son pays	211,212,213,214,215,216,258,259,260,261,262,263
+Joueuse_licenciée	Statut	Joueuse de football inscrite auprès de la fédération	225,226,227,228,229,230
+Conseil_d'État	Organisation	Juridiction	suprême de l'ordre administratif français
+Fédération_française_de_football	Organisation	Organisme	dirigeant du football en France
+Rapporteur_public	Rôle	Membre	du tribunal administratif qui donne son avis sur la décision à prendre
+Ministre_de_l'Intérieur	Rôle	Membre	du gouvernement français responsable de la sécurité intérieure
+Ministre_chargé_de_l'égalité	Rôle	Membre	du gouvernement français responsable de l'égalité entre les femmes et les hommes
+Qualification_juridique	Concept	Processus	de détermination de la nature juridique d'une situation
 Agent_du_service_public	Statut	Personne	travaillant pour un service public
-Principe_de_neutralité	Concept	Principe	d'impartialité dans le service public
-Ordre_public	Concept	Ensemble	de règles assurant le bon fonctionnement de la société
-Hijab	Objet	Voile	couvrant les cheveux porté par certaines femmes musulmanes
+Principe_de_neutralité	Concept	Obligation	de neutralité dans le service public
+Ordre_public	Concept	Ensemble	des règles assurant le bon fonctionnement de la société
+Hijab	Objet	Voile	couvrant les cheveux et le cou porté par certaines femmes musulmanes
 Laïcité	Concept	Principe	de séparation de l'État et de la religion
 Joueuse_internationale	Statut	Joueuse	de football représentant son pays
-Joueuse_licenciée	Statut	Joueuse	de football inscrite à un club
-Conseil_d'État	Applique	Principe_de_neutralité	Pour les agents du service public
+Joueuse_licenciée	Statut	Joueuse	de football inscrite auprès de la fédération
+Conseil_d'État	Applique	Principe_de_neutralité	Pour les joueuses internationales
+Conseil_d'État	Autorise	Fédération_française_de_football	À restreindre l'expression d'opinions religieuses
+Conseil_d'État	Valide	Interdiction_du_hijab	Pour prévenir l'atteinte à l'ordre public
+Rapporteur_public	Recommande	Interdiction_du_hijab	Pour les joueuses internationales
+Rapporteur_public	Recommande	Autorisation_du_hijab	Pour les joueuses licenciées
+Ministre_de_l'Intérieur	Soutient	Interdiction_du_hijab	Pour toutes les joueuses
+Ministre_chargé_de_l'égalité	Soutient	Autorisation_du_hijab	Pour toutes les joueuses
+Qualification_juridique	Détermine	Statut_juridique	Des joueuses de football
+Agent_du_service_public	Soumis_à	Principe_de_neutralité	Dans l'exercice de leurs fonctions
 Fédération_française_de_football	Peut_restreindre	Expression_d'opinions	Pour prévenir les risques d'atteinte à l'ordre public
-Conseil_d'État	Valide	Interdiction_du_hijab	Pour les joueuses de football
-Rapporteur_public	Donne_avis	Décision_juridique	Dans l'intérêt général et du droit
-Qualification_juridique	Détermine	Régime_applicable	Dans le raisonnement juridique
-Ministre_de_l'Intérieur	S'oppose	Port_du_hijab	En se référant au principe de neutralité et à la laïcité
-Ministre_chargé_de_l'égalité	Soutient	Droit_de_porter_le_hijab	Pour les joueuses de football
-Joueuse_internationale	Est_considérée_comme	Agent_du_service_public	Selon le Conseil d'État
-Joueuse_licenciée	N'est_pas_considérée_comme	Agent_du_service_public	Selon le Conseil d'État

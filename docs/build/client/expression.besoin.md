@@ -2,11 +2,11 @@
 
 ## Version
 
-Version 0.1.0 Brainstorm
+Version 0.6.0
 
 ## Aperçu du projet
 
-Développer un logiciel en Go qui, à partir de divers formats de documents (texte, PDF, Markdown, HTML, DOCX), crée une ontologie au format QuickStatement pour être compatible avec Wikibase. 
+Développer un logiciel en Go qui, à partir de divers formats de documents (texte, PDF, Markdown, HTML, DOCX), crée une ontologie au format TSV (tab separated values). 
 
 Le logiciel identifiera et extraira chaque élément d'information du document d'entrée, aussi petit ou apparemment insignifiant soit-il, tout en gérant efficacement les très grands documents.
 
@@ -27,7 +27,6 @@ Le logiciel identifiera et extraira chaque élément d'information du document d
    - Il doit être possible de traiter plusieurs documents en utilisant la même ontologie : donc on doit pouvoir donner une ontologie en ligne de commande pour que la première passe ne soit pas nécessaire.
    - Il faut un mode batch où l'on donne un répertoire et tous les fichiers présents dans le répertoire et les sous-répertoires sont traités. Si une ontologie est donnée en paramètre de ligne de commande, c'est elle qui sera utilisée et qui sera enrichie avec l'ensemble des documents.
    - Le résultat de l'exécution du logiciel est un fichier ayant l'extension .tsv (tab separated value) qui a le nom de l'ontologie. Le nom de l'ontologie doit être donné en ligne de commande par l'utilisateur. 
-   - Ajouter des options d'export en formats RDF et OWL via des paramètres de ligne de commande
    - Utiliser un comptage précis des tokens compatible avec les modèles GPT pour assurer une segmentation exacte et cohérente des documents.
 
 3. **Architecture Modulaire**
@@ -49,7 +48,7 @@ Le logiciel identifiera et extraira chaque élément d'information du document d
    - Permettre des surcharges de paramètres par ligne de commande
 
 6. **Versionnage**
-   - Implémenter un suivi de version commençant à 0.1.0
+   - Implémenter un suivi de version 
 
 ## Exigences Détaillées
 
