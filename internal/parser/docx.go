@@ -2,132 +2,164 @@ package parser
 
 import (
 	"archive/zip"
+	"bytes"
 	"encoding/xml"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"strings"
 
 	"github.com/chrlesur/Ontology/internal/i18n"
 )
 
-func init() {
-	RegisterParser(".docx", NewDOCXParser)
-}
-
-// DOCXParser implémente l'interface Parser pour les fichiers DOCX
 type DOCXParser struct {
 	metadata map[string]string
 }
 
-// NewDOCXParser crée une nouvelle instance de DOCXParser
+func init() {
+	RegisterParser(".docx", NewDOCXParser)
+}
+
 func NewDOCXParser() Parser {
 	return &DOCXParser{
 		metadata: make(map[string]string),
 	}
 }
 
-// Parse extrait le contenu textuel d'un fichier DOCX
-func (p *DOCXParser) Parse(path string) ([]byte, error) {
-	log.Debug(i18n.Messages.ParseStarted, "DOCX", path)
+func (p *DOCXParser) Parse(reader io.Reader) ([]byte, error) {
+	log.Debug(i18n.Messages.ParseStarted, "DOCX")
 
-	reader, err := zip.OpenReader(path)
+	// Lire tout le contenu en mémoire
+	content, err := ioutil.ReadAll(reader)
 	if err != nil {
-		log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
-		return nil, err
+		log.Error(i18n.Messages.ParseFailed, "DOCX", err)
+		return nil, fmt.Errorf("failed to read DOCX content: %w", err)
 	}
-	defer reader.Close()
+
+	// Créer un lecteur zip à partir du contenu
+	zipReader, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
+	if err != nil {
+		log.Error(i18n.Messages.ParseFailed, "DOCX", err)
+		return nil, fmt.Errorf("failed to create zip reader: %w", err)
+	}
 
 	var textContent strings.Builder
-	for _, file := range reader.File {
-		if file.Name == "word/document.xml" {
-			rc, err := file.Open()
-			if err != nil {
-				log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
+
+	for _, file := range zipReader.File {
+		switch file.Name {
+		case "word/document.xml":
+			if err := p.extractContent(file, &textContent); err != nil {
 				return nil, err
 			}
-			defer rc.Close()
-
-			content, err := ioutil.ReadAll(rc)
-			if err != nil {
-				log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
-				return nil, err
+		case "docProps/core.xml":
+			if err := p.extractMetadata(file); err != nil {
+				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
 			}
-
-			var document struct {
-				Body struct {
-					Paragraphs []struct {
-						Runs []struct {
-							Text string `xml:"t"`
-						} `xml:"r"`
-					} `xml:"p"`
-				}
-			}
-
-			err = xml.Unmarshal(content, &document)
-			if err != nil {
-				log.Error(i18n.Messages.ParseFailed, "DOCX", path, err)
-				return nil, err
-			}
-
-			for _, paragraph := range document.Body.Paragraphs {
-				for _, run := range paragraph.Runs {
-					textContent.WriteString(run.Text)
-				}
-				textContent.WriteString("\n")
-			}
-			break
 		}
 	}
 
-	p.extractMetadata(reader)
-	log.Info(i18n.Messages.ParseCompleted, "DOCX", path)
+	log.Info(i18n.Messages.ParseCompleted, "DOCX")
 	return []byte(textContent.String()), nil
 }
 
-// GetMetadata retourne les métadonnées du fichier DOCX
-func (p *DOCXParser) GetMetadata() map[string]string {
-	return p.metadata
-}
+func (p *DOCXParser) extractContent(file *zip.File, textContent *strings.Builder) error {
+	rc, err := file.Open()
+	if err != nil {
+		return fmt.Errorf("failed to open document.xml: %w", err)
+	}
+	defer rc.Close()
 
-// extractMetadata extrait les métadonnées du DOCX
-func (p *DOCXParser) extractMetadata(reader *zip.ReadCloser) {
-	for _, file := range reader.File {
-		if file.Name == "docProps/core.xml" {
-			rc, err := file.Open()
-			if err != nil {
-				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
-				return
-			}
-			defer rc.Close()
+	content, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return fmt.Errorf("failed to read document.xml: %w", err)
+	}
 
-			content, err := ioutil.ReadAll(rc)
-			if err != nil {
-				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
-				return
-			}
-
-			var coreProps struct {
-				Title          string `xml:"title"`
-				Subject        string `xml:"subject"`
-				Creator        string `xml:"creator"`
-				Keywords       string `xml:"keywords"`
-				Description    string `xml:"description"`
-				LastModifiedBy string `xml:"lastModifiedBy"`
-				Revision       string `xml:"revision"`
-			}
-
-			err = xml.Unmarshal(content, &coreProps)
-			if err != nil {
-				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
-				return
-			}
-
-			p.metadata["title"] = coreProps.Title
-			p.metadata["subject"] = coreProps.Subject
-			p.metadata["creator"] = coreProps.Creator
-			p.metadata["keywords"] = coreProps.Keywords
-			p.metadata["description"] = coreProps.Description
-			p.metadata["lastModifiedBy"] = coreProps.LastModifiedBy
-			p.metadata["revision"] = coreProps.Revision
+	var document struct {
+		Body struct {
+			Paragraphs []struct {
+				Runs []struct {
+					Text string `xml:"t"`
+				} `xml:"r"`
+			} `xml:"p"`
 		}
 	}
+
+	err = xml.Unmarshal(content, &document)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal document.xml: %w", err)
+	}
+
+	for _, paragraph := range document.Body.Paragraphs {
+		for _, run := range paragraph.Runs {
+			textContent.WriteString(run.Text)
+		}
+		textContent.WriteString("\n")
+	}
+
+	return nil
+}
+
+func (p *DOCXParser) extractMetadata(file *zip.File) error {
+	rc, err := file.Open()
+	if err != nil {
+		return fmt.Errorf("failed to open core.xml: %w", err)
+	}
+	defer rc.Close()
+
+	content, err := ioutil.ReadAll(rc)
+	if err != nil {
+		return fmt.Errorf("failed to read core.xml: %w", err)
+	}
+
+	var coreProps struct {
+		Title          string `xml:"title"`
+		Subject        string `xml:"subject"`
+		Creator        string `xml:"creator"`
+		Keywords       string `xml:"keywords"`
+		Description    string `xml:"description"`
+		LastModifiedBy string `xml:"lastModifiedBy"`
+		Revision       string `xml:"revision"`
+		Created        string `xml:"created"`
+		Modified       string `xml:"modified"`
+	}
+
+	err = xml.Unmarshal(content, &coreProps)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal core.xml: %w", err)
+	}
+
+	p.metadata["format"] = "DOCX"
+	if coreProps.Title != "" {
+		p.metadata["title"] = coreProps.Title
+	}
+	if coreProps.Subject != "" {
+		p.metadata["subject"] = coreProps.Subject
+	}
+	if coreProps.Creator != "" {
+		p.metadata["creator"] = coreProps.Creator
+	}
+	if coreProps.Keywords != "" {
+		p.metadata["keywords"] = coreProps.Keywords
+	}
+	if coreProps.Description != "" {
+		p.metadata["description"] = coreProps.Description
+	}
+	if coreProps.LastModifiedBy != "" {
+		p.metadata["lastModifiedBy"] = coreProps.LastModifiedBy
+	}
+	if coreProps.Revision != "" {
+		p.metadata["revision"] = coreProps.Revision
+	}
+	if coreProps.Created != "" {
+		p.metadata["created"] = coreProps.Created
+	}
+	if coreProps.Modified != "" {
+		p.metadata["modified"] = coreProps.Modified
+	}
+
+	return nil
+}
+
+func (p *DOCXParser) GetFormatMetadata() map[string]string {
+	return p.metadata
 }

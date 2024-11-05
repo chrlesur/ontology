@@ -1,57 +1,94 @@
 package parser
 
 import (
-    "io/ioutil"
-    "os"
-    "path/filepath"
+	"bufio"
+	"bytes"
 	"fmt"
-    "time"
+	"io"
+	"strings"
 
-    "github.com/chrlesur/Ontology/internal/i18n"
+	"github.com/chrlesur/Ontology/internal/i18n"
+	"gopkg.in/yaml.v2"
 )
 
-func init() {
-    RegisterParser(".md", NewMarkdownParser)
-}
-
-// MarkdownParser implémente l'interface Parser pour les fichiers Markdown
 type MarkdownParser struct {
-    metadata map[string]string
+	metadata map[string]string
 }
 
-// NewMarkdownParser crée une nouvelle instance de MarkdownParser
+func init() {
+	RegisterParser(".md", NewMarkdownParser)
+}
+
 func NewMarkdownParser() Parser {
-    return &MarkdownParser{
-        metadata: make(map[string]string),
-    }
+	return &MarkdownParser{
+		metadata: make(map[string]string),
+	}
 }
 
-// Parse lit le contenu d'un fichier Markdown
-func (p *MarkdownParser) Parse(path string) ([]byte, error) {
-    log.Debug(i18n.Messages.ParseStarted, "Markdown", path)
-    content, err := ioutil.ReadFile(path)
-    if err != nil {
-        log.Error(i18n.Messages.ParseFailed, "Markdown", path, err)
-        return nil, err
-    }
-    p.extractMetadata(path)
-    log.Info(i18n.Messages.ParseCompleted, "Markdown", path)
-    return content, nil
+func (p *MarkdownParser) Parse(reader io.Reader) ([]byte, error) {
+	log.Debug(i18n.Messages.ParseStarted, "Markdown")
+
+	var content bytes.Buffer
+	scanner := bufio.NewScanner(reader)
+	inFrontMatter := false
+	var frontMatter strings.Builder
+	lineCount, wordCount, charCount, headerCount := 0, 0, 0, 0
+
+	for scanner.Scan() {
+		line := scanner.Text()
+
+		if lineCount == 0 && line == "---" {
+			inFrontMatter = true
+			continue
+		}
+
+		if inFrontMatter {
+			if line == "---" {
+				inFrontMatter = false
+				p.parseFrontMatter(frontMatter.String())
+			} else {
+				frontMatter.WriteString(line + "\n")
+			}
+			continue
+		}
+
+		content.WriteString(line + "\n")
+		lineCount++
+		wordCount += len(strings.Fields(line))
+		charCount += len(line)
+
+		if strings.HasPrefix(line, "#") {
+			headerCount++
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+
+	p.metadata["format"] = "Markdown"
+	p.metadata["lineCount"] = fmt.Sprintf("%d", lineCount)
+	p.metadata["wordCount"] = fmt.Sprintf("%d", wordCount)
+	p.metadata["charCount"] = fmt.Sprintf("%d", charCount)
+	p.metadata["headerCount"] = fmt.Sprintf("%d", headerCount)
+
+	log.Info(i18n.Messages.ParseCompleted, "Markdown")
+	return content.Bytes(), nil
 }
 
-// GetMetadata retourne les métadonnées du fichier Markdown
-func (p *MarkdownParser) GetMetadata() map[string]string {
-    return p.metadata
+func (p *MarkdownParser) parseFrontMatter(frontMatter string) {
+	var fm map[string]interface{}
+	err := yaml.Unmarshal([]byte(frontMatter), &fm)
+	if err != nil {
+		log.Warning("Failed to parse YAML front matter: %v", err)
+		return
+	}
+
+	for key, value := range fm {
+		p.metadata[key] = fmt.Sprintf("%v", value)
+	}
 }
 
-// extractMetadata extrait les métadonnées basiques du fichier
-func (p *MarkdownParser) extractMetadata(path string) {
-    info, err := os.Stat(path)
-    if err != nil {
-        log.Warning(i18n.Messages.MetadataExtractionFailed, path, err)
-        return
-    }
-    p.metadata["filename"] = filepath.Base(path)
-    p.metadata["size"] = fmt.Sprintf("%d", info.Size())
-    p.metadata["modified"] = info.ModTime().Format(time.RFC3339)
+func (p *MarkdownParser) GetFormatMetadata() map[string]string {
+	return p.metadata
 }

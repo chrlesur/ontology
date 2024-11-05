@@ -53,24 +53,34 @@ var enrichCmd = &cobra.Command{
 		if aiyouPassword != "" {
 			cfg.AIYOUPassword = aiyouPassword
 		}
+
 		// Utiliser le chemin absolu pour l'entrée
-		absInput, err := filepath.Abs(input)
-		if err != nil {
-			return fmt.Errorf("error getting absolute path: %w", err)
+		var absInput string
+		if strings.HasPrefix(strings.ToLower(input), "s3://") {
+			absInput = input
+		} else {
+			var err error
+			absInput, err = filepath.Abs(input)
+			if err != nil {
+				return fmt.Errorf("error getting absolute path: %w", err)
+			}
 		}
 
 		// Déterminer le nom de fichier de sortie si non spécifié
 		if output == "" {
-			output = generateOutputFilename(absInput)
-		} else {
-			// Si output est spécifié, s'assurer qu'il est absolu
-			output, err = filepath.Abs(output)
-			if err != nil {
-				return fmt.Errorf("error getting absolute path for output: %w", err)
+			if strings.HasPrefix(strings.ToLower(absInput), "s3://") {
+				// Pour les entrées S3, conserver le format S3 pour la sortie
+				output = strings.TrimSuffix(absInput, filepath.Ext(absInput)) + ".tsv"
+			} else {
+				// Pour les entrées locales, utiliser un chemin local
+				output = filepath.Join(filepath.Dir(absInput), filepath.Base(absInput)+".tsv")
 			}
+		} else if !strings.HasPrefix(strings.ToLower(output), "s3://") && strings.HasPrefix(strings.ToLower(absInput), "s3://") {
+			// Si l'entrée est S3 mais pas la sortie, convertir la sortie en format S3
+			output = strings.TrimSuffix(absInput, filepath.Ext(absInput)) + ".tsv"
 		}
 
-		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel)
+		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel, absInput)
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 		}
@@ -120,21 +130,31 @@ func ExecuteEnrichCommand(input, output string, passes int, existingOntology str
 	log := logger.GetLogger()
 	log.Info(i18n.Messages.StartingEnrichProcess)
 
-	absInput, err := filepath.Abs(input)
-	if err != nil {
-		return fmt.Errorf("error getting absolute path: %w", err)
-	}
+	absInput := input // Garder l'input tel quel s'il est déjà en format S3
 
-	if output == "" {
-		output = generateOutputFilename(absInput)
-	} else {
-		output, err = filepath.Abs(output)
+	if !strings.HasPrefix(strings.ToLower(input), "s3://") {
+		var err error
+		absInput, err = filepath.Abs(input)
 		if err != nil {
-			return fmt.Errorf("error getting absolute path for output: %w", err)
+			return fmt.Errorf("error getting absolute path: %w", err)
 		}
 	}
 
-	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llm, llmModel)
+	if output == "" {
+		// Générer le nom de fichier de sortie en conservant le format S3 si l'entrée est S3
+		if strings.HasPrefix(strings.ToLower(absInput), "s3://") {
+			// Pour les entrées S3, construire un chemin de sortie S3
+			output = strings.TrimSuffix(absInput, filepath.Ext(absInput)) + ".tsv"
+		} else {
+			// Pour les entrées locales, utiliser le chemin local
+			output = filepath.Join(filepath.Dir(absInput), filepath.Base(absInput)+".tsv")
+		}
+	} else if !strings.HasPrefix(strings.ToLower(output), "s3://") && strings.HasPrefix(strings.ToLower(absInput), "s3://") {
+		// Si l'entrée est S3 mais pas la sortie, convertir la sortie en format S3
+		output = "s3://" + strings.TrimPrefix(filepath.ToSlash(output), "/")
+	}
+
+	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llm, llmModel, absInput)
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 	}

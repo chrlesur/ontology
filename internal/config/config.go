@@ -114,6 +114,12 @@ func (c *Config) loadConfigFile() {
             c.ContextWords = words
         }
     }
+	if s3AccessKey := os.Getenv("S3_ACCESS_KEY_ID"); s3AccessKey != "" {
+        c.Storage.S3.AccessKeyID = s3AccessKey
+    }
+    if s3SecretKey := os.Getenv("S3_SECRET_ACCESS_KEY"); s3SecretKey != "" {
+        c.Storage.S3.SecretAccessKey = s3SecretKey
+    }
 }
 
 // loadEnvVariables loads configuration from environment variables

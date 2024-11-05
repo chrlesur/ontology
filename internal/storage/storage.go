@@ -5,6 +5,7 @@ package storage
 import (
 	"github.com/chrlesur/Ontology/internal/logger"
 	"os"
+	"io"
 	"time"
 )
 
@@ -48,6 +49,11 @@ type Storage interface {
 
 	// Stat retourne les informations sur un fichier
     Stat(path string) (FileInfo, error)
+
+	// GetReader retourne un io.ReadCloser pour lire le contenu du fichier spécifié par le chemin.
+    // Il est de la responsabilité de l'appelant de fermer le reader une fois terminé.
+	GetReader(path string) (io.ReadCloser, error)
+
 }
 
 // Constantes pour les types de stockage

@@ -1,57 +1,67 @@
 package parser
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"path/filepath"
-	"time"
+	"io"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/chrlesur/Ontology/internal/i18n"
 )
+
+type TextParser struct {
+	metadata map[string]string
+}
 
 func init() {
 	RegisterParser(".txt", NewTextParser)
 }
 
-// TextParser implémente l'interface Parser pour les fichiers texte
-type TextParser struct {
-	metadata map[string]string
-}
-
-// NewTextParser crée une nouvelle instance de TextParser
 func NewTextParser() Parser {
 	return &TextParser{
 		metadata: make(map[string]string),
 	}
 }
 
-// Parse lit le contenu d'un fichier texte
-func (p *TextParser) Parse(path string) ([]byte, error) {
-	log.Debug(i18n.Messages.ParseStarted, "text", path)
-	content, err := ioutil.ReadFile(path)
-	if err != nil {
-		log.Error(i18n.Messages.ParseFailed, "text", path, err)
-		return nil, err
+func (p *TextParser) Parse(reader io.Reader) ([]byte, error) {
+	log.Debug(i18n.Messages.ParseStarted, "Text")
+
+	var content strings.Builder
+	scanner := bufio.NewScanner(reader)
+	lineCount := 0
+	wordCount := 0
+	charCount := 0
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		content.WriteString(line)
+		content.WriteString("\n")
+
+		lineCount++
+		words := strings.Fields(line)
+		wordCount += len(words)
+		charCount += utf8.RuneCountInString(line)
 	}
-	p.extractMetadata(path)
-	log.Info(i18n.Messages.ParseCompleted, "text", path)
-	return content, nil
+
+	if err := scanner.Err(); err != nil {
+		log.Error(i18n.Messages.ParseFailed, "Text", err)
+		return nil, fmt.Errorf("failed to read text content: %w", err)
+	}
+
+	p.extractMetadata(lineCount, wordCount, charCount)
+
+	log.Info(i18n.Messages.ParseCompleted, "Text")
+	return []byte(content.String()), nil
 }
 
-// GetMetadata retourne les métadonnées du fichier texte
-func (p *TextParser) GetMetadata() map[string]string {
+func (p *TextParser) extractMetadata(lineCount, wordCount, charCount int) {
+	p.metadata["format"] = "Text"
+	p.metadata["lineCount"] = fmt.Sprintf("%d", lineCount)
+	p.metadata["wordCount"] = fmt.Sprintf("%d", wordCount)
+	p.metadata["charCount"] = fmt.Sprintf("%d", charCount)
+}
+
+func (p *TextParser) GetFormatMetadata() map[string]string {
 	return p.metadata
-}
-
-// extractMetadata extrait les métadonnées basiques du fichier
-func (p *TextParser) extractMetadata(path string) {
-	info, err := os.Stat(path)
-	if err != nil {
-		log.Warning(i18n.Messages.MetadataExtractionFailed, path, err)
-		return
-	}
-	p.metadata["filename"] = filepath.Base(path)
-	p.metadata["size"] = fmt.Sprintf("%d", info.Size())
-	p.metadata["modified"] = info.ModTime().Format(time.RFC3339)
 }

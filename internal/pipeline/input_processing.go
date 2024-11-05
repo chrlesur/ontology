@@ -3,60 +3,41 @@
 package pipeline
 
 import (
+	"bytes"
 	"fmt"
 	"path/filepath"
 
 	"github.com/chrlesur/Ontology/internal/i18n"
 	"github.com/chrlesur/Ontology/internal/parser"
+	"github.com/chrlesur/Ontology/internal/storage"
 )
 
 // parseInput traite le fichier ou le répertoire d'entrée
 func (p *Pipeline) parseInput(input string) ([]byte, error) {
 	p.logger.Debug("Starting parseInput for: %s", input)
 	if p.storage == nil {
-        return nil, fmt.Errorf("storage is not initialized")
-    }
-	
-	isDir, err := p.storage.IsDirectory(input)
-	if err != nil {
-		p.logger.Error("Error checking if input is directory: %v", err)
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrAccessInput"), err)
+		return nil, fmt.Errorf("storage is not initialized")
 	}
 
-	if isDir {
-		p.logger.Debug("Input is a directory, parsing directory")
-		return p.parseDirectory(input)
+	storageType := storage.DetectStorageType(input)
+	p.logger.Debug("Detected storage type: %s for input: %s", storageType, input)
+
+	switch storageType {
+	case storage.S3StorageType:
+		s3Storage, ok := p.storage.(*storage.S3Storage)
+		if !ok {
+			return nil, fmt.Errorf("S3 storage is not initialized")
+		}
+		bucket, key, err := storage.ParseS3URI(input)
+		if err != nil {
+			return nil, fmt.Errorf("failed to parse S3 URI: %w", err)
+		}
+		return s3Storage.ReadFromBucket(bucket, key)
+	case storage.LocalStorageType:
+		return p.storage.Read(input)
+	default:
+		return nil, fmt.Errorf("unsupported storage type: %s", storageType)
 	}
-
-	fileInfo, err := p.storage.Stat(input)
-	if err != nil {
-		p.logger.Error("Error getting file info: %v", err)
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrAccessInput"), err)
-	}
-
-	p.logger.Debug("File info: Size: %d, ModTime: %s", fileInfo.Size(), fileInfo.ModTime())
-
-	ext := filepath.Ext(input)
-	parser, err := parser.GetParser(ext)
-	if err != nil {
-		p.logger.Error("Error getting parser for extension %s: %v", ext, err)
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrUnsupportedFormat"), err)
-	}
-
-	content, err := p.storage.Read(input)
-	if err != nil {
-		p.logger.Error("Error reading file: %v", err)
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrReadFile"), err)
-	}
-
-	parsed, err := parser.Parse(string(content))
-	if err != nil {
-		p.logger.Error("Error parsing file: %v", err)
-		return nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrParseFile"), err)
-	}
-
-	p.logger.Debug("Successfully parsed input, content length: %d bytes", len(parsed))
-	return parsed, nil
 }
 
 // parseDirectory traite récursivement un répertoire d'entrée
@@ -92,7 +73,10 @@ func (p *Pipeline) parseDirectory(dir string) ([]byte, error) {
 				continue
 			}
 
-			parsed, err := parser.Parse(string(fileContent))
+			// Créer un io.Reader à partir du contenu du fichier
+			reader := bytes.NewReader(fileContent)
+
+			parsed, err := parser.Parse(reader)
 			if err != nil {
 				p.logger.Warning("Error parsing file %s: %v", file, err)
 				continue

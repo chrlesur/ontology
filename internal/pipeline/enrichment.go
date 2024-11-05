@@ -22,6 +22,7 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
         "previous_result":   previousResult,
         "additional_prompt": p.ontologyEnrichmentPrompt,
     }
+    log.Debug("Calling LLM with OntologyEnrichmentPrompt")
 
     enrichedResult, err := p.llm.ProcessWithPrompt(prompt.OntologyEnrichmentPrompt, enrichmentValues)
     if err != nil {

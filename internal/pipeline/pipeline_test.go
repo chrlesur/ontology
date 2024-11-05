@@ -210,3 +210,4 @@ func TestGenerateContextJSON(t *testing.T) {
 	assert.Contains(t, json, "test")
 	assert.Contains(t, json, "sentence")
 }
+

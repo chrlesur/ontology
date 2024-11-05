@@ -1,86 +1,104 @@
 package parser
 
 import (
-    "io/ioutil"
-    "strings"
+	"bytes"
+	"fmt"
+	"io"
+	"io/ioutil"
+	"strings"
 
-    "golang.org/x/net/html"
-    "github.com/chrlesur/Ontology/internal/i18n"
+	"github.com/chrlesur/Ontology/internal/i18n"
+	"golang.org/x/net/html"
 )
 
-func init() {
-    RegisterParser(".html", NewHTMLParser)
-}
-
-// HTMLParser implémente l'interface Parser pour les fichiers HTML
 type HTMLParser struct {
-    metadata map[string]string
+	metadata map[string]string
 }
 
-// NewHTMLParser crée une nouvelle instance de HTMLParser
+func init() {
+	RegisterParser(".html", NewPDFParser)
+}
+
 func NewHTMLParser() Parser {
-    return &HTMLParser{
-        metadata: make(map[string]string),
-    }
+	return &HTMLParser{
+		metadata: make(map[string]string),
+	}
 }
 
-// Parse extrait le contenu textuel d'un fichier HTML
-func (p *HTMLParser) Parse(path string) ([]byte, error) {
-    log.Debug(i18n.Messages.ParseStarted, "HTML", path)
-    content, err := ioutil.ReadFile(path)
-    if err != nil {
-        log.Error(i18n.Messages.ParseFailed, "HTML", path, err)
-        return nil, err
-    }
+func (p *HTMLParser) Parse(reader io.Reader) ([]byte, error) {
+	log.Debug(i18n.Messages.ParseStarted, "HTML")
 
-    doc, err := html.Parse(strings.NewReader(string(content)))
-    if err != nil {
-        log.Error(i18n.Messages.ParseFailed, "HTML", path, err)
-        return nil, err
-    }
+	content, err := ioutil.ReadAll(reader)
+	if err != nil {
+		log.Error(i18n.Messages.ParseFailed, "HTML", err)
+		return nil, fmt.Errorf("failed to read HTML content: %w", err)
+	}
 
-    var textContent strings.Builder
-    var extractText func(*html.Node)
-    extractText = func(n *html.Node) {
-        if n.Type == html.TextNode {
-            textContent.WriteString(n.Data)
-        }
-        for c := n.FirstChild; c != nil; c = c.NextSibling {
-            extractText(c)
-        }
-    }
-    extractText(doc)
+	doc, err := html.Parse(bytes.NewReader(content))
+	if err != nil {
+		log.Error(i18n.Messages.ParseFailed, "HTML", err)
+		return nil, fmt.Errorf("failed to parse HTML: %w", err)
+	}
 
-    p.extractMetadata(doc)
-    log.Info(i18n.Messages.ParseCompleted, "HTML", path)
-    return []byte(textContent.String()), nil
+	var textContent strings.Builder
+	p.extractContent(doc, &textContent)
+	p.extractMetadata(doc)
+
+	log.Info(i18n.Messages.ParseCompleted, "HTML")
+	return []byte(textContent.String()), nil
 }
 
-// GetMetadata retourne les métadonnées du fichier HTML
-func (p *HTMLParser) GetMetadata() map[string]string {
-    return p.metadata
+func (p *HTMLParser) extractContent(n *html.Node, textContent *strings.Builder) {
+	if n.Type == html.TextNode {
+		textContent.WriteString(strings.TrimSpace(n.Data))
+		textContent.WriteString(" ")
+	}
+	for c := n.FirstChild; c != nil; c = c.NextSibling {
+		p.extractContent(c, textContent)
+	}
 }
 
-// extractMetadata extrait les métadonnées du HTML
-func (p *HTMLParser) extractMetadata(doc *html.Node) {
-    var f func(*html.Node)
-    f = func(n *html.Node) {
-        if n.Type == html.ElementNode && n.Data == "meta" {
-            var name, content string
-            for _, a := range n.Attr {
-                if a.Key == "name" {
-                    name = a.Val
-                } else if a.Key == "content" {
-                    content = a.Val
-                }
-            }
-            if name != "" && content != "" {
-                p.metadata[name] = content
-            }
-        }
-        for c := n.FirstChild; c != nil; c = c.NextSibling {
-            f(c)
-        }
-    }
-    f(doc)
+func (p *HTMLParser) extractMetadata(n *html.Node) {
+	p.metadata["format"] = "HTML"
+
+	var extractMetaTag func(*html.Node)
+	extractMetaTag = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "meta" {
+			var name, content string
+			for _, attr := range n.Attr {
+				switch attr.Key {
+				case "name", "property":
+					name = attr.Val
+				case "content":
+					content = attr.Val
+				}
+			}
+			if name != "" && content != "" {
+				p.metadata[name] = content
+			}
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			extractMetaTag(c)
+		}
+	}
+
+	var extractTitle func(*html.Node)
+	extractTitle = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "title" {
+			if n.FirstChild != nil && n.FirstChild.Type == html.TextNode {
+				p.metadata["title"] = n.FirstChild.Data
+			}
+			return
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			extractTitle(c)
+		}
+	}
+
+	extractMetaTag(n)
+	extractTitle(n)
+}
+
+func (p *HTMLParser) GetFormatMetadata() map[string]string {
+	return p.metadata
 }

@@ -14,52 +14,76 @@ import (
 
 // saveResult sauvegarde les résultats de l'ontologie et génère les fichiers de sortie
 func (p *Pipeline) saveResult(result string, outputPath string, newContent []byte) error {
-    p.logger.Debug("Starting saveResult")
-    p.logger.Debug("Number of elements in ontology: %d", len(p.ontology.Elements))
-    p.logger.Debug("Number of relations in ontology: %d", len(p.ontology.Relations))
+	p.logger.Debug("Starting saveResult")
+	p.logger.Info("Number of elements in ontology: %d", len(p.ontology.Elements))
+	p.logger.Info("Number of relations in ontology: %d", len(p.ontology.Relations))
+	p.logger.Debug("Writing TSV to: %s", outputPath)
 
-    // Générer le contenu TSV
-    tsvContent := p.generateTSVContent()
-    p.logger.Debug("Full TSV content:\n%s", tsvContent)
+	// Générer le contenu TSV
+	tsvContent := p.generateTSVContent()
 
-    dir := filepath.Dir(outputPath)
-    baseName := filepath.Base(outputPath)
-    ext := filepath.Ext(baseName)
-    nameWithoutExt := strings.TrimSuffix(baseName, ext)
+	// Sauvegarder le fichier TSV
+	err := p.storage.Write(outputPath, []byte(tsvContent))
+	if err != nil {
+		p.logger.Error("Failed to write TSV file: %v", err)
+		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOutput"), err)
+	}
+	p.logger.Debug("TSV file written: %s", outputPath)
 
-    // Sauvegarder le fichier TSV
-    tsvPath := filepath.Join(dir, nameWithoutExt+".tsv")
-    err := p.storage.Write(tsvPath, []byte(tsvContent))
-    if err != nil {
-        p.logger.Error("Failed to write TSV file: %v", err)
-        return fmt.Errorf("%s: %w", i18n.GetMessage("ErrWriteOutput"), err)
-    }
-    p.logger.Debug("TSV file written: %s", tsvPath)
+	if p.contextOutput {
+		contextFile := strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "_context.json"
 
-    var contextFile string
-    // Générer et sauvegarder le JSON de contexte si l'option est activée
-    if p.contextOutput {
-        contextFile, err = p.generateAndSaveContextJSON(newContent, dir, baseName)
-        if err != nil {
-            return err // L'erreur est déjà loggée dans generateAndSaveContextJSON
-        }
-    } else {
-        p.logger.Debug("Context output is disabled. Skipping context JSON generation.")
-    }
+		words := strings.Fields(string(newContent))
+		positionRanges := p.getAllPositionsFromNewContent(words)
+		mergedPositions := mergeOverlappingPositions(positionRanges)
 
-    p.logger.Debug("Elements with positions:")
-    for _, element := range p.ontology.Elements {
-        p.logger.Debug("Element: %s, Type: %s, Positions: %v", element.Name, element.Type, element.Positions)
-    }
+		positions := make([]int, len(mergedPositions))
+		for i, pr := range mergedPositions {
+			positions[i] = pr.Start
+		}
 
-    // Générer et sauvegarder les métadonnées
-    err = p.generateAndSaveMetadata(outputPath, contextFile)
-    if err != nil {
-        return err // L'erreur est déjà loggée dans generateAndSaveMetadata
-    }
+		contextJSON, err := GenerateContextJSON(newContent, positions, p.contextWords, mergedPositions)
+		if err != nil {
+			p.logger.Error("Failed to generate context JSON: %v", err)
+			return fmt.Errorf("failed to generate context JSON: %w", err)
+		}
 
-    p.logger.Debug("Finished saveResult")
-    return nil
+		err = p.storage.Write(contextFile, []byte(contextJSON))
+		if err != nil {
+			p.logger.Error("Failed to write context JSON file: %v", err)
+			return fmt.Errorf("failed to write context JSON file: %w", err)
+		}
+		p.logger.Info("Context JSON saved to: %s", contextFile)
+	} else {
+		p.logger.Debug("Context output is disabled. Skipping context JSON generation.")
+	}
+
+	// Générer et sauvegarder les métadonnées
+	metadataGen := metadata.NewGenerator(p.storage)
+	ontologyFile := filepath.Base(outputPath)
+	meta, err := metadataGen.GenerateMetadata(p.inputPath, ontologyFile, outputPath)
+	if err != nil {
+		p.logger.Error("Failed to generate metadata: %v", err)
+		return fmt.Errorf("failed to generate metadata: %w", err)
+	}
+
+	metaContent, err := json.MarshalIndent(meta, "", "  ")
+	if err != nil {
+		p.logger.Error("Failed to marshal metadata: %v", err)
+		return fmt.Errorf("failed to marshal metadata: %w", err)
+	}
+
+	metaFilePath := strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "_meta.json"
+
+	err = p.storage.Write(metaFilePath, metaContent)
+	if err != nil {
+		p.logger.Error("Failed to save metadata: %v", err)
+		return fmt.Errorf("failed to save metadata: %w", err)
+	}
+
+	p.logger.Info("Metadata saved to: %s", metaFilePath)
+	p.logger.Debug("Finished saveResult")
+	return nil
 }
 
 // generateTSVContent génère le contenu TSV à partir de l'ontologie
@@ -124,7 +148,7 @@ func (p *Pipeline) generateAndSaveContextJSON(content []byte, dir, baseName stri
 // generateAndSaveMetadata génère et sauvegarde les métadonnées
 func (p *Pipeline) generateAndSaveMetadata(outputPath, contextFile string) error {
 	p.logger.Debug("Generating and saving metadata")
-	metadataGen := metadata.NewGenerator()
+	metadataGen := metadata.NewGenerator(p.storage) // Passez p.storage ici
 
 	ontologyFile := filepath.Base(outputPath)
 	meta, err := metadataGen.GenerateMetadata(p.inputPath, ontologyFile, contextFile)

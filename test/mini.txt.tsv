@@ -1,0 +1,37 @@
+Qualification_juridique	Concept	Agent_du_service_public Détermine le statut juridique des personnes travaillant pour un service public	1
+Agent_du_service_public	Rôle	Principe_de_neutralité Les agents du service public doivent respecter le principe de neutralité	16,17,18,19,20,21,40,41,42,43,44,45,182,183,184,185,186,187
+Principe_de_neutralité	Principe	Obligation de neutralité applicable aux agents du service public	26,318
+Conseil_d'État	Organisation	Avis_du_rapporteur_public Le Conseil d'État peut prendre une décision différente de l'avis du rapporteur public	13,83,246
+Fédération_française_de_football	Organisation	Expression_d'opinions La FFF peut limiter l'expression d'opinions pour préserver l'ordre public	298
+Ordre_public	Concept	État de paix, de sécurité et de bon fonctionnement de la société	61,80,176,243,378
+Rapporteur_public	Rôle	Décision_juridique Le rapporteur public fournit une opinion sur la décision à prendre	116,119,153,207
+Hijab	Objet	Voile couvrant les cheveux et le cou porté par certaines femmes musulmanes	88,213,314,361
+Joueuse_internationale	Rôle	Agent_du_service_public Les joueuses internationales sont considérées comme des agents du service public	211,212,213,214,215,216,258,259,260,261,262,263
+Joueuse_licenciée	Rôle	Agent_du_service_public Les joueuses simplement licenciées ne sont pas considérées comme des agents du service public	225,226,227,228,229,230
+Ministre_de_l'Intérieur	Rôle	Interdiction_du_hijab Le ministre de l'Intérieur est favorable à l'interdiction généralisée du hijab	303,328
+Ministre_chargé_de_l'égalité	Rôle	Autorisation_du_hijab La ministre chargée de l'égalité est favorable au droit de porter le hijab	336,337,338,339,340,341,393,394,395,396,397,398
+Laïcité	Principe	Débat_sur_le_hijab Le principe de laïcité est invoqué dans les discussions sur le port du hijab	324
+Qualification_juridique	Concept	Processus	de détermination du statut juridique d'une situation ou d'une personne
+Agent_du_service_public	Rôle	Personne	travaillant pour un service public
+Principe_de_neutralité	Principe	Obligation	de neutralité applicable aux agents du service public
+Conseil_d'État	Organisation	Plus	haute juridiction administrative française
+Fédération_française_de_football	Organisation	Organisme	régissant le football en France
+Ordre_public	Concept	État	de paix, de sécurité et de bon fonctionnement de la société
+Rapporteur_public	Rôle	Membre	du tribunal administratif donnant un avis sur la décision à prendre
+Hijab	Objet	Voile	couvrant les cheveux et le cou porté par certaines femmes musulmanes
+Joueuse_internationale	Rôle	Footballeuse	représentant son pays en compétition internationale
+Joueuse_licenciée	Rôle	Footballeuse	inscrite auprès de la Fédération française de football
+Ministre_de_l'Intérieur	Rôle	Membre	du gouvernement français chargé de la sécurité intérieure
+Ministre_chargé_de_l'égalité	Rôle	Membre	du gouvernement français responsable de l'égalité entre les femmes et les hommes
+Laïcité	Principe	Principe	de séparation de l'État et de la religion
+Qualification_juridique	s'applique_à	Agent_du_service_public	Détermine le statut juridique des personnes travaillant pour un service public
+Agent_du_service_public	soumis_à	Principe_de_neutralité	Les agents du service public doivent respecter le principe de neutralité
+Conseil_d'État	statue_sur	Qualification_juridique	Le Conseil d'État détermine la qualification juridique des situations
+Fédération_française_de_football	peut_restreindre	Expression_d'opinions	La FFF peut limiter l'expression d'opinions pour préserver l'ordre public
+Rapporteur_public	donne_avis_sur	Décision_juridique	Le rapporteur public fournit une opinion sur la décision à prendre
+Conseil_d'État	peut_ne_pas_suivre	Avis_du_rapporteur_public	Le Conseil d'État peut prendre une décision différente de l'avis du rapporteur public
+Joueuse_internationale	est_un	Agent_du_service_public	Les joueuses internationales sont considérées comme des agents du service public
+Joueuse_licenciée	n'est_pas	Agent_du_service_public	Les joueuses simplement licenciées ne sont pas considérées comme des agents du service public
+Ministre_de_l'Intérieur	soutient	Interdiction_du_hijab	Le ministre de l'Intérieur est favorable à l'interdiction généralisée du hijab
+Ministre_chargé_de_l'égalité	soutient	Autorisation_du_hijab	La ministre chargée de l'égalité est favorable au droit de porter le hijab
+Laïcité	influence	Débat_sur_le_hijab	Le principe de laïcité est invoqué dans les discussions sur le port du hijab
