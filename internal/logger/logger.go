@@ -86,6 +86,7 @@ func (l *Logger) SetLevel(level LogLevel) {
 }
 
 func (l *Logger) log(level LogLevel, message string, args ...interface{}) {
+	var logMessage string
 	if level < l.level {
 		return
 	}
@@ -93,17 +94,22 @@ func (l *Logger) log(level LogLevel, message string, args ...interface{}) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	_, file, line, _ := runtime.Caller(2)
 	levelStr := [...]string{"DEBUG", "INFO", "WARNING", "ERROR"}[level]
-	logMessage := fmt.Sprintf("[%s] %s:%d - %s", levelStr, filepath.Base(file), line, fmt.Sprintf(message, args...))
+	if l.level <= DebugLevel {
+		_, file, line, _ := runtime.Caller(2)
+		logMessage = fmt.Sprintf("[%s] %s:%d - %s", levelStr, filepath.Base(file), line, fmt.Sprintf(message, args...))
+	} else {
+		logMessage = fmt.Sprintf("[%s] %s", levelStr, fmt.Sprintf(message, args...))
+	}
+
 	l.logger.Println(logMessage)
 }
 
 // Debug logs a message at DebugLevel
 func (l *Logger) Debug(format string, args ...interface{}) {
-    if l.GetLevel() <= DebugLevel {
-        l.log(DebugLevel, format, args...)
-    }
+	if l.GetLevel() <= DebugLevel {
+		l.log(DebugLevel, format, args...)
+	}
 }
 
 // Info logs a message at InfoLevel

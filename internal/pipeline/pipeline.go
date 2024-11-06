@@ -46,10 +46,11 @@ type Pipeline struct {
 	ontologyEnrichmentPrompt string
 	ontologyMergePrompt      string
 	storage                  storage.Storage
+	maxConcurrentThreads     int
 }
 
 // NewPipeline crée une nouvelle instance du pipeline de traitement
-func NewPipeline(includePositions bool, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llmType, llmModel, inputPath string) (*Pipeline, error) {
+func NewPipeline(includePositions bool, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llmType, llmModel, inputPath string, maxConcurrentThreads int, aiyouAssistantID string) (*Pipeline, error) {
 	cfg := config.GetConfig()
 	log := logger.GetLogger()
 
@@ -65,7 +66,13 @@ func NewPipeline(includePositions bool, contextOutput bool, contextWords int, en
 		selectedModel = llmModel
 	}
 
-	log.Debug("Selected LLM: %s, Model: %s", selectedLLM, selectedModel)
+	// Logique spécifique pour AIYOU
+	if selectedLLM == "aiyou" && aiyouAssistantID != "" {
+		selectedModel = aiyouAssistantID
+		log.Debug("Using AIYOU with assistant ID: %s", selectedModel)
+	}
+
+	log.Info("Selected LLM: %s, Model: %s", selectedLLM, selectedModel)
 
 	// Initialisation du client LLM
 	client, err := llm.GetClient(selectedLLM, selectedModel)
@@ -96,6 +103,7 @@ func NewPipeline(includePositions bool, contextOutput bool, contextWords int, en
 		ontologyEnrichmentPrompt: enrichmentPrompt,
 		ontologyMergePrompt:      mergePrompt,
 		storage:                  storageInstance,
+		maxConcurrentThreads:     maxConcurrentThreads,
 	}, nil
 }
 
@@ -169,11 +177,11 @@ func (p *Pipeline) ExecutePipeline(input string, output string, passes int, exis
 }
 
 func (p *Pipeline) getParser(input string) (parser.Parser, error) {
-    ext := strings.ToLower(filepath.Ext(input))
-    if ext == "" {
-        return nil, fmt.Errorf("file has no extension: %s", input)
-    }
-    p.logger.Debug("Getting parser for file extension: %s", ext)
-    
-    return parser.GetParser(ext)
+	ext := strings.ToLower(filepath.Ext(input))
+	if ext == "" {
+		return nil, fmt.Errorf("file has no extension: %s", input)
+	}
+	p.logger.Debug("Getting parser for file extension: %s", ext)
+
+	return parser.GetParser(ext)
 }

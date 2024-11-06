@@ -21,6 +21,7 @@ go.work
 .DS_Store
 Thumbs.db
 # Log files
+/logs/
 *.log
 # Configuration files with sensitive information
 config.yaml

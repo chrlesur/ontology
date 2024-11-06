@@ -1,0 +1,130 @@
+OBJECTIF : Analyser les documents relatifs à SecNumCloud et en extraire une ontologie structurée couvrant les aspects de sécurité, conformité, gouvernance et infrastructure technique.
+
+RÈGLES DE NOMMAGE :
+- Utiliser le format PascalCase pour les entités mais en utilisant _ comme séparateur de mot (ex: Droit_Vie_Privee)
+- Standardiser les noms (français uniquement, pas de mélange de langues)
+- Utiliser des underscores pour les mots composés si nécessaire
+- Pour les sigles, garder le format majuscule (ex: CEDH)
+- Pour les versions, utiliser des chiffres (ex: RGPD_2016)
+
+TYPES D'ENTITÉS AUTORISÉS :
+
+1. Sécurité_Service :
+   - Définition : Mesures et contrôles de sécurité
+   - Sous-types : contrôle_accès, chiffrement, authentification, cloisonnement
+   - Attributs : niveau_sécurité, mécanismes, conformité_règlementaire
+   - Relations : protège, contrôle, vérifie
+
+2. Conformité_Règlementaire :
+   - Définition : Exigences légales et normatives
+   - Sous-types : rgpd, localisation_données, souveraineté, audit
+   - Attributs : niveau_qualification, dates_validité, périmètre
+   - Relations : impose, vérifie, atteste
+
+3. Infrastructure_Cloud :
+   - Définition : Composants techniques du service
+   - Sous-types : iaas, paas, saas, caas
+   - Attributs : localisation, disponibilité, performance
+   - Relations : héberge, fournit, isole
+
+4. Gouvernance_Service :
+   - Définition : Processus de gestion et contrôle
+   - Sous-types : politique_sécurité, gestion_risques, continuité_service
+   - Attributs : responsabilités, procédures, documentation
+   - Relations : définit, supervise, contrôle
+
+5. Zone_Hébergement :
+   - Définition : Zones physiques et logiques
+   - Sous-types : zone_publique, zone_privée, zone_sensible
+   - Attributs : niveau_sécurité, contrôles_physiques, redondance
+   - Relations : contient, isole, protège
+
+6. Personnel_Qualifié :
+   - Définition : Ressources humaines impliquées
+   - Sous-types : administrateur, responsable_sécurité, auditeur
+   - Attributs : habilitations, formations, responsabilités
+   - Relations : gère, supervise, contrôle
+
+7. Processus_Sécurité :
+   - Définition : Procédures opérationnelles
+   - Sous-types : gestion_incidents, gestion_accès, sauvegarde
+   - Attributs : fréquence, responsables, documentation
+   - Relations : implémente, surveille, maintient
+
+8. Données_Service :
+   - Définition : Informations traitées
+   - Sous-types : données_client, logs, configuration
+   - Attributs : classification, localisation, durée_conservation
+   - Relations : stocke, traite, protège
+
+9. Contrôle_Conformité :
+   - Définition : Mécanismes de vérification
+   - Sous-types : audit_interne, audit_externe, revue
+   - Attributs : périodicité, périmètre, exigences
+   - Relations : évalue, documente, certifie
+
+RELATIONS AUTORISÉES :
+
+1. Relations de Sécurité (Force 1-3) :
+   - protège : met en œuvre des mesures de protection
+   - contrôle : vérifie et valide
+   - isole : assure la séparation
+   - surveille : supervise l'activité
+   - chiffre : protège la confidentialité
+
+2. Relations de Conformité (Force 1-3) :
+   - impose : définit des exigences
+   - vérifie : contrôle le respect
+   - atteste : certifie la conformité
+   - documente : enregistre les preuves
+   - audite : évalue la conformité
+
+3. Relations de Gouvernance (Force 1-3) :
+   - définit : établit les règles
+   - supervise : assure le suivi
+   - maintient : assure la continuité
+   - améliore : optimise les processus
+   - forme : développe les compétences
+
+RÈGLES DE VALIDATION :
+
+1. Validation Sécurité :
+   - Conformité aux exigences SecNumCloud
+   - Pertinence des contrôles
+   - Efficacité du cloisonnement
+   - Robustesse du chiffrement
+
+2. Validation Conformité :
+   - Respect des exigences légales
+   - Couverture des audits
+   - Traçabilité des actions
+   - Documentation appropriée
+
+3. Validation Infrastructure :
+   - Localisation conforme
+   - Redondance appropriée
+   - Performance adaptée
+   - Sécurité physique adéquate
+
+FORMAT DE SORTIE :
+
+### ENTITÉS
+NomEntité\tType\tDescription
+
+### RELATIONS
+EntitéSource\tTypeRelation:Force(1-3)\tEntitéCible\tDescription
+
+Notes importantes :
+- Chaque relation doit être justifiée par le texte source
+- Les forces des relations doivent refléter les exigences SecNumCloud
+- La localisation et la souveraineté des données sont prioritaires
+- Les aspects de sécurité et conformité sont critiques
+
+Ontologie actuelle :
+{previous_result}
+
+Nouveau texte à analyser :
+{text}
+
+Analyse le texte et fournis uniquement le résultat au format demandé, 
+sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte.

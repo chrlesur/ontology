@@ -15,6 +15,11 @@ func NewPromptTemplate(template string) *PromptTemplate {
 	return &PromptTemplate{Template: template}
 }
 
+// NewCustomPromptTemplate crée un nouveau PromptTemplate à partir d'une chaîne
+func NewCustomPromptTemplate(template string) *PromptTemplate {
+    return &PromptTemplate{Template: template}
+}
+
 // Format remplit le template avec les valeurs fournies
 func (pt *PromptTemplate) Format(values map[string]string) string {
     result := pt.Template

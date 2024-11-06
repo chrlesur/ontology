@@ -1,0 +1,113 @@
+# TYPES D'ENTITÉS AUTORISÉS
+
+1. Système_Juridique:
+   - Définition : Ensemble cohérent de règles et institutions à une époque donnée
+   - Sous-types : droit romain, droit germanique, droit canonique
+   - Attributs : territoire, période, principes fondamentaux
+   - Relations : influence, fusionne_avec, remplace
+
+2. Institution:
+   - Définition : Structure d'organisation sociale ou politique
+   - Sous-types : empire, royaume, église, cité
+   - Attributs : territoire, compétences, organisation
+   - Relations : succède_à, contrôle, administre
+
+3. Pouvoir:
+   - Définition : Autorité politique ou religieuse
+   - Sous-types : empereur, roi, évêque, chef militaire
+   - Attributs : nature du pouvoir, territoire, légitimité
+   - Relations : délègue, conquiert, soumet
+
+4. Norme:
+   - Définition : Règle juridique ou coutumière
+   - Sous-types : loi, coutume, édit, canon
+   - Attributs : source, portée, sanctions
+   - Relations : modifie, abroge, complète
+
+5. Population:
+   - Définition : Groupe social ou ethnique
+   - Sous-types : peuple, tribu, classe sociale
+   - Attributs : territoire, statut, coutumes
+   - Relations : assimile, combat, s'allie_avec
+
+6. Pratique_Juridique:
+   - Définition : Mode d'application du droit
+   - Sous-types : procédure, rituel, administration
+   - Attributs : formalisme, acteurs, effets
+   - Relations : dérive_de, remplace, adapte
+
+7. Évènement:
+   - Définition : Fait historique majeur
+   - Sous-types : bataille, conversion, traité
+   - Attributs : date, lieu, acteurs
+   - Relations : provoque, marque, termine
+
+# RELATIONS AUTORISÉES
+
+1. Relations de transition :
+   - succède_à : remplacement historique (force 2-3)
+   - fusionne_avec : combinaison de systèmes (force 2-3)
+   - transforme : évolution progressive (force 1-2)
+
+2. Relations d'influence :
+   - influence : impact démontrable (force 1-3)
+   - inspire : source d'innovation (force 1-2)
+   - adapte : modification contextuelle (force 1-3)
+
+3. Relations de pouvoir :
+   - contrôle : autorité directe (force 2-3)
+   - administre : gestion effective (force 2-3)
+   - délègue : transmission d'autorité (force 2-3)
+
+4. Relations de conflit :
+   - combat : opposition militaire (force 2-3)
+   - résiste_à : opposition passive (force 1-2)
+   - soumet : domination établie (force 2-3)
+
+Force des relations :
+1 = relation suggérée par le contexte historique
+2 = relation attestée par des sources primaires
+3 = relation structurelle majeure
+
+# FORMAT DE SORTIE
+
+### ENTITÉS
+NomEntité\tType\tDescription
+
+Exemple :
+Droit_Romain\tSystème_Juridique\tSystème juridique de l'Empire romain appliqué en Gaule
+Empire_Romain\tInstitution\tStructure politique contrôlant la Gaule jusqu'en 476
+
+### RELATIONS
+EntitéSource\tTypeRelation:Force(1-3)\tEntitéCible\tDescription
+
+Exemple :
+Droit_Canonique\tinfluence:2\tDroit_Romain\tEmprunt des techniques juridiques romaines par l'Église
+
+# RÈGLES DE VALIDATION
+
+1. Validation chronologique :
+   - Cohérence temporelle des relations
+   - Périodisation exacte
+   - Succession des événements
+   - Simultanéité vérifiable
+
+2. Validation territoriale :
+   - Cohérence géographique
+   - Extensions territoriales
+   - Frontières historiques
+   - Zones d'influence
+
+3. Validation conceptuelle :
+   - Authenticité historique
+   - Sources fiables
+   - Consensus historiographique
+   - Interprétation justifiée
+
+Ontologie actuelle :
+{previous_result}
+
+Nouveau texte à analyser :
+{text}
+
+Analyse le texte et fournis uniquement le résultat au format demandé, sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte.

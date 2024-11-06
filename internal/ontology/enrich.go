@@ -26,6 +26,8 @@ var (
 	relationExtractionPrompt string
 	ontologyEnrichmentPrompt string
 	ontologyMergePrompt      string
+	maxThreads               int
+	aiyouAssistantID         string
 )
 
 // enrichCmd represents the enrich command
@@ -80,7 +82,7 @@ var enrichCmd = &cobra.Command{
 			output = strings.TrimSuffix(absInput, filepath.Ext(absInput)) + ".tsv"
 		}
 
-		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel, absInput)
+		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel, absInput, maxThreads, aiyouAssistantID)
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 		}
@@ -124,6 +126,8 @@ func init() {
 	enrichCmd.Flags().StringVarP(&relationExtractionPrompt, "relation-prompt", "r", "", "Additional prompt for relation extraction")
 	enrichCmd.Flags().StringVarP(&ontologyEnrichmentPrompt, "enrichment-prompt", "n", "", "Additional prompt for ontology enrichment")
 	enrichCmd.Flags().StringVarP(&ontologyMergePrompt, "merge-prompt", "m", "", "Additional prompt for ontology merging")
+	enrichCmd.Flags().IntVarP(&maxThreads, "max-threads", "t", 10, "Maximum number of concurrent threads for processing")
+
 }
 
 func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, includePositions, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt string) error {
@@ -154,7 +158,7 @@ func ExecuteEnrichCommand(input, output string, passes int, existingOntology str
 		output = "s3://" + strings.TrimPrefix(filepath.ToSlash(output), "/")
 	}
 
-	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llm, llmModel, absInput)
+	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityPrompt, relationPrompt, ontologyEnrichmentPrompt, mergePrompt, llm, llmModel, absInput, maxThreads, aiyouAssistantID)
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 	}

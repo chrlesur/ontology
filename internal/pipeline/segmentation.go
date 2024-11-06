@@ -76,7 +76,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 
 	results := make([]string, len(segments))
 	var wg sync.WaitGroup
-	sem := make(chan struct{}, 10) // Sémaphore pour limiter à 5 goroutines concurrentes
+	sem := make(chan struct{}, p.maxConcurrentThreads) // Utilise la valeur configurée
 
 	for i, segment := range segments {
 		wg.Add(1)
@@ -132,7 +132,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 
 // mergeResults fusionne les résultats de tous les segments
 func (p *Pipeline) mergeResults(previousResult string, newResults []string) (string, error) {
-	log.Debug("Starting mergeResults. Previous result length: %d, Number of new results: %d", len(previousResult), len(newResults))
+	log.Info("Starting mergeResults. Previous result length: %d, Number of new results: %d", len(previousResult), len(newResults))
 
 	// Combiner tous les nouveaux résultats
 	combinedNewResults := strings.Join(newResults, "\n")
@@ -146,6 +146,8 @@ func (p *Pipeline) mergeResults(previousResult string, newResults []string) (str
 	}
 
 	// Utiliser le LLM pour fusionner les résultats
+	log.Debug("Calling LLM with OntologyMergePrompt")
+
 	mergedResult, err := p.llm.ProcessWithPrompt(prompt.OntologyMergePrompt, mergeValues)
 	if err != nil {
 		log.Error("Ontology merge failed: %v", err)
@@ -168,31 +170,31 @@ func (p *Pipeline) processMetadata(metadata map[string]string) {
 }
 
 func (p *Pipeline) readDirectory(dirPath string) ([]byte, error) {
-    p.logger.Debug("Reading directory: %s", dirPath)
-    
-    files, err := p.storage.List(dirPath)
-    if err != nil {
-        return nil, fmt.Errorf("failed to list directory contents: %w", err)
-    }
+	p.logger.Debug("Reading directory: %s", dirPath)
 
-    var allContent []byte
-    for _, filePath := range files {
-        // Utiliser le chemin tel quel, sans le joindre à dirPath
-        content, err := p.readFile(filePath)
-        if err != nil {
-            p.logger.Warning("Failed to read file %s: %v", filePath, err)
-            continue
-        }
+	files, err := p.storage.List(dirPath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to list directory contents: %w", err)
+	}
 
-        allContent = append(allContent, content...)
-        allContent = append(allContent, '\n') // Add separator between files
-    }
+	var allContent []byte
+	for _, filePath := range files {
+		// Utiliser le chemin tel quel, sans le joindre à dirPath
+		content, err := p.readFile(filePath)
+		if err != nil {
+			p.logger.Warning("Failed to read file %s: %v", filePath, err)
+			continue
+		}
 
-    if len(allContent) == 0 {
-        return nil, fmt.Errorf("no content found in directory: %s", dirPath)
-    }
+		allContent = append(allContent, content...)
+		allContent = append(allContent, '\n') // Add separator between files
+	}
 
-    return allContent, nil
+	if len(allContent) == 0 {
+		return nil, fmt.Errorf("no content found in directory: %s", dirPath)
+	}
+
+	return allContent, nil
 }
 
 func (p *Pipeline) readFile(filePath string) ([]byte, error) {

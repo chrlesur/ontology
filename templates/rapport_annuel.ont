@@ -1,0 +1,180 @@
+ ONTOLOGIE POUR L'ANALYSE DE RAPPORTS FINANCIERS
+
+ RÈGLES DE NOMMAGE
+- Utiliser le format PascalCase pour les entités avec _ comme séparateur de mot (ex: Chiffre_Affaires)
+- Standardiser les noms (français uniquement, pas de mélange de langues)
+- Utiliser des underscores pour les mots composés si nécessaire
+- Pour les sigles, garder le format majuscule (ex: EBITDA)
+- Pour les années, utiliser le format complet (ex: Résultat_2023)
+
+ TYPES D'ENTITÉS AUTORISÉS (par ordre de priorité)
+
+ 1. KPI_Financier
+- Définition : Indicateurs clés de performance financière et extra-financière
+- Sous-types : fondamental, opérationnel, ESG, prédictif
+- Attributs attendus : valeur, période, variation, unité, tendance
+- Relations possibles : dérive_de, influence, agrège, compare_à
+
+ 2. État_Financier
+- Définition : Documents comptables normalisés
+- Sous-types : bilan, compte_résultat, flux_trésorerie, annexes
+- Attributs attendus : période, devise, référentiel, certification
+- Relations possibles : contient, justifie, réconcilie
+
+ 3. Segment_Activité
+- Définition : Division opérationnelle ou secteur d'activité
+- Sous-types : business_unit, zone_géographique, ligne_produit
+- Attributs attendus : poids, croissance, rentabilité, effectif
+- Relations possibles : contribue_à, dépend_de, surperforme
+
+ 4. Structure_Financière
+- Définition : Éléments de structure du bilan et financement
+- Sous-types : fonds_propres, dette, investissement, BFR
+- Attributs attendus : montant, composition, variation, ratio
+- Relations possibles : constitue, finance, garantit
+
+ 5. ESG_Impact
+- Définition : Indicateurs environnementaux, sociaux et gouvernance
+- Sous-types : environnement, social, gouvernance
+- Attributs attendus : mesure, objectif, conformité, certification
+- Relations possibles : respecte, améliore, certifie
+
+ 6. Prévision_Stratégie
+- Définition : Éléments prospectifs et stratégiques
+- Sous-types : objectif, plan, innovation, marché
+- Attributs attendus : horizon, probabilité, ressources, impact
+- Relations possibles : vise, nécessite, anticipe
+
+ 7. Risque_Opportunité
+- Définition : Facteurs d'impact potentiel sur la performance
+- Sous-types : marché, opérationnel, financier, réglementaire
+- Attributs attendus : probabilité, impact, horizon, contrôle
+- Relations possibles : menace, offre, requiert
+
+8. Acteur_Majeur
+
+- Définition : Parties prenantes clés impactant ou influençant l'entreprise
+- Sous-types :
+    - interne : dirigeant, manager_clé, équipe_direction, comité_exécutif
+    - corporate : filiale, maison_mère, concurrent, partenaire
+    - marché : client_stratégique, fournisseur_clé, régulateur, auditeur
+    - inancier : actionnaire_référence, investisseur_institutionnel, analyste
+- Attributs attendus : rôle, niveau_influence, périmètre_action, durée_relation
+- Relations possibles : dirige, contrôle, influence, collabore_avec, concurrence, audite, régule
+
+ RÈGLES DE DÉSAMBIGUÏSATION
+
+ 1. Indicateurs multi-types
+- Privilégier le type le plus spécifique et impactant
+- Noter les autres types possibles dans la description
+- Tracer les relations avec les autres types
+- Justifier le choix par l'usage principal
+
+ 2. Indicateurs composites
+- Créer une entité pour l'indicateur composite
+- Créer des entités distinctes pour chaque composante
+- Établir les relations de calcul explicites
+- Préciser les poids relatifs dans la description
+
+ 3. Variations temporelles
+- Créer une entité distincte par période significative
+- Établir des relations de comparaison entre périodes
+- Préciser la base de comparaison
+- Documenter les changements de méthode
+
+ 4. Indicateurs sectoriels
+- Privilégier le rattachement au segment principal
+- Créer des relations avec les segments secondaires
+- Noter le pourcentage d'attribution
+- Justifier la répartition si nécessaire
+
+ 5. Éléments prospectifs
+- Distinguer les objectifs des prévisions
+- Séparer le court terme du long terme
+- Préciser le degré de certitude
+- Identifier les facteurs déterminants
+
+ 6. Indicateurs réglementaires
+- Privilégier la définition normative officielle
+- Préciser le référentiel applicable
+- Noter les éventuelles différences méthodologiques
+- Tracer les réconciliations nécessaires
+
+ 7. Indicateurs de risque
+- Séparer les risques des impacts potentiels
+- Distinguer les facteurs internes et externes
+- Préciser l'horizon temporel
+- Quantifier la probabilité et l'impact quand possible
+
+ RELATIONS AUTORISÉES
+
+ 1. Relations calculées
+- dérive_de : calcul direct (force 3)
+- agrège : consolidation d'éléments (force 3)
+- compare_à : mise en perspective (force 2)
+
+ 2. Relations causales
+- influence : impact démontré (force 2-3)
+- contribue_à : participation partielle (force 2)
+- dépend_de : nécessité établie (force 3)
+
+ 3. Relations analytiques
+- explique : justification (force 1-2)
+- anticipe : prévision (force 1)
+- corrèle_avec : variation conjointe (force 2)
+
+ 4. Relations normatives
+- respecte : conformité (force 3)
+- certifie : validation externe (force 3)
+- requiert : obligation (force 3)
+
+Force des relations :
+- 1 = relation suggérée ou contextuelle
+- 2 = relation documentée dans le rapport
+- 3 = relation normative ou calculée
+
+FORMAT DE SORTIE :
+
+### ENTITÉS
+
+NomEntité\tType\tDescription
+
+Exemple :
+Chiffre_Affaires_2023\tKPI_Financier\t725,3M€, croissance +10,4% vs 2022
+ROC_2023\tKPI_Financier\t81,2M€, soit 11,2% du CA
+
+### RELATIONS
+
+EntitéSource\tTypeRelation:Force(1-3)\tEntitéCible\tDescription
+
+Exemple :
+Chiffre_Affaires_2023\tinfluence:3\tROC_2023\tImpact direct sur la rentabilité opérationnelle
+
+
+RÈGLES DE VALIDATION :
+
+ 1. Validation quantitative
+- Cohérence des calculs
+- Traçabilité des variations
+- Réconciliation des agrégats
+- Comparabilité temporelle
+
+ 2. Validation qualitative
+- Pertinence sectorielle
+- Contextualisation du marché
+- Justification des écarts
+- Analyse des tendances
+
+ 3. Validation normative
+- Conformité réglementaire
+- Respect des normes comptables
+- Certification externe
+- Documentation des méthodes
+
+Ontologie actuelle :
+{previous_result}
+
+Nouveau texte à analyser :
+{text}
+
+Analyse le texte et fournis uniquement le résultat au format demandé, sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte.

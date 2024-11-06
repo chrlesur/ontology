@@ -20,7 +20,7 @@ func GenerateContextJSON(content []byte, positions []int, contextWords int, posi
 	entries := make([]ContextEntry, 0, len(positions))
 
 	for i, pos := range positions {
-		log.Debug("Processing position: %d", pos)
+		//log.Debug("Processing position: %d", pos)
 
 		if pos < 0 || pos >= len(words) {
 			log.Warning("Invalid position %d. Skipping.", pos)
