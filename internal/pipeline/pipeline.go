@@ -4,6 +4,7 @@ package pipeline
 
 import (
 	"fmt"
+	"io/ioutil"
 	"path/filepath"
 	"strings"
 
@@ -47,10 +48,11 @@ type Pipeline struct {
 	ontologyMergePrompt      string
 	storage                  storage.Storage
 	maxConcurrentThreads     int
+	enrichmentPromptFile     string
 }
 
 // NewPipeline crée une nouvelle instance du pipeline de traitement
-func NewPipeline(includePositions bool, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llmType, llmModel, inputPath string, maxConcurrentThreads int, aiyouAssistantID string) (*Pipeline, error) {
+func NewPipeline(includePositions bool, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt, llmType, llmModel, inputPath string, maxConcurrentThreads int, aiyouAssistantID string, enrichmentPromptFile string) (*Pipeline, error) {
 	cfg := config.GetConfig()
 	log := logger.GetLogger()
 
@@ -104,6 +106,7 @@ func NewPipeline(includePositions bool, contextOutput bool, contextWords int, en
 		ontologyMergePrompt:      mergePrompt,
 		storage:                  storageInstance,
 		maxConcurrentThreads:     maxConcurrentThreads,
+		enrichmentPromptFile:     enrichmentPromptFile,
 	}, nil
 }
 
@@ -184,4 +187,23 @@ func (p *Pipeline) getParser(input string) (parser.Parser, error) {
 	p.logger.Debug("Getting parser for file extension: %s", ext)
 
 	return parser.GetParser(ext)
+}
+
+func (p *Pipeline) readPromptFile(filePath string) (string, error) {
+
+	if strings.HasPrefix(filePath, "s3://") {
+		// Lecture depuis S3
+		content, err := p.storage.Read(filePath)
+		if err != nil {
+			return "", fmt.Errorf("failed to read S3 prompt file: %w", err)
+		}
+		return string(content), nil
+	}
+
+	// Lecture depuis le système de fichiers local
+	content, err := ioutil.ReadFile(filePath)
+	if err != nil {
+		return "", fmt.Errorf("failed to read local prompt file: %w", err)
+	}
+	return string(content), nil
 }

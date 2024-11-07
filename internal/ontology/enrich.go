@@ -28,6 +28,7 @@ var (
 	ontologyMergePrompt      string
 	maxThreads               int
 	aiyouAssistantID         string
+	enrichmentPromptFile     string
 )
 
 // enrichCmd represents the enrich command
@@ -82,7 +83,7 @@ var enrichCmd = &cobra.Command{
 			output = strings.TrimSuffix(absInput, filepath.Ext(absInput)) + ".tsv"
 		}
 
-		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel, absInput, maxThreads, aiyouAssistantID)
+		p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityExtractionPrompt, relationExtractionPrompt, ontologyEnrichmentPrompt, ontologyMergePrompt, llm, llmModel, absInput, maxThreads, aiyouAssistantID, enrichmentPromptFile)
 		if err != nil {
 			return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 		}
@@ -120,14 +121,13 @@ func init() {
 	enrichCmd.Flags().StringVar(&llmModel, "llm-model", "", i18n.Messages.LLMModelFlagUsage)
 	enrichCmd.Flags().IntVar(&passes, "passes", 1, i18n.Messages.PassesFlagUsage)
 	enrichCmd.Flags().BoolVar(&recursive, "recursive", false, i18n.Messages.RecursiveFlagUsage)
-	enrichCmd.Flags().StringVar(&existingOntology, "existing-ontology", "", i18n.Messages.ExistingOntologyFlagUsage)
+	enrichCmd.Flags().StringVar(&existingOntology, "existing-calculated-ontology", "", i18n.Messages.ExistingOntologyFlagUsage)
 
 	enrichCmd.Flags().StringVarP(&entityExtractionPrompt, "entity-prompt", "e", "", "Additional prompt for entity extraction")
 	enrichCmd.Flags().StringVarP(&relationExtractionPrompt, "relation-prompt", "r", "", "Additional prompt for relation extraction")
-	enrichCmd.Flags().StringVarP(&ontologyEnrichmentPrompt, "enrichment-prompt", "n", "", "Additional prompt for ontology enrichment")
+	enrichCmd.Flags().StringVarP(&enrichmentPromptFile, "ontology definition file", "o", "", "File path (local or S3) for custom ontology definition prompt")
 	enrichCmd.Flags().StringVarP(&ontologyMergePrompt, "merge-prompt", "m", "", "Additional prompt for ontology merging")
 	enrichCmd.Flags().IntVarP(&maxThreads, "max-threads", "t", 10, "Maximum number of concurrent threads for processing")
-
 }
 
 func ExecuteEnrichCommand(input, output string, passes int, existingOntology string, includePositions, contextOutput bool, contextWords int, entityPrompt, relationPrompt, enrichmentPrompt, mergePrompt string) error {
@@ -158,7 +158,7 @@ func ExecuteEnrichCommand(input, output string, passes int, existingOntology str
 		output = "s3://" + strings.TrimPrefix(filepath.ToSlash(output), "/")
 	}
 
-	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityPrompt, relationPrompt, ontologyEnrichmentPrompt, mergePrompt, llm, llmModel, absInput, maxThreads, aiyouAssistantID)
+	p, err := pipeline.NewPipeline(includePositions, contextOutput, contextWords, entityPrompt, relationPrompt, ontologyEnrichmentPrompt, mergePrompt, llm, llmModel, absInput, maxThreads, aiyouAssistantID, enrichmentPromptFile)
 	if err != nil {
 		return fmt.Errorf("%s: %w", i18n.Messages.ErrorCreatingPipeline, err)
 	}

@@ -1,0 +1,127 @@
+Tu es un expert en sécurité des systèmes d'information et en ontologies. Ta tâche est d'analyser une politique de sécurité et d'en extraire une ontologie structurée.
+
+RÈGLES DE NOMMAGE :
+- Utiliser le format PascalCase avec _ comme séparateur à la place de l'espace (ex: Controle d'accès devient Controle_Accès). 
+- Ne pas remplacer le caractere tiret '-'
+- Standardiser les noms (français uniquement)
+- Utiliser des underscores pour les mots composés
+- Pour les sigles, garder le format majuscule (ex: PSSI, PER-025-DIR)
+- Pour les versions, utiliser des chiffres (ex: ISO27001_2022)
+- Les entités ont au maximum 3 mots qui les composes
+
+TYPES D'ENTITÉS AUTORISÉS :
+
+1. Politique_Sécurité:
+   - Définition : Document cadre définissant les règles de sécurité
+   - Sous-types : politique générale, politique spécifique, directive
+   - Attributs attendus : portée, validité, niveau_criticité
+   - Relations possibles : définit, impose, structure, encadre
+
+2. Controle_Sécurité:
+   - Définition : Mesure technique ou organisationnelle de sécurité
+   - Sous-types : contrôle technique, contrôle organisationnel, contrôle physique
+   - Attributs attendus : fréquence, responsable, criticité
+   - Relations possibles : protège, vérifie, surveille, atténue
+
+3. Actif_Sécurité:
+   - Définition : Ressource à protéger
+   - Sous-types : donnée, système, infrastructure, personnel
+   - Attributs attendus : classification, propriétaire, criticité
+   - Relations possibles : requiert, subit, contient, utilise
+
+4. Risque_Sécurité:
+   - Définition : Menace potentielle sur un actif
+   - Sous-types : risque technique, risque humain, risque organisationnel
+   - Attributs attendus : probabilité, impact, niveau
+   - Relations possibles : menace, impacte, nécessite, découle_de
+
+5. Procedure_Sécurité:
+   - Définition : Processus formalisé de sécurité
+   - Sous-types : procédure urgence, procédure contrôle, procédure audit
+   - Attributs attendus : périodicité, responsable, prérequis
+   - Relations possibles : implémente, suit, requiert, vérifie
+
+6. Role_Sécurité:
+   - Définition : Fonction ou responsabilité dans le SMSI
+   - Sous-types : RSSI, administrateur, utilisateur, auditeur
+   - Attributs attendus : périmètre, responsabilités, droits
+   - Relations possibles : applique, supervise, exécute, valide
+
+7. Exigence_Sécurité:
+   - Définition : Obligation de sécurité à respecter
+   - Sous-types : exigence légale, exigence technique, exigence organisationnelle
+   - Attributs attendus : source, niveau, délai_conformité
+   - Relations possibles : impose, nécessite, dérive_de, justifie
+
+RÈGLES DE DÉSAMBIGUÏSATION :
+1. Si une entité peut appartenir à plusieurs types :
+   - Privilégier le type le plus opérationnel
+   - Noter les types alternatifs dans la description
+   - Justifier le choix par le contexte
+
+2. Pour les contrôles imbriqués :
+   - Créer des entités distinctes
+   - Établir des relations de hiérarchie explicites
+   - Préciser le niveau d'application
+
+RELATIONS AUTORISÉES :
+1. Relations hiérarchiques :
+   - inclut : relation d'inclusion
+   - dépend_de : relation de dépendance
+   - dérive_de : relation de descendance
+
+2. Relations opérationnelles :
+   - implémente : met en œuvre une exigence
+   - contrôle : surveille un élément
+   - protège : sécurise un actif
+
+3. Relations de responsabilité :
+   - supervise : responsabilité de surveillance
+   - exécute : responsabilité d'exécution
+   - valide : responsabilité de validation
+
+4. Relations de risque :
+   - menace : représente un danger
+   - atténue : réduit un risque
+   - détecte : identifie un problème
+
+Force des relations :
+1 = relation secondaire ou indirecte
+2 = relation importante
+3 = relation critique ou obligatoire
+
+FORMAT DE SORTIE :
+
+### ENTITÉS
+NomEntité\tType\tDescription
+
+### RELATIONS
+EntitéSource\tTypeRelation:Force(1-3)\tEntitéCible\tDescription
+
+RÈGLES DE VALIDATION :
+1. Vérification des entités :
+   - Chaque entité doit correspondre à un élément de sécurité concret
+   - Les responsabilités doivent être clairement définies
+   - La description doit être précise et actionnable
+   - Les niveaux de criticité doivent être cohérents
+
+2. Vérification des relations :
+   - Chaque relation doit avoir un impact opérationnel
+   - La force de la relation doit refléter son importance
+   - Les relations doivent former une chaîne de contrôle cohérente
+   - Éviter les relations redondantes
+
+3. Cohérence globale :
+   - Alignement avec les normes ISO 27001/27002
+   - Couverture complète des domaines de sécurité
+   - Traçabilité des exigences
+   - Applicabilité pratique des contrôles
+   
+Ontologie actuelle :
+{previous_result}
+
+Nouveau texte à analyser :
+{text}
+
+Analyse le texte et fournis uniquement le résultat au format demandé, 
+sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte.

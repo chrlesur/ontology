@@ -22,16 +22,19 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 		"previous_result": previousResult,
 	}
 
-	var enrichmentPrompt *prompt.PromptTemplate
-	if p.ontologyEnrichmentPrompt != "" {
-		// Utiliser le prompt personnalisé s'il est fourni
-		enrichmentPrompt = prompt.NewCustomPromptTemplate(p.ontologyEnrichmentPrompt)
-		log.Debug("Using custom enrichment prompt")
-	} else {
-		// Utiliser le prompt par défaut
-		enrichmentPrompt = prompt.OntologyEnrichmentPrompt
-		log.Debug("Using default enrichment prompt")
-	}
+    var enrichmentPrompt *prompt.PromptTemplate
+    if p.enrichmentPromptFile != "" {
+        customPrompt, err := p.readPromptFile(p.enrichmentPromptFile)
+        if err != nil {
+            log.Error("Failed to read custom prompt file: %v", err)
+            return "", fmt.Errorf("failed to read custom prompt file: %w", err)
+        }
+        enrichmentPrompt = prompt.NewCustomPromptTemplate(customPrompt)
+        log.Info("Using custom enrichment prompt from file: %s", p.enrichmentPromptFile)
+    } else {
+        enrichmentPrompt = prompt.OntologyEnrichmentPrompt
+        log.Info("Using default enrichment prompt")
+    }
 
 	log.Debug("Calling LLM with OntologyEnrichmentPrompt")
 
@@ -59,6 +62,10 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 
 	lines := strings.Split(enrichedResult, "\n")
 	log.Debug("Number of lines to process: %d", len(lines))
+
+	log.Debug("--CONTENT--")
+	log.Debug("%s", content)
+	log.Debug("--END CONTENT--")
 
 	for i, line := range lines {
 		log.Debug("Processing line %d: %s", i, line)
