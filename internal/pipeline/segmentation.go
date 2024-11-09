@@ -43,6 +43,8 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 		return "", nil, fmt.Errorf("no content found in input")
 	}
 
+	p.fullContent = content
+
 	// Initialiser le tokenizer
 	tke, err := tiktoken.GetEncoding("cl100k_base")
 	if err != nil {
@@ -53,18 +55,23 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 	contentTokens := len(tke.Encode(string(content), nil, nil))
 	p.logger.Info("Input content tokens: %d", contentTokens)
 
-	positionIndex := p.createPositionIndex(content)
+	p.fullContent = content
+	positionIndex := p.createPositionIndex(p.fullContent)
 	p.logger.Debug("Position index created. Number of entries: %d", len(positionIndex))
 
-	segments, err := segmenter.Segment(content, segmenter.SegmentConfig{
+	segments, offsets, err := segmenter.Segment(content, segmenter.SegmentConfig{
 		MaxTokens:   p.config.MaxTokens,
 		ContextSize: p.config.ContextSize,
 		Model:       p.config.DefaultModel,
 	})
+
 	if err != nil {
 		p.logger.Error("Failed to segment content: %v", err)
 		return "", nil, fmt.Errorf("%s: %w", i18n.GetMessage("ErrSegmentContent"), err)
 	}
+
+	p.segmentOffsets = offsets
+
 	p.logger.Info("Number of segments: %d", len(segments))
 
 	if p.progressCallback != nil {
@@ -98,7 +105,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 			})
 			p.logger.Debug("Context for segment %d/%d, Length: %d bytes", i+1, len(segments), len(context))
 
-			result, err := p.processSegment(seg.Content, context, previousResult, positionIndex, includePositions)
+			result, err := p.processSegment(seg.Content, context, previousResult, positionIndex, includePositions, seg.Start)
 			if err != nil {
 				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i+1, err)
 				return
@@ -137,6 +144,9 @@ func (p *Pipeline) mergeResults(previousResult string, newResults []string) (str
 	// Combiner tous les nouveaux résultats
 	combinedNewResults := strings.Join(newResults, "\n")
 	log.Debug("Combined new results length: %d", len(combinedNewResults))
+	log.Debug("--- Combined Results ---")
+	log.Debug("%s", combinedNewResults)
+	log.Debug("--- ---")
 
 	// Préparer les valeurs pour le prompt de fusion
 	mergeValues := map[string]string{
@@ -156,6 +166,9 @@ func (p *Pipeline) mergeResults(previousResult string, newResults []string) (str
 
 	// Normaliser le résultat fusionné
 	normalizedMergedResult := normalizeTSV(mergedResult)
+	log.Debug("--- Normalized Results ---")
+	log.Debug("%s", normalizedMergedResult)
+	log.Debug("--- ---")
 
 	log.Debug("Merged result length: %d", len(normalizedMergedResult))
 	return normalizedMergedResult, nil

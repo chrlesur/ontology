@@ -45,34 +45,48 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 }
 
 // findPositions trouve toutes les positions d'un mot ou d'une phrase dans le contenu
-func (p *Pipeline) findPositions(word string, index map[string][]int, content string) []int {
-	parts := strings.Split(word, "\t")
-	entityName := parts[0]
-
+func (p *Pipeline) findPositions(entityName string, index map[string][]int, fullContent string) []int {
 	log.Debug("Searching for positions of entity: %s", entityName)
 
-	allVariants := generateArticleVariants(entityName)
+	contentWords := strings.Fields(fullContent)
 	var allPositions []int
 
-	for _, variant := range allVariants {
+	// Générer les variantes de l'entité
+	variants := generateEntityVariants(entityName)
+
+	for _, variant := range variants {
 		normalizedVariant := normalizeWord(variant)
 		log.Debug("Trying variant: %s", normalizedVariant)
 
-		// Recherche exacte d'abord
+		// Recherche exacte en utilisant l'index
 		if positions, ok := index[normalizedVariant]; ok {
 			log.Debug("Found exact match positions for %s: %v", variant, positions)
 			allPositions = append(allPositions, positions...)
 			continue
 		}
 
-		// Utiliser la recherche approximative seulement pour la variante originale
-		if variant == entityName {
-			positions := p.findApproximatePositions(normalizedVariant, content)
-			if len(positions) > 0 {
-				log.Debug("Found approximate positions for %s: %v", variant, positions)
-				allPositions = append(allPositions, positions...)
+		// Recherche exacte dans le contenu si non trouvé dans l'index
+		variantWords := strings.Fields(variant)
+		for i := 0; i <= len(contentWords)-len(variantWords); i++ {
+			match := true
+			for j, word := range variantWords {
+				if !strings.EqualFold(contentWords[i+j], word) {
+					match = false
+					break
+				}
+			}
+			if match {
+				allPositions = append(allPositions, i)
+				log.Debug("Found exact match for %s at position %d", variant, i)
 			}
 		}
+	}
+
+	// Si aucune correspondance exacte n'est trouvée, essayer la recherche approximative
+	if len(allPositions) == 0 {
+		log.Debug("No exact matches found, trying approximate search for: %s", entityName)
+		approximatePositions := p.findApproximatePositions(entityName, fullContent)
+		allPositions = append(allPositions, approximatePositions...)
 	}
 
 	// Dédupliquer et trier les positions trouvées
@@ -88,10 +102,32 @@ func (p *Pipeline) findPositions(word string, index map[string][]int, content st
 	return uniquePositions
 }
 
+func generateEntityVariants(entityName string) []string {
+	variants := []string{entityName}
+	lowercaseEntity := strings.ToLower(entityName)
+
+	// Ajouter des variantes avec et sans tirets/underscores
+	if strings.Contains(lowercaseEntity, "-") || strings.Contains(lowercaseEntity, "_") {
+		variants = append(variants,
+			strings.ReplaceAll(lowercaseEntity, "-", " "),
+			strings.ReplaceAll(lowercaseEntity, "_", " "))
+	}
+
+	// Ajouter des variantes avec articles
+	variants = append(variants,
+		"l'"+lowercaseEntity,
+		"d'"+lowercaseEntity,
+		"le "+lowercaseEntity,
+		"la "+lowercaseEntity,
+		"les "+lowercaseEntity)
+
+	return variants
+}
+
 // findApproximatePositions trouve les positions approximatives d'un mot ou d'une phrase
-func (p *Pipeline) findApproximatePositions(entityName string, content string) []int {
+func (p *Pipeline) findApproximatePositions(entityName, fullContent string) []int {
 	words := strings.Fields(strings.ToLower(entityName))
-	contentLower := strings.ToLower(content)
+	contentLower := strings.ToLower(fullContent)
 	var positions []int
 
 	// Recherche exacte de la phrase complète
@@ -138,40 +174,19 @@ func (p *Pipeline) checkApproximateMatch(searchWords, contentWords []string, max
 }
 
 // getAllPositionsFromNewContent récupère toutes les positions des éléments dans le nouveau contenu
-func (p *Pipeline) getAllPositionsFromNewContent(words []string) []PositionRange {
+func (p *Pipeline) getAllPositionsFromNewContent() []PositionRange {
 	var allPositions []PositionRange
 	for _, element := range p.ontology.Elements {
-		elementWords := strings.Fields(strings.ToLower(element.Name))
-		// Utiliser les positions déjà connues dans l'ontologie
-		for _, pos := range element.Positions {
-			if pos >= 0 && pos < len(words) {
-				end := min(pos+len(elementWords), len(words)) - 1
-				allPositions = append(allPositions, PositionRange{
-					Start:   pos,
-					End:     end,
-					Element: element.Name,
-				})
-			}
-		}
-		// Rechercher également de nouvelles occurrences
-		for i := 0; i <= len(words)-len(elementWords); i++ {
-			match := true
-			for j, ew := range elementWords {
-				if strings.ToLower(words[i+j]) != ew {
-					match = false
-					break
-				}
-			}
-			if match {
-				allPositions = append(allPositions, PositionRange{
-					Start:   i,
-					End:     i + len(elementWords) - 1,
-					Element: element.Name,
-				})
-			}
+		positions := element.Positions
+		for _, pos := range positions {
+			allPositions = append(allPositions, PositionRange{
+				Start:   pos,
+				End:     pos + len(strings.Fields(element.Name)) - 1,
+				Element: element.Name,
+			})
 		}
 	}
-	log.Debug("Total position ranges collected from new content: %d", len(allPositions))
+	log.Debug("Total position ranges collected from ontology: %d", len(allPositions))
 	return allPositions
 }
 

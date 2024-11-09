@@ -31,26 +31,27 @@ type SegmentInfo struct {
 	End     int
 }
 
-func Segment(content []byte, cfg SegmentConfig) ([]SegmentInfo, error) {
+func Segment(content []byte, cfg SegmentConfig) ([]SegmentInfo, []int, error) {
 	log.Debug(i18n.Messages.LogSegmentationStarted)
 	log.Debug(fmt.Sprintf("Segmentation config: MaxTokens=%d, ContextSize=%d, Model=%s", cfg.MaxTokens, cfg.ContextSize, cfg.Model))
 	log.Debug(fmt.Sprintf("Content length: %d bytes", len(content)))
 
 	if len(content) == 0 {
-		return nil, ErrInvalidContent
+		return nil, nil, ErrInvalidContent
 	}
 
 	tokenizer, err := getTokenizer(cfg.Model)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	var segments []SegmentInfo
-	sentences := splitIntoSentences(content)
+	var offsets []int
 	currentSegment := new(bytes.Buffer)
 	currentTokenCount := 0
 	currentStart := 0
 
+	sentences := splitIntoSentences(content)
 	for _, sentence := range sentences {
 		sentenceTokens := CountTokens(sentence, tokenizer)
 
@@ -62,9 +63,9 @@ func Segment(content []byte, cfg SegmentConfig) ([]SegmentInfo, error) {
 					Start:   currentStart,
 					End:     currentStart + currentSegment.Len(),
 				})
-				log.Debug(fmt.Sprintf("Segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
-					currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount,
-					truncateString(string(segmentContent), 100)))
+				offsets = append(offsets, currentStart)
+				log.Debug(fmt.Sprintf("Segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d",
+					currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount))
 				currentStart = currentStart + currentSegment.Len()
 				currentSegment.Reset()
 				currentTokenCount = 0
@@ -73,21 +74,6 @@ func Segment(content []byte, cfg SegmentConfig) ([]SegmentInfo, error) {
 
 		currentSegment.Write(sentence)
 		currentTokenCount += sentenceTokens
-
-		if currentTokenCount >= cfg.MaxTokens {
-			segmentContent := content[currentStart : currentStart+currentSegment.Len()]
-			segments = append(segments, SegmentInfo{
-				Content: segmentContent,
-				Start:   currentStart,
-				End:     currentStart + currentSegment.Len(),
-			})
-			log.Debug(fmt.Sprintf("Segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
-				currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount,
-				truncateString(string(segmentContent), 100)))
-			currentStart = currentStart + currentSegment.Len()
-			currentSegment.Reset()
-			currentTokenCount = 0
-		}
 	}
 
 	if currentSegment.Len() > 0 {
@@ -97,14 +83,15 @@ func Segment(content []byte, cfg SegmentConfig) ([]SegmentInfo, error) {
 			Start:   currentStart,
 			End:     currentStart + currentSegment.Len(),
 		})
-		log.Debug(fmt.Sprintf("Final segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d, Preview: %s",
-			currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount,
-			truncateString(string(segmentContent), 100)))
+		offsets = append(offsets, currentStart)
+		log.Debug(fmt.Sprintf("Final segment created. Start: %d, End: %d, Length: %d bytes, Tokens: %d",
+			currentStart, currentStart+currentSegment.Len(), len(segmentContent), currentTokenCount))
 	}
 
 	log.Info(fmt.Sprintf(i18n.Messages.LogSegmentationCompleted, len(segments)))
-	return segments, nil
+	return segments, offsets, nil
 }
+
 func splitIntoSentences(content []byte) [][]byte {
 	var sentences [][]byte
 	var currentSentence []byte

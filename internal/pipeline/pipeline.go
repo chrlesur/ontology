@@ -49,6 +49,8 @@ type Pipeline struct {
 	storage                  storage.Storage
 	maxConcurrentThreads     int
 	enrichmentPromptFile     string
+	fullContent              []byte	// stocker le contenu complet du document.
+	segmentOffsets           []int	// stocker les offsets de début de chaque segment.
 }
 
 // NewPipeline crée une nouvelle instance du pipeline de traitement

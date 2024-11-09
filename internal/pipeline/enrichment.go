@@ -11,8 +11,8 @@ import (
 )
 
 // processSegment traite un segment individuel du contenu
-func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, positionIndex map[string][]int, includePositions bool) (string, error) {
-	log.Debug("Processing segment of length %d, context length %d, previous result length %d", len(segment), len(context), len(previousResult))
+func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, positionIndex map[string][]int, includePositions bool, offset int) (string, error) {
+	log.Debug("Processing segment of length %d, context length %d, previous result length %d, offset %d", len(segment), len(context), len(previousResult), offset)
 	log.Debug("Segment content preview: %s", truncateString(string(segment), 200))
 	log.Debug("Context preview: %s", truncateString(context, 200))
 
@@ -22,19 +22,19 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 		"previous_result": previousResult,
 	}
 
-    var enrichmentPrompt *prompt.PromptTemplate
-    if p.enrichmentPromptFile != "" {
-        customPrompt, err := p.readPromptFile(p.enrichmentPromptFile)
-        if err != nil {
-            log.Error("Failed to read custom prompt file: %v", err)
-            return "", fmt.Errorf("failed to read custom prompt file: %w", err)
-        }
-        enrichmentPrompt = prompt.NewCustomPromptTemplate(customPrompt)
-        log.Info("Using custom enrichment prompt from file: %s", p.enrichmentPromptFile)
-    } else {
-        enrichmentPrompt = prompt.OntologyEnrichmentPrompt
-        log.Info("Using default enrichment prompt")
-    }
+	var enrichmentPrompt *prompt.PromptTemplate
+	if p.enrichmentPromptFile != "" {
+		customPrompt, err := p.readPromptFile(p.enrichmentPromptFile)
+		if err != nil {
+			log.Error("Failed to read custom prompt file: %v", err)
+			return "", fmt.Errorf("failed to read custom prompt file: %w", err)
+		}
+		enrichmentPrompt = prompt.NewCustomPromptTemplate(customPrompt)
+		log.Info("Using custom enrichment prompt from file: %s", p.enrichmentPromptFile)
+	} else {
+		enrichmentPrompt = prompt.OntologyEnrichmentPrompt
+		log.Info("Using default enrichment prompt")
+	}
 
 	log.Debug("Calling LLM with OntologyEnrichmentPrompt")
 
@@ -49,23 +49,19 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 
 	log.Debug("Enriched result length: %d, preview: %s", len(normalizedResult), truncateString(normalizedResult, 100))
 
-	p.enrichOntologyWithPositions(normalizedResult, positionIndex, includePositions, string(segment))
+	p.enrichOntologyWithPositions(normalizedResult, positionIndex, includePositions, string(segment), offset)
 
 	return normalizedResult, nil
 }
 
 // enrichOntologyWithPositions enrichit l'ontologie avec les positions des éléments
-func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int, includePositions bool, content string) {
-	log.Debug("Starting enrichOntologyWithPositions")
+func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int, includePositions bool, content string, offset int) {
+	log.Debug("Starting enrichOntologyWithPositions with offset %d", offset)
 	log.Debug("Include positions: %v", includePositions)
 	log.Debug("Position index size: %d", len(positionIndex))
 
 	lines := strings.Split(enrichedResult, "\n")
 	log.Debug("Number of lines to process: %d", len(lines))
-
-	log.Debug("--CONTENT--")
-	log.Debug("%s", content)
-	log.Debug("--END CONTENT--")
 
 	for i, line := range lines {
 		log.Debug("Processing line %d: %s", i, line)
@@ -87,31 +83,20 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 
 			if includePositions {
 				log.Debug("Searching for positions of entity: %s", name)
-				allPositions := p.findPositions(name, positionIndex, content)
+				allPositions := p.findPositions(name, positionIndex, string(p.fullContent))
 				log.Debug("Found %d positions for entity %s: %v", len(allPositions), name, allPositions)
 				if len(allPositions) > 0 {
-					uniquePos := uniquePositions(allPositions)
-					element.SetPositions(uniquePos)
-					log.Debug("Set %d unique positions for element %s: %v", len(uniquePos), name, uniquePos)
+					// Garder toutes les positions trouvées
+					element.SetPositions(uniquePositions(allPositions))
+					log.Debug("Set %d positions for element %s: %v", len(allPositions), name, allPositions)
 				} else {
 					log.Debug("No positions found for element %s", name)
 				}
 			}
 
-			if len(parts) >= 4 { // C'est une relation
-				log.Debug("Processing relation: %v", parts)
-				source := parts[0]
-				relationType := parts[1]
-				target := parts[2]
-				relationDescription := strings.Join(parts[3:], " ")
-				relation := &model.Relation{
-					Source:      source,
-					Type:        relationType,
-					Target:      target,
-					Description: relationDescription,
-				}
-				p.ontology.AddRelation(relation)
-				log.Debug("Added new relation: %v", relation)
+			// Traitement des relations (si nécessaire)
+			if len(parts) >= 4 {
+				// Code pour traiter les relations...
 			}
 		} else {
 			log.Warning("Skipping invalid line: %s", line)
@@ -154,4 +139,14 @@ func normalizeTSV(input string) string {
 		}
 	}
 	return strings.Join(normalizedLines, "\n")
+}
+
+func filterValidPositions(positions []int, contentLength int) []int {
+	var validPositions []int
+	for _, pos := range positions {
+		if pos >= 0 && pos < contentLength {
+			validPositions = append(validPositions, pos)
+		}
+	}
+	return uniquePositions(validPositions)
 }

@@ -32,9 +32,7 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 
 	if p.contextOutput {
 		contextFile := strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "_context.json"
-
-		words := strings.Fields(string(newContent))
-		positionRanges := p.getAllPositionsFromNewContent(words)
+		positionRanges := p.getAllPositionsFromNewContent()
 		mergedPositions := mergeOverlappingPositions(positionRanges)
 
 		positions := make([]int, len(mergedPositions))
@@ -113,10 +111,8 @@ func (p *Pipeline) generateTSVContent() string {
 // generateAndSaveContextJSON génère et sauvegarde le JSON de contexte
 func (p *Pipeline) generateAndSaveContextJSON(content []byte, dir, baseName string) (string, error) {
 	p.logger.Info("Generating context JSON")
-	words := strings.Fields(string(content))
-	p.logger.Debug("Total words in content: %d", len(words))
 
-	positionRanges := p.getAllPositionsFromNewContent(words)
+	positionRanges := p.getAllPositionsFromNewContent()
 	p.logger.Info("Total position ranges collected: %d", len(positionRanges))
 
 	mergedPositions := mergeOverlappingPositions(positionRanges)

@@ -3,11 +3,10 @@ Tu es un expert en sécurité des systèmes d'information et en ontologies. Ta t
 RÈGLES DE NOMMAGE :
 - Utiliser le format PascalCase avec _ comme séparateur à la place de l'espace (ex: Controle d'accès devient Controle_Accès). 
 - Ne pas remplacer le caractere tiret '-'
-- Standardiser les noms (français uniquement)
+- Standardiser les noms (français uniquement) et respecter les accents
 - Utiliser des underscores pour les mots composés
 - Pour les sigles, garder le format majuscule (ex: PSSI, PER-025-DIR)
 - Pour les versions, utiliser des chiffres (ex: ISO27001_2022)
-- Les entités ont au maximum 3 mots qui les composes
 
 TYPES D'ENTITÉS AUTORISÉS :
 
@@ -124,4 +123,4 @@ Nouveau texte à analyser :
 {text}
 
 Analyse le texte et fournis uniquement le résultat au format demandé, 
-sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte.
+sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte. RESPECT BIEN LE SEPARATEUR \t.
