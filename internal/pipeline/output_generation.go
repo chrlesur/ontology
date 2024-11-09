@@ -86,26 +86,31 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 
 // generateTSVContent génère le contenu TSV à partir de l'ontologie
 func (p *Pipeline) generateTSVContent() string {
-	var tsvBuilder strings.Builder
+    var tsvBuilder strings.Builder
 
-	p.logger.Debug("Generating TSV content")
+    p.logger.Debug("Generating TSV content")
 
-	// Écrire les éléments
-	for _, element := range p.ontology.Elements {
-		positions := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(element.Positions)), ","), "[]")
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\n", element.Name, element.Type, element.Description, positions)
-		tsvBuilder.WriteString(line)
-		p.logger.Debug("Added element to TSV: %s", strings.TrimSpace(line))
-	}
+    // Écrire les éléments
+    for _, element := range p.ontology.Elements {
+        positions := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(element.Positions)), ","), "[]")
+        line := fmt.Sprintf("%s\t%s\t%s\t%s\n", element.Name, element.Type, element.Description, positions)
+        tsvBuilder.WriteString(line)
+        p.logger.Debug("Added element to TSV: %s", strings.TrimSpace(line))
+    }
 
-	// Écrire les relations
-	for _, relation := range p.ontology.Relations {
-		line := fmt.Sprintf("%s\t%s\t%s\t%s\n", relation.Source, relation.Type, relation.Target, relation.Description)
-		tsvBuilder.WriteString(line)
-		p.logger.Debug("Added relation to TSV: %s", strings.TrimSpace(line))
-	}
+    // Écrire les relations
+    for _, relation := range p.ontology.Relations {
+        line := fmt.Sprintf("%s\t%s:%.0f\t%s\t%s\n", 
+            relation.Source, 
+            relation.Type, 
+            relation.Weight, 
+            relation.Target, 
+            relation.Description)
+        tsvBuilder.WriteString(line)
+        p.logger.Debug("Added relation to TSV: %s", strings.TrimSpace(line))
+    }
 
-	return tsvBuilder.String()
+    return tsvBuilder.String()
 }
 
 // generateAndSaveContextJSON génère et sauvegarde le JSON de contexte

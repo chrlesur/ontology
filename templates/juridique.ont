@@ -6,6 +6,7 @@ RÈGLES DE NOMMAGE :
 - Utiliser des underscores pour les mots composés si nécessaire
 - Pour les sigles, garder le format majuscule (ex: CEDH)
 - Pour les versions, utiliser des chiffres (ex: RGPD_2016)
+- Respect les formes pluriel/singulier du texte initial
 
 TYPES D'ENTITÉS AUTORISÉS (par ordre de priorité) :
 
@@ -101,7 +102,7 @@ ConventionEuropéenne\tDocument_Juridique\tTraité fondamental des droits de l'h
 EntitéSource\tTypeRelation:Force(1-3)\tEntitéCible\tDescription
 
 Exemple :
-CEDH\tappliqu:3\tConventionEuropéenne\tLa CEDH applique et interprète la Convention
+CEDH\tapplique:3\tConventionEuropéenne\tLa CEDH applique et interprète la Convention
 
 RÈGLES DE VALIDATION :
 1. Vérification des entités :

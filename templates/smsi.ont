@@ -7,6 +7,8 @@ RÈGLES DE NOMMAGE :
 - Utiliser des underscores pour les mots composés
 - Pour les sigles, garder le format majuscule (ex: PSSI, PER-025-DIR)
 - Pour les versions, utiliser des chiffres (ex: ISO27001_2022)
+- Respect les formes pluriel/singulier du texte initial
+
 
 TYPES D'ENTITÉS AUTORISÉS :
 

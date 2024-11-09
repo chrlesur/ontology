@@ -1,12 +1,19 @@
 package model
 
+import (
+	"database/sql"
+	"time"
+)
+
 // OntologyElement représente un élément unique dans l'ontologie
 type OntologyElement struct {
-	Name      string // Nom de l'élément
-	Type      string // Type de l'élément
-	Positions []int  // Positions de l'élément dans le document source
-	Description string 
-
+	Name        string // Nom de l'élément
+	Type        string // Type de l'élément
+	Positions   []int  // Positions de l'élément dans le document source
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+	Source      string
 }
 
 // Relation représente une relation entre deux éléments de l'ontologie
@@ -15,6 +22,10 @@ type Relation struct {
 	Type        string
 	Target      string
 	Description string
+	Weight      float64
+	Direction   sql.NullString // "forward", "backward", or "bidirectional"
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 // Ontology représente une collection d'éléments d'ontologie
@@ -25,7 +36,7 @@ type Ontology struct {
 
 // SetPositions définit les positions de l'élément
 func (e *OntologyElement) SetPositions(positions []int) {
-    e.Positions = positions
+	e.Positions = positions
 }
 
 // NewOntologyElement crée un nouvel élément d'ontologie

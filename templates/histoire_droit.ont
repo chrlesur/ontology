@@ -1,5 +1,13 @@
 # TYPES D'ENTITÉS AUTORISÉS
 
+RÈGLES DE NOMMAGE :
+- Utiliser le format PascalCase pour les entités mais en utilisant _ comme séparateur de mot (ex: Droit_Vie_Privee)
+- Standardiser les noms (français uniquement, pas de mélange de langues)
+- Utiliser des underscores pour les mots composés si nécessaire
+- Pour les sigles, garder le format majuscule (ex: CEDH)
+- Pour les versions, utiliser des chiffres (ex: RGPD_2016)
+- Respect les formes pluriel/singulier du texte initial
+
 1. Système_Juridique:
    - Définition : Ensemble cohérent de règles et institutions à une époque donnée
    - Sous-types : droit romain, droit germanique, droit canonique
