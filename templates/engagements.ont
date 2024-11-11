@@ -1,0 +1,158 @@
+# RÈGLES DE NOMMAGE
+
+1. Nom de l'entité:
+   - Utiliser les termes exacts du document
+   - Remplacer les espaces par des underscores
+   - Ne pas inclure le type dans le nom
+   - Utiliser le français uniquement
+   - Ne pas remplacer le caractere tiret '-'
+   - Pour les sigles, garder le format majuscule (ex: PSSI, PER-025-DIR)
+   - Pour les versions, utiliser des chiffres (ex: ISO27001_2022)
+   - Respect les formes pluriel/singulier du texte initial et les accents
+
+2. Types:
+   - Liste fixe de types autorisés (voir ci-dessous)
+   - Pas de sous-types avec des caractères spéciaux
+   - Pas de variantes hors liste
+
+# TYPES D'ENTITÉS AUTORISÉS
+
+1. Partie_Prestataire:
+   - Définition : Organisation fournissant les services
+   - Attributs : nom, rôle, responsabilités
+
+2. Partie_Client:
+   - Définition : Organisation recevant les services
+   - Attributs : nom, besoins, périmètre
+
+3. Engagement_Contractuel:
+   - Définition : Obligation contractuelle formelle
+   - Attributs : description, paragraphe, conditions, periodicite
+
+4. Engagement_Qualité:
+   - Définition : Engagement sur la qualité de service
+   - Attributs : description, niveau_service, mesure, periodicite
+
+5. Engagement_Securité:
+   - Définition : Engagement sur la sécurité
+   - Attributs : description, niveau_protection, normes, controles
+
+6. Engagement_Performance:
+   - Définition : Engagement sur les performances
+   - Attributs : description, seuils, mesures, periodicite
+
+7. Engagement_Disponibilité:
+   - Définition : Engagement sur la disponibilité
+   - Attributs : description, taux, plages, exceptions
+
+8. Engagement_Organisation:
+   - Définition : Engagement sur l'organisation
+   - Attributs : description, roles, responsabilites, processus
+
+9. Engagement_Gouvernance:
+   - Définition : Engagement sur le pilotage
+   - Attributs : description, instances, livrables, frequence
+
+10. Engagement_Technique:
+    - Définition : Engagement technique spécifique
+    - Attributs : description, specifications, normes, validations
+
+11. Engagement_Financier:
+    - Définition : Engagement sur les aspects financiers
+    - Attributs : description, montants, conditions, echeances
+
+12. Engagement_Réversibilité:
+    - Définition : Engagement sur la réversibilité
+    - Attributs : description, conditions, delais, livrables
+
+13. Périmetre_Service:
+    - Définition : Périmètre d'application du service
+    - Attributs : description, inclusions, exclusions
+
+14. Périmetre_Infrastructure:
+    - Définition : Infrastructure technique concernée
+    - Attributs : description, composants, limites
+
+15. Mesure_KPI:
+    - Définition : Indicateur de performance
+    - Attributs : description, unite, cible, frequence
+
+# FORMAT DE DESCRIPTION
+```
+[Référence] - [Description littérale incluant l'acteur, l'action et les conditions précises]
+```
+
+Éléments requis:
+- Citation fidèle du texte source
+- Acteur(s) concerné(s)
+- Conditions et limites explicites
+- Métriques et mesures si applicables
+- Contexte nécessaire à la compréhension
+
+# RELATIONS AUTORISÉES
+
+1. Relations d'engagement:
+   - sengage_a (force 3)
+   - garantit (force 3)
+   - assure (force 2)
+
+2. Relations de responsabilité:
+   - est_responsable_de (force 3)
+   - contribue_a (force 2)
+   - supervise (force 2)
+
+3. Relations de contrôle:
+   - mesure (force 2-3)
+   - evalue (force 2)
+   - verifie (force 2-3)
+
+4. Relations de dépendance:
+   - necessite (force 2-3)
+   - depend_de (force 2)
+   - utilise (force 1-2)
+
+Force des relations:
+1 = relation implicite/contextuelle
+2 = relation explicite dans le texte
+3 = relation contractuelle formelle
+
+# EXEMPLES
+
+### ENTITÉS
+```
+Support_24x7    Engagement_Disponibilite    §4.1 - L'équipe assure un support 24/7 pour les incidents critiques
+Cloud_Azure    Perimetre_Infrastructure    §2.1 - Infrastructure hébergée sur la plateforme Azure
+Neurones      Partie_Prestataire          §1.1 - Prestataire principal en charge de l'infogérance
+```
+
+### RELATIONS
+```
+Support_24x7    garantit:3    Resolution_Incidents    Support permanent permettant la résolution des incidents
+Cloud_Azure    necessite:2    Migration_Donnees    L'infrastructure Azure requiert une migration complète
+```
+
+# RÈGLES DE VALIDATION
+
+1. Validation des entités:
+   - Type doit être dans la liste autorisée
+   - Description complète et traçable
+   - Nom significatif et recherchable
+
+2. Validation des relations:
+   - Relations uniquement parmi celles listées
+   - Force justifiée par le texte
+   - Description explicite du lien
+
+3. Validation globale:
+   - Cohérence entre entités et relations
+   - Traçabilité vers le document source
+   - Non ambiguïté des descriptions
+
+Ontologie actuelle :
+{previous_result}
+
+Nouveau texte à analyser :
+{text}
+
+Analyse le texte et fournis uniquement le résultat au format demandé, 
+sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte. RESPECT BIEN LE SEPARATEUR \t.

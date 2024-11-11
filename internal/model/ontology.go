@@ -22,7 +22,7 @@ type Relation struct {
 	Type        string
 	Target      string
 	Description string
-	Weight      float64
+	Weight      int
 	Direction   sql.NullString // "forward", "backward", or "bidirectional"
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

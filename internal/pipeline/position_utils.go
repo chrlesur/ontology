@@ -6,6 +6,8 @@ import (
 	"bytes"
 	"sort"
 	"strings"
+
+	"github.com/mozillazg/go-unidecode"
 )
 
 // PositionRange représente une plage de positions pour un élément
@@ -46,46 +48,49 @@ func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
 
 // findPositions trouve toutes les positions d'un mot ou d'une phrase dans le contenu
 func (p *Pipeline) findPositions(entityName string, index map[string][]int, fullContent string) []int {
-	log.Debug("Searching for positions of entity: %s", entityName)
+	p.logger.Debug("Starting findPositions for entity: %s", entityName)
 
 	contentWords := strings.Fields(fullContent)
 	var allPositions []int
 
 	// Générer les variantes de l'entité
 	variants := generateEntityVariants(entityName)
+	p.logger.Debug("Generated variants for %s: %v", entityName, variants)
+
+	normalizedFullContent := normalizeString(fullContent)
 
 	for _, variant := range variants {
-		normalizedVariant := normalizeWord(variant)
-		log.Debug("Trying variant: %s", normalizedVariant)
+		normalizedVariant := normalizeString(variant)
+		p.logger.Debug("Processing normalized variant: %s", normalizedVariant)
 
 		// Recherche exacte en utilisant l'index
 		if positions, ok := index[normalizedVariant]; ok {
-			log.Debug("Found exact match positions for %s: %v", variant, positions)
+			p.logger.Debug("Found exact match positions for %s: %v", variant, positions)
 			allPositions = append(allPositions, positions...)
 			continue
 		}
 
-		// Recherche exacte dans le contenu si non trouvé dans l'index
-		variantWords := strings.Fields(variant)
+		// Recherche exacte dans le contenu normalisé si non trouvé dans l'index
+		variantWords := strings.Fields(normalizedVariant)
 		for i := 0; i <= len(contentWords)-len(variantWords); i++ {
 			match := true
 			for j, word := range variantWords {
-				if !strings.EqualFold(contentWords[i+j], word) {
+				if !strings.Contains(normalizeString(contentWords[i+j]), word) {
 					match = false
 					break
 				}
 			}
 			if match {
 				allPositions = append(allPositions, i)
-				log.Debug("Found exact match for %s at position %d", variant, i)
+				p.logger.Debug("Found exact match for %s at position %d", variant, i)
 			}
 		}
 	}
 
 	// Si aucune correspondance exacte n'est trouvée, essayer la recherche approximative
 	if len(allPositions) == 0 {
-		log.Debug("No exact matches found, trying approximate search for: %s", entityName)
-		approximatePositions := p.findApproximatePositions(entityName, fullContent)
+		p.logger.Debug("No exact matches found, trying approximate search for: %s", entityName)
+		approximatePositions := p.findApproximatePositions(entityName, normalizedFullContent)
 		allPositions = append(allPositions, approximatePositions...)
 	}
 
@@ -94,9 +99,9 @@ func (p *Pipeline) findPositions(entityName string, index map[string][]int, full
 	sort.Ints(uniquePositions)
 
 	if len(uniquePositions) > 0 {
-		log.Debug("Found total unique positions for %s: %v", entityName, uniquePositions)
+		p.logger.Debug("Found total unique positions for %s: %v", entityName, uniquePositions)
 	} else {
-		log.Debug("No positions found for entity: %s", entityName)
+		p.logger.Debug("No positions found for entity: %s", entityName)
 	}
 
 	return uniquePositions
@@ -139,9 +144,10 @@ func (p *Pipeline) findApproximatePositions(entityName, fullContent string) []in
 
 	// Recherche approximative
 	contentWords := strings.Fields(contentLower)
-	maxDistance := 5 // Nombre maximum de mots entre les termes recherchés
+	maxDistance := 10 // Nombre maximum de mots entre les termes recherchés
 
 	for i := 0; i < len(contentWords); i++ {
+		//log.Debug("Checking approximate match for %s at maximum distance %d", words, maxDistance)
 		if matchFound, endPos := p.checkApproximateMatch(words, contentWords[i:], maxDistance); matchFound {
 			positions = append(positions, i)
 			matchedPhrase := strings.Join(contentWords[i:i+endPos+1], " ")
@@ -154,22 +160,42 @@ func (p *Pipeline) findApproximatePositions(entityName, fullContent string) []in
 
 // checkApproximateMatch vérifie si une correspondance approximative est trouvée
 func (p *Pipeline) checkApproximateMatch(searchWords, contentWords []string, maxDistance int) (bool, int) {
+	//p.logger.Debug("Starting checkApproximateMatch with searchWords: %v, maxDistance: %d", searchWords, maxDistance)
+
+	// Normaliser les mots de recherche
+	normalizedSearchWords := make([]string, len(searchWords))
+	for i, word := range searchWords {
+		normalizedSearchWords[i] = normalizeString(word)
+	}
+
 	wordIndex := 0
 	distanceCount := 0
 	for i, word := range contentWords {
-		if strings.Contains(word, searchWords[wordIndex]) {
+		normalizedWord := normalizeString(word)
+		//p.logger.Debug("Checking normalized word: '%s' at position %d", normalizedWord, i)
+
+		if strings.Contains(normalizedWord, normalizedSearchWords[wordIndex]) {
+			//p.logger.Debug("Match found for '%s' in '%s'", normalizedSearchWords[wordIndex], normalizedWord)
 			wordIndex++
 			distanceCount = 0
-			if wordIndex == len(searchWords) {
+			//p.logger.Debug("wordIndex incremented to %d, distanceCount reset to 0", wordIndex)
+
+			if wordIndex == len(normalizedSearchWords) {
+				p.logger.Debug("All search words matched. Returning true with end position %d", i)
 				return true, i
 			}
 		} else {
 			distanceCount++
+			// p.logger.Debug("No match. distanceCount incremented to %d", distanceCount)
+
 			if distanceCount > maxDistance {
+				//p.logger.Debug("Max distance exceeded. Returning false")
 				return false, -1
 			}
 		}
 	}
+
+	//p.logger.Debug("End of content words reached without full match. Returning false")
 	return false, -1
 }
 
@@ -217,4 +243,8 @@ func mergeOverlappingPositions(positions []PositionRange) []PositionRange {
 	}
 
 	return merged
+}
+
+func normalizeString(s string) string {
+	return strings.ToLower(unidecode.Unidecode(s))
 }

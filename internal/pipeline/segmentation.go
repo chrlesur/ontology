@@ -49,6 +49,8 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 	}
 
 	p.fullContent = content
+	p.positionIndex = p.createPositionIndex(p.fullContent)
+	p.logger.Debug("Position index created. Number of entries: %d", len(p.positionIndex))
 
 	// Initialisation du tokenizer
 	tke, err := tiktoken.GetEncoding("cl100k_base")
@@ -233,29 +235,21 @@ func (p *Pipeline) readFile(filePath string) ([]byte, error) {
 // mergeResultsWithDB fusionne les résultats précédents avec les nouveaux résultats en utilisant une base de données temporaire.
 func (p *Pipeline) mergeResultsWithDB(previousResult string, newResults []string) (string, error) {
 	p.logger.Debug("Starting mergeResultsWithDB")
-
-	db, err := initDB()
-	if err != nil {
-		p.logger.Error("Failed to initialize database: %v", err)
-		return "", err
-	}
-	defer db.Close()
-
 	p.logger.Debug("Inserting previous result: %s", previousResult)
-	if err := p.insertResults(db, previousResult); err != nil {
+	if err := p.insertResults(p.db, previousResult); err != nil {
 		p.logger.Error("Failed to insert previous result: %v", err)
 		return "", err
 	}
 
 	for i, result := range newResults {
 		p.logger.Debug("Inserting new result %d: %s", i, result)
-		if err := p.insertResults(db, result); err != nil {
+		if err := p.insertResults(p.db, result); err != nil {
 			p.logger.Error("Failed to insert new result %d: %v", i, err)
 			return "", err
 		}
 	}
 
-	mergedResult, err := p.getMergedResults(db)
+	mergedResult, err := p.getMergedResults(p.db)
 	if err != nil {
 		p.logger.Error("Failed to get merged results: %v", err)
 		return "", err
@@ -291,7 +285,17 @@ func (p *Pipeline) insertResults(db *sql.DB, result string) error {
 					continue
 				}
 				relationType := relationParts[0]
-				strength, _ := strconv.ParseFloat(relationParts[1], 64) // Convertir la force en float64
+				// Extraire l'entier de la chaîne formatée
+				strengthStr := relationParts[1]
+				strengthStr = strings.TrimPrefix(strengthStr, "%!f(int=")
+				strengthStr = strings.TrimSuffix(strengthStr, ")")
+
+				strength, err := strconv.Atoi(strengthStr)
+				if err != nil {
+					p.logger.Warning("Invalid strength value: %v", err)
+					continue
+				}
+				
 				target := parts[2]
 				description := strings.Join(parts[3:], " ")
 
@@ -309,15 +313,21 @@ func (p *Pipeline) insertResults(db *sql.DB, result string) error {
 					p.logger.Error("Failed to upsert relation: %v", err)
 					return err
 				}
-				
+
 				p.logger.Debug("Relation upserted successfully")
 			} else {
 				// C'est une entité
+				description := ""
+				if len(parts) > 3 {
+					description = strings.Join(parts[3:], " ")
+				} else if len(parts) == 3 {
+					description = parts[2]
+				}
 				entity := &model.OntologyElement{
 					Name:        strings.TrimSpace(parts[0]),
 					Type:        strings.TrimSpace(parts[1]),
-					Description: strings.TrimSpace(strings.Join(parts[2:], " ")),
-					Positions:   []int{}, 
+					Description: strings.TrimSpace(description),
+					Positions:   p.findPositions(strings.TrimSpace(parts[0]), p.positionIndex, string(p.fullContent)),
 					CreatedAt:   time.Now(),
 					UpdatedAt:   time.Now(),
 				}
@@ -337,37 +347,53 @@ func (p *Pipeline) insertResults(db *sql.DB, result string) error {
 
 // getMergedResults récupère les résultats fusionnés de la base de données.
 func (p *Pipeline) getMergedResults(db *sql.DB) (string, error) {
+	p.logger.Debug("Starting getMergedResults")
 	var result strings.Builder
 
 	// Récupérer et écrire les entités
 	entities, err := GetAllEntities(db)
 	if err != nil {
-		return "", err
+		p.logger.Error("Failed to get all entities: %v", err)
+		return "", fmt.Errorf("failed to get all entities: %w", err)
 	}
+	p.logger.Debug("Retrieved %d entities", len(entities))
+
 	for _, entity := range entities {
-		result.WriteString(fmt.Sprintf("%s\t%s\t%s\n",
+		positionsStr := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(entity.Positions)), ","), "[]")
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\n",
 			entity.Name,
 			entity.Type,
-			entity.Description))
+			entity.Description,
+			positionsStr)
+		result.WriteString(line)
+		p.logger.Debug("Added entity to result: %s", strings.TrimSpace(line))
 	}
 
 	// Récupérer et écrire les relations
 	relations, err := GetAllRelations(db)
 	if err != nil {
-		return "", err
+		p.logger.Error("Failed to get all relations: %v", err)
+		return "", fmt.Errorf("failed to get all relations: %w", err)
 	}
+	p.logger.Debug("Retrieved %d relations", len(relations))
+
 	for _, relation := range relations {
-		result.WriteString(fmt.Sprintf("%s\t%s:%.0f\t%s\t%s\n",
+		line := fmt.Sprintf("%s\t%s:%d\t%s\t%s\n",
 			relation.Source,
 			relation.Type,
-			relation.Weight,
+			int(relation.Weight),
 			relation.Target,
-			relation.Description))
+			relation.Description)
+		result.WriteString(line)
+		p.logger.Debug("Added relation to result: %s", strings.TrimSpace(line))
 	}
 
-    // Mettez à jour l'ontologie
-    p.ontology.Elements = entities
-    p.ontology.Relations = relations
+	// Mettre à jour l'ontologie
+	p.ontology.Elements = entities
+	p.ontology.Relations = relations
+	p.logger.Info("Updated ontology with %d elements and %d relations", len(entities), len(relations))
 
-	return result.String(), nil
+	finalResult := result.String()
+	p.logger.Debug("Final merged result length: %d characters", len(finalResult))
+	return finalResult, nil
 }

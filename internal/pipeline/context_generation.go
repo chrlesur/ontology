@@ -11,54 +11,59 @@ import (
 
 // GenerateContextJSON génère un JSON contenant le contexte pour chaque position donnée
 func GenerateContextJSON(content []byte, positions []int, contextWords int, positionRanges []PositionRange) (string, error) {
-    log.Debug("Starting GenerateContextJSON")
-    log.Debug("Number of positions: %d, Context words: %d", len(positions), contextWords)
+	log.Debug("Starting GenerateContextJSON")
+	log.Debug("Number of positions: %d, Context words: %d", len(positions), contextWords)
 
-    words := strings.Fields(string(content))
-    log.Debug("Total words in content: %d", len(words))
+	words := strings.Fields(string(content))
+	log.Debug("Total words in content: %d", len(words))
 
-    var entries []ContextEntry
-    for _, pr := range positionRanges {
-        start := pr.Start
-        end := pr.End
-        element := pr.Element
+	var entries []ContextEntry
+	for _, pr := range positionRanges {
+		start := pr.Start
+		end := pr.End
+		element := pr.Element
 
-        if start < 0 || end >= len(words) {
-            log.Warning("Invalid position range for element %s: [%d, %d]", element, start, end)
-            continue
-        }
+		if start < 0 || end >= len(words) {
+			log.Warning("Invalid position range for element %s: [%d, %d]", element, start, end)
+			continue
+		}
 
-        beforeStart := max(0, start-contextWords)
-        afterEnd := min(len(words), end+contextWords+1)
+		beforeStart := max(0, start-contextWords)
+		afterEnd := min(len(words), end+contextWords+1)
 
-        entry := ContextEntry{
-            Position: start,
-            Before:   words[beforeStart:start],
-            After:    words[end+1:afterEnd],
-            Element:  element,
-            Length:   end - start + 1,
-        }
-        entries = append(entries, entry)
-        log.Debug("Generated context for element %s at position %d", element, start)
-    }
+		entry := ContextEntry{
+			Position: start,
+			Before:   words[beforeStart:start],
+			After:    words[end+1 : afterEnd],
+			Element:  element,
+			Length:   end - start + 1,
+		}
+		entries = append(entries, entry)
+		log.Debug("Generated context for element %s at position %d", element, start)
+	}
 
-    log.Debug("Number of context entries generated: %d", len(entries))
+	log.Debug("Number of context entries generated: %d", len(entries))
 
-    // Utiliser un encoder JSON personnalisé
-    var buf strings.Builder
-    encoder := json.NewEncoder(&buf)
-    encoder.SetEscapeHTML(false)
-    encoder.SetIndent("", "  ") // Deux espaces pour l'indentation
+	if len(entries) == 0 {
+		log.Warning("No context entries generated")
+		return "[]", nil
+	}
 
-    if err := encoder.Encode(entries); err != nil {
-        log.Error("Error marshaling context JSON: %v", err)
-        return "", fmt.Errorf("error marshaling context JSON: %w", err)
-    }
+	// Utiliser un encoder JSON personnalisé
+	var buf strings.Builder
+	encoder := json.NewEncoder(&buf)
+	encoder.SetEscapeHTML(false)
+	encoder.SetIndent("", "  ") // Deux espaces pour l'indentation
 
-    output := buf.String()
-    log.Debug("JSON data generated successfully. Length: %d bytes", len(output))
+	if err := encoder.Encode(entries); err != nil {
+		log.Error("Error marshaling context JSON: %v", err)
+		return "", fmt.Errorf("error marshaling context JSON: %w", err)
+	}
 
-    return output, nil
+	output := buf.String()
+	log.Debug("JSON data generated successfully. Length: %d bytes", len(output))
+
+	return output, nil
 }
 
 // getContextWords récupère les mots de contexte avant et après une position donnée

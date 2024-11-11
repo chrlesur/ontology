@@ -83,14 +83,15 @@ func UpsertEntity(db *sql.DB, entity *model.OntologyElement) error {
        entity.Type, entity.Description, positionsJSON, entity.UpdatedAt, entity.Source)
     if err != nil {
         log.Error("Failed to upsert entity: %v", err)
-        return fmt.Errorf("échec de la mise à jour/insertion de l'entité : %w", err)
+        return fmt.Errorf("failed to upsert entity: %w", err)
     }
+    log.Debug("Entity upserted successfully with positions: %v", entity.Positions)
     return nil
 }
 
 func UpsertRelation(db *sql.DB, relation *model.Relation) error {
-	log.Debug("Upserting relation: %+v", relation)
-	_, err := db.Exec(`
+    log.Debug("Upserting relation: %+v", relation)
+    _, err := db.Exec(`
         INSERT INTO relations (source, type, target, description, weight, direction, created_at, updated_at)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(source, type, target) DO UPDATE SET
@@ -99,45 +100,54 @@ func UpsertRelation(db *sql.DB, relation *model.Relation) error {
         direction = ?,
         updated_at = ?
     `, relation.Source, relation.Type, relation.Target, relation.Description, relation.Weight, relation.Direction,
-		relation.CreatedAt, relation.UpdatedAt,
-		relation.Description, relation.Weight, relation.Direction, relation.UpdatedAt)
-	if err != nil {
-		log.Error("Failed to upsert relation: %v", err)
-		return fmt.Errorf("échec de la mise à jour/insertion de la relation : %w", err)
-	}
-	return nil
+        relation.CreatedAt, relation.UpdatedAt,
+        relation.Description, relation.Weight, relation.Direction, relation.UpdatedAt)
+    if err != nil {
+        log.Error("Failed to upsert relation: %v", err)
+        return fmt.Errorf("failed to upsert relation: %w", err)
+    }
+    return nil
 }
 
 func GetAllEntities(db *sql.DB) ([]*model.OntologyElement, error) {
-    log.Debug("Getting all entities")
-    rows, err := db.Query("SELECT name, type, description, positions, created_at, updated_at, source FROM entities")
-    if err != nil {
-        log.Error("Failed to query entities: %v", err)
-        return nil, fmt.Errorf("échec de la récupération des entités : %w", err)
-    }
-    defer rows.Close()
+	log.Debug("Starting GetAllEntities")
 
-    var entities []*model.OntologyElement
-    for rows.Next() {
-        var e model.OntologyElement
-        var positionsJSON []byte
+	rows, err := db.Query("SELECT name, type, description, positions, created_at, updated_at, source FROM entities")
+	if err != nil {
+		log.Error("Failed to query entities: %v", err)
+		return nil, fmt.Errorf("échec de la récupération des entités : %w", err)
+	}
+	defer rows.Close()
+
+	var entities []*model.OntologyElement
+	for rows.Next() {
+		var e model.OntologyElement
+		var positionsJSON []byte
         err := rows.Scan(&e.Name, &e.Type, &e.Description, &positionsJSON, &e.CreatedAt, &e.UpdatedAt, &e.Source)
-        if err != nil {
-            log.Error("Failed to scan entity: %v", err)
-            return nil, fmt.Errorf("échec du scan d'une entité : %w", err)
-        }
-        if len(positionsJSON) > 0 {
-            err = json.Unmarshal(positionsJSON, &e.Positions)
-            if err != nil {
-                log.Error("Failed to unmarshal positions: %v", err)
-                return nil, fmt.Errorf("échec du décodage des positions : %w", err)
-            }
-        }
-        log.Debug("Retrieved entity: %+v", e)
-        entities = append(entities, &e)
-    }
-    log.Debug("Total entities retrieved: %d", len(entities))
-    return entities, nil
+		if err != nil {
+			log.Error("Failed to scan entity: %v", err)
+			return nil, fmt.Errorf("échec du scan d'une entité : %w", err)
+		}
+
+		log.Debug("Retrieved entity from DB: Name=%s, Type=%s, Description=%s, PositionsJSON=%s",
+			e.Name, e.Type, e.Description, string(positionsJSON))
+
+		if len(positionsJSON) > 0 {
+			err = json.Unmarshal(positionsJSON, &e.Positions)
+			if err != nil {
+				log.Error("Failed to unmarshal positions for entity %s: %v", e.Name, err)
+				return nil, fmt.Errorf("échec du décodage des positions pour l'entité %s : %w", e.Name, err)
+			}
+			log.Debug("Unmarshalled positions for entity %s: %v", e.Name, e.Positions)
+		} else {
+			log.Debug("No positions found for entity %s", e.Name)
+		}
+
+		entities = append(entities, &e)
+	}
+
+	log.Debug("Retrieved %d entities in total", len(entities))
+	return entities, nil
 }
 
 func GetAllRelations(db *sql.DB) ([]*model.Relation, error) {

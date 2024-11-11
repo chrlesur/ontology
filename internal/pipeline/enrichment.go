@@ -30,10 +30,10 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 			return "", fmt.Errorf("failed to read custom prompt file: %w", err)
 		}
 		enrichmentPrompt = prompt.NewCustomPromptTemplate(customPrompt)
-		log.Info("Using custom enrichment prompt from file: %s", p.enrichmentPromptFile)
+		log.Debug("Using custom enrichment prompt from file: %s", p.enrichmentPromptFile)
 	} else {
 		enrichmentPrompt = prompt.OntologyEnrichmentPrompt
-		log.Info("Using default enrichment prompt")
+		log.Debug("Using default enrichment prompt")
 	}
 
 	log.Debug("Calling LLM with OntologyEnrichmentPrompt")
@@ -139,14 +139,4 @@ func normalizeTSV(input string) string {
 		}
 	}
 	return strings.Join(normalizedLines, "\n")
-}
-
-func filterValidPositions(positions []int, contentLength int) []int {
-	var validPositions []int
-	for _, pos := range positions {
-		if pos >= 0 && pos < contentLength {
-			validPositions = append(validPositions, pos)
-		}
-	}
-	return uniquePositions(validPositions)
 }

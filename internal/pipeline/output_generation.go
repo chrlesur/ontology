@@ -32,8 +32,19 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 
 	if p.contextOutput {
 		contextFile := strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "_context.json"
+		entities, err := GetAllEntities(p.db)
+		if err != nil {
+			p.logger.Error("Failed to get all entities: %v", err)
+			return fmt.Errorf("failed to get all entities: %w", err)
+		}
+		p.ontology.Elements = entities
+		p.logger.Debug("Updated ontology with %d entities from database", len(entities))
+
 		positionRanges := p.getAllPositionsFromNewContent()
+		p.logger.Debug("Got %d position ranges from new content", len(positionRanges))
+
 		mergedPositions := mergeOverlappingPositions(positionRanges)
+		p.logger.Debug("Merged to %d position ranges", len(mergedPositions))
 
 		positions := make([]int, len(mergedPositions))
 		for i, pr := range mergedPositions {
@@ -86,91 +97,33 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 
 // generateTSVContent génère le contenu TSV à partir de l'ontologie
 func (p *Pipeline) generateTSVContent() string {
-    var tsvBuilder strings.Builder
+	var tsvBuilder strings.Builder
 
-    p.logger.Debug("Generating TSV content")
+	p.logger.Debug("Starting generateTSVContent")
 
-    // Écrire les éléments
-    for _, element := range p.ontology.Elements {
-        positions := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(element.Positions)), ","), "[]")
-        line := fmt.Sprintf("%s\t%s\t%s\t%s\n", element.Name, element.Type, element.Description, positions)
-        tsvBuilder.WriteString(line)
-        p.logger.Debug("Added element to TSV: %s", strings.TrimSpace(line))
-    }
-
-    // Écrire les relations
-    for _, relation := range p.ontology.Relations {
-        line := fmt.Sprintf("%s\t%s:%.0f\t%s\t%s\n", 
-            relation.Source, 
-            relation.Type, 
-            relation.Weight, 
-            relation.Target, 
-            relation.Description)
-        tsvBuilder.WriteString(line)
-        p.logger.Debug("Added relation to TSV: %s", strings.TrimSpace(line))
-    }
-
-    return tsvBuilder.String()
-}
-
-// generateAndSaveContextJSON génère et sauvegarde le JSON de contexte
-func (p *Pipeline) generateAndSaveContextJSON(content []byte, dir, baseName string) (string, error) {
-	p.logger.Info("Generating context JSON")
-
-	positionRanges := p.getAllPositionsFromNewContent()
-	p.logger.Info("Total position ranges collected: %d", len(positionRanges))
-
-	mergedPositions := mergeOverlappingPositions(positionRanges)
-	p.logger.Info("Merged position ranges: %d", len(mergedPositions))
-
-	validPositions := make([]int, len(mergedPositions))
-	for i, pr := range mergedPositions {
-		validPositions[i] = pr.Start
+	// Écrire les éléments
+	for _, element := range p.ontology.Elements {
+		positions := strings.Trim(strings.Join(strings.Fields(fmt.Sprint(element.Positions)), ","), "[]")
+		line := fmt.Sprintf("%s\t%s\t%s\t%s\n", element.Name, element.Type, element.Description, positions)
+		tsvBuilder.WriteString(line)
+		p.logger.Debug("Added element to TSV: Name=%s, Type=%s, Description=%s, Positions=%s",
+			element.Name, element.Type, element.Description, positions)
 	}
 
-	contextJSON, err := GenerateContextJSON(content, validPositions, p.contextWords, mergedPositions)
-	if err != nil {
-		p.logger.Error("Failed to generate context JSON: %v", err)
-		return "", fmt.Errorf("failed to generate context JSON: %w", err)
-	}
-	p.logger.Debug("Context JSON generated successfully. Length: %d bytes", len(contextJSON))
-
-	contextFile := filepath.Join(dir, strings.TrimSuffix(baseName, filepath.Ext(baseName))+"_context.json")
-	err = p.storage.Write(contextFile, []byte(contextJSON))
-	if err != nil {
-		p.logger.Error("Failed to write context JSON file: %v", err)
-		return "", fmt.Errorf("failed to write context JSON file: %w", err)
-	}
-	p.logger.Info("Context JSON saved to: %s", contextFile)
-
-	return contextFile, nil
-}
-
-// generateAndSaveMetadata génère et sauvegarde les métadonnées
-func (p *Pipeline) generateAndSaveMetadata(outputPath, contextFile string) error {
-	p.logger.Debug("Generating and saving metadata")
-	metadataGen := metadata.NewGenerator(p.storage) // Passez p.storage ici
-
-	ontologyFile := filepath.Base(outputPath)
-	meta, err := metadataGen.GenerateMetadata(p.inputPath, ontologyFile, contextFile)
-	if err != nil {
-		p.logger.Error("Failed to generate metadata: %v", err)
-		return fmt.Errorf("failed to generate metadata: %w", err)
+	// Écrire les relations
+	for _, relation := range p.ontology.Relations {
+		line := fmt.Sprintf("%s\t%s:%d\t%s\t%s\n",
+			relation.Source,
+			relation.Type,
+			relation.Weight,
+			relation.Target,
+			relation.Description)
+		tsvBuilder.WriteString(line)
+		p.logger.Debug("Added relation to TSV: Source=%s, Type=%s, Weight=%d, Target=%s, Description=%s",
+			relation.Source, relation.Type, relation.Weight, relation.Target, relation.Description)
 	}
 
-	metaContent, err := json.MarshalIndent(meta, "", "  ")
-	if err != nil {
-		p.logger.Error("Failed to marshal metadata: %v", err)
-		return fmt.Errorf("failed to marshal metadata: %w", err)
-	}
-
-	metaFilePath := filepath.Join(filepath.Dir(outputPath), metadataGen.GetMetadataFilename(p.inputPath))
-	err = p.storage.Write(metaFilePath, metaContent)
-	if err != nil {
-		p.logger.Error("Failed to save metadata: %v", err)
-		return fmt.Errorf("failed to save metadata: %w", err)
-	}
-
-	p.logger.Info("Metadata saved to: %s", metaFilePath)
-	return nil
+	result := tsvBuilder.String()
+	p.logger.Debug("TSV content generation completed. Total lines: %d", strings.Count(result, "\n"))
+	return result
 }

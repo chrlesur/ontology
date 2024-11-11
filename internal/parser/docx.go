@@ -8,8 +8,6 @@ import (
 	"io"
 	"io/ioutil"
 	"strings"
-
-	"github.com/chrlesur/Ontology/internal/i18n"
 )
 
 type DOCXParser struct {
@@ -27,75 +25,111 @@ func NewDOCXParser() Parser {
 }
 
 func (p *DOCXParser) Parse(reader io.Reader) ([]byte, error) {
-	log.Debug(i18n.Messages.ParseStarted, "DOCX")
+	log.Debug("Parse started for DOCX")
 
 	// Lire tout le contenu en mémoire
 	content, err := ioutil.ReadAll(reader)
 	if err != nil {
-		log.Error(i18n.Messages.ParseFailed, "DOCX", err)
+		log.Error("Failed to read DOCX content: %v", err)
 		return nil, fmt.Errorf("failed to read DOCX content: %w", err)
 	}
+	log.Debug("DOCX content read, size: %d bytes", len(content))
 
 	// Créer un lecteur zip à partir du contenu
 	zipReader, err := zip.NewReader(bytes.NewReader(content), int64(len(content)))
 	if err != nil {
-		log.Error(i18n.Messages.ParseFailed, "DOCX", err)
+		log.Error("Failed to create zip reader: %v", err)
 		return nil, fmt.Errorf("failed to create zip reader: %w", err)
 	}
+	log.Debug("Zip reader created successfully")
 
 	var textContent strings.Builder
 
 	for _, file := range zipReader.File {
+		log.Debug("Processing zip file: %s", file.Name)
 		switch file.Name {
 		case "word/document.xml":
+			log.Debug("Found word/document.xml, extracting content")
 			if err := p.extractContent(file, &textContent); err != nil {
+				log.Error("Failed to extract content from word/document.xml: %v", err)
 				return nil, err
 			}
 		case "docProps/core.xml":
+			log.Debug("Found docProps/core.xml, extracting metadata")
 			if err := p.extractMetadata(file); err != nil {
-				log.Warning(i18n.Messages.MetadataExtractionFailed, "DOCX", err)
+				log.Warning("Failed to extract metadata from docProps/core.xml: %v", err)
 			}
 		}
 	}
 
-	log.Info(i18n.Messages.ParseCompleted, "DOCX")
-	return []byte(textContent.String()), nil
+	result := textContent.String()
+	log.Debug("Extracted text content length: %d characters", len(result))
+	log.Debug("Contenu extrait (premiers 100 caractères) : %s", string(result[:min(100, len(result))]))
+	log.Debug("Contenu extrait (derniers 100 caractères) : %s", string(result[max(0, len(result)-100):]))
+	log.Debug("Longueur totale du contenu extrait : %d", len(result))
+	log.Info("DOCX parsing completed")
+	return []byte(result), nil
 }
 
 func (p *DOCXParser) extractContent(file *zip.File, textContent *strings.Builder) error {
+	log.Debug("Extracting content from: %s", file.Name)
+
 	rc, err := file.Open()
 	if err != nil {
+		log.Error("Failed to open document.xml: %v", err)
 		return fmt.Errorf("failed to open document.xml: %w", err)
 	}
 	defer rc.Close()
 
 	content, err := ioutil.ReadAll(rc)
 	if err != nil {
+		log.Error("Failed to read document.xml: %v", err)
 		return fmt.Errorf("failed to read document.xml: %w", err)
 	}
+	log.Debug("Read %d bytes from document.xml", len(content))
 
-	var document struct {
-		Body struct {
-			Paragraphs []struct {
-				Runs []struct {
-					Text string `xml:"t"`
-				} `xml:"r"`
-			} `xml:"p"`
+	if len(content) > 1000 {
+		log.Debug("First 1000 characters of document.xml: %s", string(content[:1000]))
+	} else {
+		log.Debug("Full content of document.xml: %s", string(content))
+	}
+
+	decoder := xml.NewDecoder(bytes.NewReader(content))
+	var inTextElement bool
+	var currentText string
+
+	for {
+		token, err := decoder.Token()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Error("Error decoding XML: %v", err)
+			return err
+		}
+
+		switch se := token.(type) {
+		case xml.StartElement:
+			if se.Name.Local == "t" {
+				inTextElement = true
+			}
+		case xml.EndElement:
+			if se.Name.Local == "t" {
+				inTextElement = false
+				textContent.WriteString(currentText)
+				textContent.WriteString(" ")
+				currentText = ""
+			} else if se.Name.Local == "p" {
+				textContent.WriteString("\n")
+			}
+		case xml.CharData:
+			if inTextElement {
+				currentText += string(se)
+			}
 		}
 	}
 
-	err = xml.Unmarshal(content, &document)
-	if err != nil {
-		return fmt.Errorf("failed to unmarshal document.xml: %w", err)
-	}
-
-	for _, paragraph := range document.Body.Paragraphs {
-		for _, run := range paragraph.Runs {
-			textContent.WriteString(run.Text)
-		}
-		textContent.WriteString("\n")
-	}
-
+	log.Debug("Total extracted content length: %d", textContent.Len())
 	return nil
 }
 

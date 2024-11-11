@@ -1,13 +1,20 @@
-Conseil_d'État	Organisation	Interdiction_du_hijab Pour les joueuses internationales et licenciées	12,13,82,83,245,246
-Fédération_française_de_football	Organisation	Expression_religieuse Pour prévenir les risques d'atteinte à l'ordre public	
-Rapporteur_public	Rôle	Décision_juridique Propose une interprétation de la loi dans l'intérêt général	115,116,118,119,152,153,206,207
-Ministre_de_l'Intérieur	Rôle	Port_du_hijab En invoquant le principe de neutralité et la laïcité	303,328
-Ministre_chargé_de_l'égalité	Rôle	Port_du_hijab Estime que les joueuses ont le droit de le porter	
-Qualification_juridique	Concept	Régime_applicable Influence l'application des règles juridiques	0,1
-Principe_de_neutralité	Concept	Principe imposant l'impartialité dans le service public	26,318
-Ordre_public	Concept	Notion juridique visant à maintenir la paix sociale	61,80,176,243
-Laïcité	Concept	Principe de séparation de l'État et de la religion	323,324
-Hijab	Objet	Voile couvrant les cheveux porté par certaines femmes musulmanes	88,213,314,360,361
-Joueuse_internationale	Rôle	Principe_de_neutralité Selon la décision du Conseil d'État	
-Joueuse_licenciée	Rôle	Agent_du_service_public Selon la décision du Conseil d'État	
-Débat_public	Est_généré_par	Question_juridique Les décisions juridiques suscitent des controverses	441,442
+Qualification_Juridique	Concept_Juridique	Processus d'analyse et de catégorisation juridique d'une situation	0,1
+Conseil_Etat	Organisation	Juridiction administrative suprême en France	
+Principe_Neutralite	Principe_Juridique	Principe imposant l'impartialité dans le service public	
+Federation_Francaise_Football	Organisation	Organisation gérant le football en France	
+Ordre_Public	Concept_Juridique	Concept désignant l'état social idéal caractérisé par la paix et la sécurité	61,80,176,243
+Rapporteur_Public	Concept_Juridique	Membre du tribunal administratif donnant son avis sur la décision à prendre	115,116,118,119,152,153,206,207
+Tribunal_Administratif	Organisation	Juridiction traitant des litiges entre l'administration et les administrés	125
+Interet_General	Concept_Juridique	Concept représentant le bien commun de la société	
+Ministre_Interieur	Organisation	Membre du gouvernement chargé de la sécurité intérieure	
+Principe_Laicite	Principe_Juridique	Principe de séparation de l'État et des religions	
+Ministre_Egalite	Organisation	Membre du gouvernement chargé de l'égalité entre les femmes et les hommes	
+Conseil_Etat	applique:3.00	Qualification_Juridique Le Conseil d'État utilise la qualification juridique pour ses décisions	
+Qualification_Juridique	conditionne:3.00	Principe_Neutralite La qualification juridique détermine l'application du principe de neutralité	
+Federation_Francaise_Football	contrôle:2.00	Ordre_Public La FFF peut restreindre l'expression pour prévenir les risques d'atteinte à l'ordre public	
+Rapporteur_Public	fait_partie_de:2.00	Tribunal_Administratif Le rapporteur public est un membre du tribunal administratif	
+Rapporteur_Public	définit:2.00	Interet_General Le rapporteur public donne son avis dans l'intérêt général	
+Conseil_Etat	contrôle:3.00	Federation_Francaise_Football Le Conseil d'État valide les décisions de la FFF	
+Ministre_Interieur	applique:2.00	Principe_Laicite Le ministre de l'Intérieur se réfère au principe de laïcité	
+Ministre_Egalite	modifie:1.00	Principe_Laicite La ministre de l'Égalité propose une interprétation différente du principe de laïcité	
+Qualification_Juridique	implique:2.00	Ordre_Public La qualification juridique peut impliquer des considérations d'ordre public	

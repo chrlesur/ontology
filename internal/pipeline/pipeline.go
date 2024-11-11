@@ -3,9 +3,9 @@
 package pipeline
 
 import (
+	"database/sql"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
 	"strings"
 
 	"github.com/chrlesur/Ontology/internal/config"
@@ -13,7 +13,6 @@ import (
 	"github.com/chrlesur/Ontology/internal/llm"
 	"github.com/chrlesur/Ontology/internal/logger"
 	"github.com/chrlesur/Ontology/internal/model"
-	"github.com/chrlesur/Ontology/internal/parser"
 	"github.com/chrlesur/Ontology/internal/storage"
 
 	"github.com/pkoukk/tiktoken-go"
@@ -49,8 +48,10 @@ type Pipeline struct {
 	storage                  storage.Storage
 	maxConcurrentThreads     int
 	enrichmentPromptFile     string
-	fullContent              []byte	// stocker le contenu complet du document.
-	segmentOffsets           []int	// stocker les offsets de début de chaque segment.
+	positionIndex            map[string][]int
+	fullContent              []byte // stocker le contenu complet du document.
+	segmentOffsets           []int  // stocker les offsets de début de chaque segment.
+	db                       *sql.DB
 }
 
 // NewPipeline crée une nouvelle instance du pipeline de traitement
@@ -92,6 +93,13 @@ func NewPipeline(includePositions bool, contextOutput bool, contextWords int, en
 		return nil, fmt.Errorf("failed to initialize storage: %w", err)
 	}
 
+	// Initialisation de la base sql in memory
+
+	db, err := initDB()
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize database: %w", err)
+	}
+
 	log.Info("Pipeline instance created successfully")
 
 	return &Pipeline{
@@ -109,6 +117,8 @@ func NewPipeline(includePositions bool, contextOutput bool, contextWords int, en
 		storage:                  storageInstance,
 		maxConcurrentThreads:     maxConcurrentThreads,
 		enrichmentPromptFile:     enrichmentPromptFile,
+		db:                       db,
+		positionIndex:            make(map[string][]int),
 	}, nil
 }
 
@@ -181,16 +191,6 @@ func (p *Pipeline) ExecutePipeline(input string, output string, passes int, exis
 	return nil
 }
 
-func (p *Pipeline) getParser(input string) (parser.Parser, error) {
-	ext := strings.ToLower(filepath.Ext(input))
-	if ext == "" {
-		return nil, fmt.Errorf("file has no extension: %s", input)
-	}
-	p.logger.Debug("Getting parser for file extension: %s", ext)
-
-	return parser.GetParser(ext)
-}
-
 func (p *Pipeline) readPromptFile(filePath string) (string, error) {
 
 	if strings.HasPrefix(filePath, "s3://") {
@@ -208,4 +208,11 @@ func (p *Pipeline) readPromptFile(filePath string) (string, error) {
 		return "", fmt.Errorf("failed to read local prompt file: %w", err)
 	}
 	return string(content), nil
+}
+
+func (p *Pipeline) Close() error {
+    if p.db != nil {
+        return p.db.Close()
+    }
+    return nil
 }
