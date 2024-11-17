@@ -3,7 +3,6 @@
 package pipeline
 
 import (
-	"encoding/json"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -30,8 +29,9 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 	}
 	p.logger.Debug("TSV file written: %s", outputPath)
 
+	contextFile := ""
 	if p.contextOutput {
-		contextFile := strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "_context.json"
+		contextFile = strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "_context.json"
 		entities, err := GetAllEntities(p.db)
 		if err != nil {
 			p.logger.Error("Failed to get all entities: %v", err)
@@ -70,21 +70,15 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 	// Générer et sauvegarder les métadonnées
 	metadataGen := metadata.NewGenerator(p.storage)
 	ontologyFile := filepath.Base(outputPath)
-	meta, err := metadataGen.GenerateMetadata(p.inputPath, ontologyFile, outputPath)
+	sourcePaths := p.getSourcePaths() // Nouvelle méthode pour obtenir tous les chemins sources
+	meta, err := metadataGen.GenerateMetadata(sourcePaths, ontologyFile, contextFile)
 	if err != nil {
 		p.logger.Error("Failed to generate metadata: %v", err)
 		return fmt.Errorf("failed to generate metadata: %w", err)
 	}
 
-	metaContent, err := json.MarshalIndent(meta, "", "  ")
-	if err != nil {
-		p.logger.Error("Failed to marshal metadata: %v", err)
-		return fmt.Errorf("failed to marshal metadata: %w", err)
-	}
-
 	metaFilePath := strings.TrimSuffix(outputPath, filepath.Ext(outputPath)) + "_meta.json"
-
-	err = p.storage.Write(metaFilePath, metaContent)
+	err = metadataGen.SaveMetadata(meta, metaFilePath)
 	if err != nil {
 		p.logger.Error("Failed to save metadata: %v", err)
 		return fmt.Errorf("failed to save metadata: %w", err)
@@ -126,4 +120,67 @@ func (p *Pipeline) generateTSVContent() string {
 	result := tsvBuilder.String()
 	p.logger.Debug("TSV content generation completed. Total lines: %d", strings.Count(result, "\n"))
 	return result
+}
+
+func (p *Pipeline) getSourcePaths() []string {
+	var sourcePaths []string
+
+	// Fonction récursive pour parcourir les répertoires
+	var collectPaths func(path string) error
+	collectPaths = func(path string) error {
+		isDir, err := p.storage.IsDirectory(path)
+		if err != nil {
+			p.logger.Error("Error checking if path is directory: %v", err)
+			return err
+		}
+
+		if isDir {
+			files, err := p.storage.List(path)
+			if err != nil {
+				p.logger.Error("Error listing directory contents: %v", err)
+				return err
+			}
+
+			for _, file := range files {
+				fullPath := filepath.Join(path, file)
+				err := collectPaths(fullPath)
+				if err != nil {
+					return err
+				}
+			}
+		} else {
+			// Vérifier si le fichier est d'un type supporté
+			if isSupportedFileType(path) {
+				sourcePaths = append(sourcePaths, path)
+			}
+		}
+
+		return nil
+	}
+
+	err := collectPaths(p.inputPath)
+	if err != nil {
+		p.logger.Error("Error collecting source paths: %v", err)
+		// En cas d'erreur, retournez au moins le chemin d'entrée original
+		return []string{p.inputPath}
+	}
+
+	if len(sourcePaths) == 0 {
+		// Si aucun fichier n'a été trouvé, retournez le chemin d'entrée original
+		return []string{p.inputPath}
+	}
+
+	return sourcePaths
+}
+
+// isSupportedFileType vérifie si le fichier est d'un type supporté
+func isSupportedFileType(path string) bool {
+	ext := strings.ToLower(filepath.Ext(path))
+	supportedExtensions := []string{".txt", ".pdf", ".md", ".html", ".docx"} // Ajoutez ici les extensions supportées
+	for _, supportedExt := range supportedExtensions {
+		if ext == supportedExt {
+			return true
+		}
+	}
+	return false
 }

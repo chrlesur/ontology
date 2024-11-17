@@ -15,7 +15,7 @@ import (
 )
 
 func TestPDFParser(t *testing.T) {
-    content := `%PDF-1.5
+	content := `%PDF-1.5
     1 0 obj
     <</Type/Catalog/Pages 2 0 R>>
     endobj
@@ -62,7 +62,7 @@ func TestPDFParser(t *testing.T) {
 
 func TestDOCXParser(t *testing.T) {
 	// This is a simplified DOCX content for testing purposes
-    content := `
+	content := `
     <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
     <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
       <w:body>
@@ -125,7 +125,7 @@ func TestTextParser(t *testing.T) {
 	assert.Equal(t, "3", metadata["lineCount"])
 	assert.Equal(t, "13", metadata["wordCount"])
 	assert.Equal(t, "69", metadata["charCount"])
-    assert.Equal(t, content+"\n", string(result))
+	assert.Equal(t, content+"\n", string(result))
 }
 
 func TestMarkdownParser(t *testing.T) {
@@ -176,10 +176,10 @@ func TestParseDirectory(t *testing.T) {
 	metadataGen := metadata.NewGenerator(storage)
 
 	// Parse the directory
-	results, metadataList, err := ParseDirectory(tempDir, false, metadataGen)
+	results, projectMeta, err := ParseDirectory(tempDir, false, metadataGen)
 	assert.NoError(t, err)
 	assert.Len(t, results, 3)
-	assert.Len(t, metadataList, 3)
+	assert.Len(t, projectMeta.Files, 3)
 
 	// Check if all files were parsed
 	for _, result := range results {
@@ -191,9 +191,27 @@ func TestParseDirectory(t *testing.T) {
 	}
 
 	// Check metadata
-	for _, meta := range metadataList {
-		assert.NotEmpty(t, meta.SourceFile)
-		assert.NotEmpty(t, meta.SHA256Hash)
+	for _, fileMeta := range projectMeta.Files {
+		assert.NotEmpty(t, fileMeta.SourceFile)
+		assert.NotEmpty(t, fileMeta.SHA256Hash)
+		assert.NotEmpty(t, fileMeta.ID)
+
+		// Check if the file exists in the original map
+		_, exists := files[fileMeta.SourceFile]
+		assert.True(t, exists, "File %s should exist in the original map", fileMeta.SourceFile)
+
+		// You can add more specific checks here if needed
+		switch filepath.Ext(fileMeta.SourceFile) {
+		case ".txt":
+			assert.Contains(t, fileMeta.FormatMetadata, "format")
+			assert.Equal(t, "text", fileMeta.FormatMetadata["format"])
+		case ".md":
+			assert.Contains(t, fileMeta.FormatMetadata, "format")
+			assert.Equal(t, "markdown", fileMeta.FormatMetadata["format"])
+		case ".html":
+			assert.Contains(t, fileMeta.FormatMetadata, "format")
+			assert.Equal(t, "html", fileMeta.FormatMetadata["format"])
+		}
 	}
 }
 

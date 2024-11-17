@@ -45,64 +45,66 @@ func GetParser(format string) (Parser, error) {
 }
 
 // ParseDirectory parcourt un répertoire et parse tous les fichiers supportés
-func ParseDirectory(path string, recursive bool, metadataGen *metadata.Generator) ([][]byte, []*metadata.FileMetadata, error) {
-	var results [][]byte
-	var metadataList []*metadata.FileMetadata
+func ParseDirectory(path string, recursive bool, metadataGen *metadata.Generator) ([][]byte, *metadata.ProjectMetadata, error) {
+    var results [][]byte
+    projectMeta := &metadata.ProjectMetadata{
+        Files: make(map[string]metadata.FileMetadata),
+    }
 
-	err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
+    err := filepath.Walk(path, func(filePath string, info os.FileInfo, err error) error {
+        if err != nil {
+            return err
+        }
 
-		if info.IsDir() {
-			if !recursive && filePath != path {
-				return filepath.SkipDir
-			}
-			return nil
-		}
+        if info.IsDir() {
+            if !recursive && filePath != path {
+                return filepath.SkipDir
+            }
+            return nil
+        }
 
-		ext := strings.ToLower(filepath.Ext(filePath))
-		parser, err := GetParser(ext)
-		if err != nil {
-			log.Warning("Unsupported file type: %s, skipping", filePath)
-			return nil
-		}
+        ext := strings.ToLower(filepath.Ext(filePath))
+        parser, err := GetParser(ext)
+        if err != nil {
+            log.Warning("Unsupported file type: %s, skipping", filePath)
+            return nil
+        }
 
-		file, err := os.Open(filePath)
-		if err != nil {
-			log.Warning("Failed to open file: %s, error: %v", filePath, err)
-			return nil
-		}
-		defer file.Close()
+        file, err := os.Open(filePath)
+        if err != nil {
+            log.Warning("Failed to open file: %s, error: %v", filePath, err)
+            return nil
+        }
+        defer file.Close()
 
-		content, err := parser.Parse(file)
-		if err != nil {
-			log.Warning("Failed to parse file: %s, error: %v", filePath, err)
-			return nil
-		}
+        content, err := parser.Parse(file)
+        if err != nil {
+            log.Warning("Failed to parse file: %s, error: %v", filePath, err)
+            return nil
+        }
 
-		results = append(results, content)
+        results = append(results, content)
 
-		// Generate metadata
-		meta, err := metadataGen.GenerateMetadata(filePath, "", "")
-		if err != nil {
-			log.Warning("Failed to generate metadata for file: %s, error: %v", filePath, err)
-			return nil
-		}
+        // Generate metadata
+        fileMeta, err := metadataGen.GenerateSingleFileMetadata(filePath)
+        if err != nil {
+            log.Warning("Failed to generate metadata for file: %s, error: %v", filePath, err)
+            return nil
+        }
 
-		// Add format-specific metadata
-		for key, value := range parser.GetFormatMetadata() {
-			meta.FormatMetadata[key] = value
-		}
+        // Add format-specific metadata
+        for key, value := range parser.GetFormatMetadata() {
+            fileMeta.FormatMetadata[key] = value
+        }
 
-		metadataList = append(metadataList, meta)
+        projectMeta.Files[fileMeta.ID] = *fileMeta
 
-		return nil
-	})
+        return nil
+    })
 
-	if err != nil {
-		return nil, nil, err
-	}
+    if err != nil {
+        return nil, nil, err
+    }
 
-	return results, metadataList, nil
+    return results, projectMeta, nil
 }
