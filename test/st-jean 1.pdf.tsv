@@ -1,324 +1,406 @@
-Evangile_Selon_Saint_Jean	Livre_Biblique	Quatrième évangile du Nouveau Testament, attribué à l'apôtre Jean	0,129,867,1687,2557,3466,4258,5091,5996,6810,7474,8267,9199,10145,10904,11811,12509,13343,14184,15062,15832,16718,17545,18401,19074,19896
-Verbe	Concept_Théologique	Concept divin identifié à Jésus-Christ dans le prologue de Jean	140,149,242,332
-Jean_Baptiste	Personnage	Prophète qui baptisait et annonçait la venue du Christ	
-Jésus	Personnage	Fils de Dieu, fondateur du christianisme	14,85,100,423,455,686,840,860,947,976,1004,1057,1089,1119,1155,1234,1265,1276,1327,1438,1496,1610,1719,1777,1814,1870,1974,2247,2256,2562,2568,2592,2646,2672,2734,2819,2912,2989,3107,3244,3471,3485,3572,3597,3634,3650,3713,3737,3776,3863,3919,4024,4039,4073,4082,4144,4799,4828,4860,4952,4980,5076,5103,5144,5173,5246,5285,5305,5326,5418,5485,5561,5732,5758,5946,6132,6190,6257,6303,6360,6369,6450,6608,6632,6743,6910,6993,7044,7161,7221,7415,7482,7534,7579,7662,7685,7703,7709,7745,7768,7898,7947,8065,8116,8186,8248,8355,8427,8616,8729,8836,8866,8907,9100,9167,9415,9686,9721,9752,9809,9959,9976,10312,10331,10371,10485,10545,10679,10685,10795,10809,10841,10909,10989,11005,11058,11102,11120,11152,11176,11268,11325,11365,11392,11434,11452,11480,11506,11583,11600,11634,11744,11780,11856,11917,11925,11961,12035,12088,12122,12140,12178,12219,12308,12352,12368,12544,12646,12709,12892,13061,13073,13088,13225,13264,13302,13575,13620,13628,13654,13664,13705,13739,13778,13910,13954,14091,14148,14497,15760,16085,16161,16236,16792,16838,16872,16895,16920,16950,17024,17049,17068,17122,17137,17248,17256,17330,17345,17453,17459,17565,17584,17597,17639,17688,17814,17893,18003,18011,18048,18124,18214,18254,18273,18292,18365,18447,18457,18476,18523,18538,18575,18653,18752,18769,18790,18810,18872,18924,19128,19177,19189,19229,19258,19346,19460,19536,19600,19626,19658,19688,19769,19784,19845,19934,19982,20007,20031,20046,20075,20113,20173,20263,20295,20303,20339,20397
-Moïse	Personnage	Figure importante de l'Ancien Testament, mentionné comme référence par les Juifs	413,1043,2065,4740,4752,5502,6701,6759,6770,6805,7551,9566,9579
-Elie	Personnage	Prophète de l'Ancien Testament attendu pour le retour	524,625,11588,15422
-Isaïe	Personnage	Prophète de l'Ancien Testament	601,2294,3231,3434,3804,5060,5726,5931,6550,6568,6578,6620,6853,7006,7242,7253,7263,7566,7888,7976,8057,9055,9062,9222,9241,10266,10281,10715,11650,11859,12535,12761,12790,12831,15741,17848
-Béthanie	Lieu	Village proche de Jérusalem	675,10753,11068,11910,11920
+Évangile_Jean	Livre_Biblique	Livre du Nouveau Testament relatant la vie, la mort et la résurrection de Jésus-Christ, attribué à Jean l'Apôtre	
+Jean_Baptiste	Personnage	Prophète qui annonce la venue de Jésus et baptise dans l'eau	
+Jésus	Personnage	Messie et Fils de Dieu dans le Nouveau Testament	14,85,100,423,455,686,840,860,947,976,1004,1057,1089,1119,1155,1234,1265,1276,1327,1438,1496,1610,1719,1777,1814,1870,1974,2247,2256,2562,2568,2592,2646,2672,2734,2819,2912,2989,3107,3244,3471,3485,3572,3597,3634,3650,3713,3737,3776,3863,3919,4024,4039,4073,4082,4144,4799,4828,4860,4952,4980,5076,5103,5144,5173,5246,5285,5305,5326,5418,5485,5561,5732,5758,5946,6132,6190,6257,6303,6360,6369,6450,6608,6632,6743,6910,6993,7044,7161,7221,7415,7482,7534,7579,7662,7685,7703,7709,7745,7768,7898,7947,8065,8116,8186,8248,8355,8427,8616,8729,8836,8866,8907,9100,9167,9415,9686,9721,9752,9809,9959,9976,10312,10331,10371,10485,10545,10679,10685,10795,10809,10841,10909,10989,11005,11058,11102,11120,11152,11176,11268,11325,11365,11392,11434,11452,11480,11506,11583,11600,11634,11744,11780,11856,11917,11925,11961,12035,12088,12122,12140,12178,12219,12308,12352,12368,12544,12646,12709,12892,13061,13073,13088,13225,13264,13302,13575,13620,13628,13654,13664,13705,13739,13778,13910,13954,14091,14148,14497,15760,16085,16161,16236,16792,16838,16872,16895,16920,16950,17024,17049,17068,17122,17137,17248,17256,17330,17345,17453,17459,17565,17584,17597,17639,17688,17814,17893,18003,18011,18048,18124,18214,18254,18273,18292,18365,18447,18457,18476,18523,18538,18575,18653,18752,18769,18790,18810,18872,18924,19128,19177,19189,19229,19258,19346,19460,19536,19600,19626,19658,19688,19769,19784,19845,19934,19982,20007,20031,20046,20075,20113,20173,20263,20295,20303,20339,20397
+Moïse	Personnage	Prophète central de l'Ancien Testament, leader des Israélites	413,1043,2065,4740,4752,5502,6701,6759,6770,6805,7551,9566,9579
+André	Personnage	Un des douze apôtres de Jésus, frère de Pierre	929,1029,4918,12359
+Simon_Pierre	Personnage	Disciple de Jésus, appelé aussi Pierre ou Céphas	933,4922,13211,17001,17120,17381,18917,19002,19868,19950,20049
+Philippe	Personnage	Un des douze apôtres, souvent mentionné dans les Évangiles	1014,1080,1126,4863,12333,12363,14167
+Nathanaël	Personnage	Futur disciple de Jésus, reconnu comme un véritable Israélite	1035,1065,1091,1109,1138,19711
+Galilée	Lieu	Région où Jésus enseignait et réalisait des miracles	1010,1229,1444,2609,3473,3484,3505,3548,3578,3746,4809,6372,6519,7269,7444,7458,12339,19715
+Bethsaïde	Lieu	Ville natale de Philippe, André et Pierre	1026,12337
+Nazareth	Lieu	Ville de Galilée, lieu d'origine de Jésus	1063,1071
+Nathanaèl	Personnage	Un des premiers disciples de Jésus	1035,1065,1091,1109,1138,19711
+Figurier	Lieu	Lieu où Nathanaèl était avant d'être appelé	
+Ciel	Lieu	Mentionné par Jésus, comme étant ouvert avec les anges montant et descendant	768,1197,2046,2052,2059,2380,2472,5483,5512,5527,5541,5629,5723,5755,5879,5895,6066,12492,16171
+Noces_de_Cana	Événement	Premier miracle de transformation de Jésus, transformant l'eau en vin	1214,19712
+Canar	Lieu	Ville de Galilée où se déroula le premier miracle de Jésus	
+Mère_de_Jésus	Personnage	Mère de Jésus, présente aux noces de Cana	13,84,99,454,1003,1232,1263,1437,2246,4827,5304,7744,9685,10316,10484,11451,11599,11960,12125,13060,13072,13653,16160,16791,18456,18522,18751,18768,18809,18871,19127,20045
+Servants	Personnage	Personnes servant lors des noces de Cana	1297,1383
+Jarre_de_pierre	Artefact	Jarre utilisée pour les purifications des Juifs, remplie d'eau par Jésus et transformée en vin	1031,1312,6255,17055
+Maître_du_repas	Personnage	Maître de cérémonie qui goûta l'eau changée en vin	1352,1362,1393
+Marié	Personnage	Marié dont les noces manquaient de vin	10757,11089,11111,11241,11295,11326,11610,11945,18468,18889,19088,19234
+Capharnaüm	Lieu	Ville mentionnée dans le Nouveau Testament, située près de la mer de Galilée	1461,3569,5138,5222,5300,6099
+Pâque	Concept_Théologique	Fête juive commémorant la libération des Israélites d'Égypte	31,45,80,87,1484,1490,1705,4782,4841,11826,11833,11850,11916,13063,13087,17484,17779,18147
+Temple	Lieu	Bâtiment sacré du judaïsme à Jérusalem	1488,1504,1529,4044,6611,6914,7499,7932,8872,10337,11869,17279
+Vendeurs_de_boeufs,_de_brebis_et_de_colombes	Personnage	Personnes vendant des animaux dans le Temple	360,1030,1506,1512,1532,1549,3261,7287,10100,10132,10758,11087,12502,18685,20019
+Changeurs	Personnage	Personnes changeant la monnaie dans le Temple	1516,1542
+Fouet_de_cordes	Artefact	Instrument utilisé par Jésus pour chasser les vendeurs et changeurs du Temple	1521
+Sanctuaire	Concept_Théologique	Sanctuaire mentionné par Jésus, symbolisant son corps	1617,1641,1656
+Ressuscitation	Événement	Résurrection de Jésus d'entre les morts	
+Écriture	Concept_Théologique	Texte sacré auquel les disciples crurent après la résurrection	1679,4623,7188,7276,10581,13505,16475,18423,18534,18718,18732,19067
+Nicodème	Personnage	Pharisien qui apporta des aromates pour la sépulture de Jésus	1753,1767,1842,1962,7406,18780
+Pharisiens	Peuple	Groupe religieux juif influent au temps de Jésus	609,1761,2572,7036,7338,7365,7389,7519,7749,9158,9183,9221,9786,11627,11640,11889,12285,12866,16860
+Royaume_de_Dieu	Concept_Théologique	Royaume spirituel mentionné par Jésus	90,204,301,328,697,820,849,1147,1202,1792,1838,1895,2167,2507,2551,2744,4343,4678,5414,5424,5534,5830,6300,6661,8388,8441,8572,8589,8928,9229,9654,10575,10612,10826,10833,11224,11497,11767,12890,13066,13156,16017,16082,17980,19664
+Serpent_élevé_dans_le_désert	Artefact	Symbole du serpent élevé par Moïse dans le désert	254,588,1502,1860,1893,2069,2126,2179,4042,5071,5203,5250,5464,5861,6912,7497,7930,8958,10335,10596,10661,10861,11061,11228,11867,12931,13109,14197,14235,14307,16027,16142,16415,16421,16488,16569,16578,17033,17277,17437,17471,17578,17708,17997,19009,19754,19952
+Fils_unique_de_Dieu	Concept_Théologique	Titre de Jésus, donné par Dieu pour sauver le monde	90,204,301,328,355,432,697,820,849,1147,1202,1792,1839,1896,2102,2165,2507,2551,2744,4343,4678,5414,5424,5534,5830,6300,6661,8388,8441,8572,8589,8928,9229,9654,10575,10612,10826,10833,11224,11497,11767,12890,13066,13156,16017,16082,17980,19664
+Lumière	Concept_Théologique	Symbole de Jésus, venu dans le monde	181,220,231,240,2176,2192,2206,2213,2232,4542,7704,7721,7736,8964,10934,10949,12657,12667,12694,12705,12927
+Ténèbres	Concept_Théologique	Opposition à la lumière, aimée par ceux dont les œuvres sont mauvaises	190,2189,7732,12672,12682,12945
+Judea	Lieu	Région où Jésus et ses disciples séjournaient et baptisaient	
+Jean	Livre_Biblique	Évangile du Nouveau Testament attribué à l'apôtre Jean	3,132,210,449,469,477,680,752,828,870,944,990,1690,2253,2315,2327,2560,2586,3469,4261,4498,4551,5094,5999,6813,7477,8270,9202,10148,10702,10718,10728,10907,11814,12512,13346,14187,15065,15835,16721,17548,18404,19077,19899,20055,20097,20134
+Jean_3_23-36	Livre_Biblique	Passage de l'évangile selon Jean décrivant le ministère de Jean le Baptiste	870
+Jean_4_1-43	Livre_Biblique	Passage de l'évangile selon Jean décrivant Jésus en Samarie et en Galilée	1690
+Aenon	Lieu	Lieu où Jean baptisait, près de Salim	2278
+Salim	Lieu	Lieu près de Aenon où les gens allaient se faire baptiser par Jean	2281
 Jourdain	Lieu	Fleuve où Jean baptisait	678,2343,10684,10690,10698
-Galilée	Lieu	Région du nord d'Israël	1010,1229,1444,2609,3473,3484,3505,3548,3578,3746,4809,6372,6519,7269,7444,7458,12339,19715
-Bethsaïde	Lieu	Ville d'origine d'André et Pierre	1026,12337
-Nazareth	Lieu	Ville d'origine de Jésus	1063,1071
-André	Personnage	Disciple de Jésus	929,1029,4918,12359
-Simon-Pierre	Personnage	Apôtre de Jésus, aussi appelé Pierre	933,4922,6270,13211,13283,13629,13900,17001,17120,17381,18917,19002,19707,19729,19868,19950,20049
-Philippe	Personnage	Disciple de Jésus mentionné dans l'évangile de Jean	1014,1080,1126,4863,12333,12363,14167
-Nathanaël	Personnage	Disciple de Jésus, originaire de Cana en Galilée	1035,1065,1091,1109,1138,19711
-Juifs	Peuple	Peuple d'Israël mentionné dans le récit de la Passion	480,1319,1492,1592,1627,1771,2724,3035,3774,3951,4070,4080,4112,4845,5702,5920,6385,6542,6598,6618,7088,7975,8193,8593,8672,8818,9293,9403,9441,10257,10344,10476,10513,10893,11081,11291,11361,11395,11595,11604,11788,11835,12077,12112,13838,17066,17102,17283,17536,17594,17669,17750,17788,17854,17959,18095,18157,18279,18285,18316,18328,18341,18598,18759,18828,18862,19345
-Pharisiens	Personnage	Groupe religieux juif	609,1761,2572,7036,7338,7365,7389,7519,7749,9158,9183,9221,9786,11627,11640,11889,12285,12866,16860
-Fils_de_Dieu	Concept_Théologique	Titre divin attribué à Jésus	90,204,301,328,697,820,849,988,1059,1146,1202,1209,1792,1839,1896,2061,2078,2167,2507,2551,2744,4342,4678,5385,5414,5424,5534,5734,5830,5966,6146,6300,6331,6661,8127,8388,8441,8572,8589,8928,9229,9654,9701,10575,10611,10826,10832,11223,11497,11767,12382,12634,12641,12703,12890,13066,13133,13156,13693,13784,16017,16082,16470,17979,19663,19717,20053,20095,20132
-Roi_d_Israël	Concept_Théologique	Titre messianique attribué à Jésus	667,1152,2038,12174,17592,17786,17852,18277,18326,18339,18455,18607,19816
-Fils_de_l_homme	Concept_Théologique	Titre que Jésus s'attribue, désignant sa nature humaine et divine	20,64,77,88,116,202,250,256,373,458,483,584,665,683,706,716,762,853,920,988,1026,1059,1098,1146,1209,1228,1405,1423,1443,1512,1523,1550,1562,1703,1763,1789,1842,1849,1902,1911,1959,2034,2061,2078,2097,2221,2249,2280,2339,2367,2399,2410,2426,2445,2459,2579,2628,2670,2729,2766,2837,3172,3190,3256,3292,3301,3362,3379,3404,3480,3519,3547,3660,3681,3786,3815,3856,3874,4123,4168,4314,4342,4461,4514,4655,4802,4808,4814,4855,5084,5131,5224,5230,5308,5385,5466,5639,5648,5734,5966,6146,6194,6239,6284,6331,6341,6354,6378,6573,6604,6644,6672,6685,6785,6822,6851,6962,7026,7149,7155,7187,7194,7200,7267,7282,7288,7312,7357,7378,7406,7416,7425,7442,7456,7487,7545,7555,7737,7937,8070,8104,8127,8244,8378,8415,8500,8704,8882,8940,8976,8988,9001,9103,9170,9205,9246,9273,9308,9406,9422,9467,9650,9691,9701,9750,9782,9925,10004,10228,10234,10305,10324,10341,10348,10462,10539,10611,10731,10743,10750,10787,10832,10855,11032,11071,11095,11223,11422,11535,11574,11596,11652,11710,11732,11761,11776,11782,11823,11843,11902,11973,11982,12074,12115,12130,12149,12184,12231,12382,12396,12405,12430,12599,12615,12634,12641,12702,12846,12876,13064,13085,13111,13123,13133,13167,13182,13194,13567,13638,13693,13784,13892,14279,14313,14613,14723,14801,14952,15152,15360,15440,15617,15629,15672,15864,15870,16262,16470,16507,16531,16537,16555,16803,16864,17113,17150,17194,17422,17454,17501,17567,17720,17979,18086,18145,18299,18332,18453,18470,18591,18643,18670,18686,18737,18814,18822,18858,18876,18886,18966,19089,19301,19328,19492,19504,19663,19698,19717,19833,19891,19991,20053,20095,20132,20239,20411
-Cana	Lieu	Ville de Galilée où Jésus a accompli des miracles	1216,1227,1442,3534,3546,19713
-Marie	Personnage	Mère de Jésus, présente lors de la crucifixion	10757,11089,11111,11241,11295,11326,11610,11945,18468,18889,19088,19234
-Capharnaüm	Lieu	Ville où Jésus se rend et prononce un discours	1461,3569,5138,5222,5300,6099
-Jérusalem	Lieu	Ville sainte d'Israël	39,484,1499,1694,2980,3007,3517,3751,3779,6363,6852,10328,11072,11847,12128,12143
-Temple	Lieu	Lieu saint à Jérusalem où Jésus enseigne	1488,1504,1529,4044,6611,6914,7499,7932,8872,10337,11869,17279
-Nicodème	Personnage	Pharisien venu aider à l'ensevelissement de Jésus	1753,1767,1842,1962,7406,18780
-Judée	Lieu	Région au sud de la Palestine	2249,2264,2604,3576,3744,6381,6408,10881
-Jean	Personnage	Disciple bien-aimé de Jésus, auteur présumé de l'Évangile selon Jean	3,132,210,449,469,477,680,752,828,870,944,990,1690,2253,2315,2327,2560,2586,3469,4261,4498,4551,5094,5999,6813,7477,8270,9202,10148,10702,10718,10728,10907,11814,12512,13346,14187,15065,15835,16721,17548,18404,19077,19899,20055,20097,20134
-Aenon	Lieu	Endroit où Jean baptisait, près de Salim	2278
-Salim	Lieu	Lieu près duquel Jean baptisait	2281
-Samarie	Lieu	Région que Jésus traverse en allant de Judée en Galilée	2616,2624,2666
-Sychar	Lieu	Ville de Samarie où Jésus rencontre la Samaritaine	2626
-Jacob	Personnage	Patriarche mentionné comme ayant donné une terre à Joseph	2632,2645,2798
-Joseph	Personnage	Fils de Jacob mentionné dans le texte	1061,2638,5736,18746
-Samaritaine	Personnage	Femme que Jésus rencontre au puits de Jacob	2698,2720
-Samaritains	Peuple	Habitants de la Samarie	2565,2733,3370,3407
-Messie	Concept_Théologique	Titre désignant le sauveur attendu, identifié à Jésus dans le texte	965,3092
-Christ	Personnage	Figure messianique attendue par les Juifs	424,514,623,972,2394,3098,3185,6847,6886,6898,7010,7232,7258,7272,7299,9418,10367,11221,12620,19661
-Baptême	Concept_Théologique	Rite de purification pratiqué par Jean et les disciples de Jésus	
-Eau_Vive	Concept_Théologique	Métaphore utilisée par Jésus pour désigner son enseignement spirituel	2767,2789,7150,7196
-Bethesda	Lieu	Piscine à Jérusalem réputée pour ses propriétés curatives	3795
-Père	Concept_Théologique	Dieu le Père dans la trinité chrétienne	353,441,1567,2516,2797,2967,3012,3050,3064,3707,4099,4133,4176,4189,4217,4238,4267,4276,4353,4557,4576,4687,4736,5393,5459,5517,5607,5679,5741,5776,5810,5824,5837,5860,6037,6049,6076,6237,7881,7895,7909,7919,8115,8150,8329,8343,8351,8403,8423,8436,8484,8492,8536,8628,8714,8745,8799,10140,10153,10204,10247,10394,10445,10466,10501,10591,10624,10655,10663,11516,12457,12468,12485,13014,13049,13102,13144,14008,14109,14121,14142,14175,14182,14199,14224,14237,14288,14304,14334,14427,14458,14511,14549,14572,14655,14714,14721,14741,14913,14926,14957,15056,15107,15275,15309,15337,15344,15403,15560,15653,15737,15923,15974,15997,16024,16041,16124,16176,16257,16430,16622,16696,16738,17042,17083,19276,19289,19400
-Fils	Concept_Théologique	Titre utilisé par Jésus pour se désigner lui-même	355,432,988,1059,1146,1209,2061,2078,2102,2125,2165,2519,2530,2541,2637,2813,3538,3565,3592,3641,3720,4143,4163,4183,4192,4229,4247,4257,4272,4342,4366,4385,5385,5684,5734,5966,6146,6331,8127,8283,8291,9323,9350,9701,10611,10832,11223,12382,12634,12641,12703,13133,13693,13784,14309,16183,16470,17979,18499,19663,19717,20053,20095,20132
-Sabbat	Concept_Théologique	Jour de repos hebdomadaire dans le judaïsme	3947,3964,4092,4126,6779,6795,6828,9163,9237,18610
-Écritures	Livre_Biblique	Ensemble des textes sacrés scrutés pour trouver la vie éternelle	4623
-Dieu	Personnage	Divinité suprême dans la tradition judéo-chrétienne	91,146,157,205,302,329,429,698,821,850,1148,1203,1793,1808,1840,1897,2092,2120,2168,2243,2493,2501,2508,2552,2745,4130,4138,4344,4679,4725,5394,5415,5425,5535,5803,5831,6301,6662,8389,8425,8433,8442,8573,8590,8757,8929,9230,9460,9575,9618,9655,10543,10576,10613,10827,10834,11147,11225,11498,11768,12891,13067,13157,13163,13791,13798,13804,13998,15392,16018,16083,16229,17981,19295,19597,19665,20241
-Pâque	Événement	Fête juive mentionnée comme contexte de la crucifixion	31,45,80,87,1484,1490,1705,4782,4841,11826,11833,11850,11916,13063,13087,17484,17779,18147
-Mer_de_Galilée	Lieu	Mer également appelée mer de Tibériade, où se déroulent certains événements	1228,1443,3547,4807,19700
-Pain_de_Vie	Concept_Théologique	Titre que Jésus s'attribue, symbolisant la nourriture spirituelle éternelle	47,4418,4784,5533,5569,5856
-Multiplication_des_Pains	Événement	Miracle réalisé par Jésus pour nourrir une foule	4793,4868
-Marche_sur_les_Eaux	Événement	Miracle où Jésus marche sur la mer pour rejoindre ses disciples	2283,4825,5174,9208
-Pain_De_Vie	Concept_Théologique	Métaphore utilisée par Jésus pour se décrire	47,4418,4784,5533,5569,5856
-Fils_De_L_Homme	Concept_Théologique	Titre messianique utilisé par Jésus pour se désigner	20,64,77,88,116,202,250,256,373,458,483,584,665,683,706,716,762,853,920,988,1026,1059,1098,1146,1209,1228,1405,1423,1443,1512,1523,1550,1562,1703,1763,1789,1842,1849,1902,1911,1959,2034,2061,2078,2097,2221,2249,2280,2339,2367,2399,2410,2426,2445,2459,2579,2628,2670,2729,2766,2837,3172,3190,3256,3292,3301,3362,3379,3404,3480,3519,3547,3660,3681,3786,3815,3856,3874,4123,4168,4314,4342,4461,4514,4655,4802,4808,4814,4855,5084,5131,5224,5230,5308,5385,5466,5639,5648,5734,5966,6146,6194,6239,6284,6331,6341,6354,6378,6573,6604,6644,6672,6685,6785,6822,6851,6962,7026,7149,7155,7187,7194,7200,7267,7282,7288,7312,7357,7378,7406,7416,7425,7442,7456,7487,7545,7555,7737,7937,8070,8104,8127,8244,8378,8415,8500,8704,8882,8940,8976,8988,9001,9103,9170,9205,9246,9273,9308,9406,9422,9467,9650,9691,9701,9750,9782,9925,10004,10228,10234,10305,10324,10341,10348,10462,10539,10611,10731,10743,10750,10787,10832,10855,11032,11071,11095,11223,11422,11535,11574,11596,11652,11710,11732,11761,11776,11782,11823,11843,11902,11973,11982,12074,12115,12130,12149,12184,12231,12382,12396,12405,12430,12599,12615,12634,12641,12702,12846,12876,13064,13085,13111,13123,13133,13167,13182,13194,13567,13638,13693,13784,13892,14279,14313,14613,14723,14801,14952,15152,15360,15440,15617,15629,15672,15864,15870,16262,16470,16507,16531,16537,16555,16803,16864,17113,17150,17194,17422,17454,17501,17567,17720,17979,18086,18145,18299,18332,18453,18470,18591,18643,18670,18686,18737,18814,18822,18858,18876,18886,18966,19089,19301,19328,19492,19504,19663,19698,19717,19833,19891,19991,20053,20095,20132,20239,20411
-Douze	Personnage	Les douze apôtres choisis par Jésus	5032,6261,6317,6347,10916,19451
-Simon_Pierre	Personnage	L'un des douze apôtres, porte-parole du groupe	933,4922,13211,17001,17120,17381,18917,19002,19868,19950,20049
-Judas	Personnage	Disciple qui a trahi Jésus	6330,11979,13131,13571,13692,13732,16825,16908
-Fête_Des_Tentes	Événement	Fête juive célébrée à l'automne	55,3772,4843,6350,6394
-Loi	Concept_Théologique	Ensemble des commandements divins donnés par Moïse	
-Grecs	Peuple	Non-Juifs venus adorer à Jérusalem	7113,12320
-Esprit	Concept_Théologique	Esprit Saint promis par Jésus	1914,3052,3067,3074,6174,11369,13580
-David	Personnage	Roi d'Israël, ancêtre du Messie	7286,7294
-Bethléem	Lieu	Ville de naissance de David et lieu prophétisé pour la naissance du Messie	7289
-Mont_des_Oliviers	Lieu	Montagne près de Jérusalem	7486
-Fils_de_l'homme	Concept_Théologique	Titre messianique utilisé par Jésus pour se désigner	988,1059,1146,1209,2061,2078,4342,5385,5734,5966,6146,6331,8127,9701,10611,10832,11223,12382,12634,12641,12703,13133,13693,13784,16470,17979,19663,19717,20053,20095,20132
-Abraham	Personnage	Patriarche considéré comme le père des croyants dans le judaïsme et le christianisme	8188,8353,8391,8685,8833
-Évangile_Selon_Saint_Jean	Livre_Biblique	Quatrième évangile du Nouveau Testament	0,129,867,1687,2557,3466,4258,5091,5996,6810,7474,8267,9199,10145,10904,11811,12509,13343,14184,15062,15832,16718,17545,18401,19074,19896
-Diable	Concept_Théologique	Figure représentant le mal et l'opposition à Dieu	8482,13125
-Samaritain	Peuple	Groupe ethnique et religieux distinct des Juifs	8607
-Siloé	Lieu	Piscine mentionnée dans l'Évangile de Jean	9002,9118
-Aveugle_Né	Personnage	Homme guéri par Jésus, central dans le récit	
-Synagogue	Lieu	Lieu de culte et d'étude juif	5220,6097,9424,12878,17275
-Portique_De_Salomon	Lieu	Partie du Temple mentionnée dans le récit	10340
-Fête_De_La_Dédicace	Événement	Fête juive mentionnée dans le texte	20,55,63,77,116,458,1562,1702,1789,1902,2034,2459,2628,3190,3379,3519,3772,3786,4314,4805,4843,5134,5233,5311,6284,6350,6604,7026,7155,7267,7282,7442,7456,7737,8415,8704,8976,9103,9170,9205,9422,10228,10234,10304,10323,10462,11535,11823,11843,11973,12615,12876,13084,13567,16262,17150,17720,18145,18299,18453,18858,18876,18886,19328,19698,19891
-Guérison_Aveugle_Né	Événement	Miracle réalisé par Jésus, central dans le récit	
-Parabole_Bon_Pasteur	Concept_Théologique	Enseignement de Jésus utilisant l'image du berger et des brebis	10067,10126
-Lazare	Personnage	Homme ressuscité par Jésus	10744,10751,10784,10848,10964,11011,11060,11560,11923,11939,12093,12107,12251
-Marthe	Personnage	Sœur de Lazare	10762,10843,11086,11099,11166,11283,11461,11937
-Thomas	Personnage	Apôtre de Jésus, aussi appelé Didyme	11037,19448,19533,19560,19708
-Caïphe	Personnage	Grand prêtre en fonction lors de l'arrestation de Jésus	11684,17053,17085,17093,17379,17462
-Romains	Peuple	Puissance occupante de la Judée à l'époque de Jésus	11668
-Résurrection	Événement	Résurrection de Jésus le troisième jour après sa crucifixion	118,4417,4428,10742,11171,11184,18878
-Judas_Iscariote	Personnage	Disciple de Jésus qui le trahit	13131
-Grands_Prêtres	Personnage	Autorités religieuses juives opposées à Jésus	7334,11636,11885,12101,16856,17629,17921,18188,18313
-Simon	Personnage	Père de Judas Iscariote	955,986,6333,13135,13695,20052,20094,20131
-Satan	Personnage	Figure du mal dans la Bible	13701
-Paraclet	Concept_Théologique	Esprit de vérité envoyé par Jésus d'auprès du Père	14341,14567,15330,15431,15503
-Esprit_Saint	Concept_Théologique	Troisième personne de la trinité chrétienne	806,14568,19422
-Prince_Du_Monde	Personnage	Figure symbolique représentant le mal dans le monde	703,3463,5916,7705,7722,8965,15151,15165,15173,15526,16285,16516,16524,16534,16546,16554,16736
-Vigne_Véritable	Concept_Théologique	Métaphore utilisée par Jésus pour décrire sa relation avec ses disciples	14730,14737
-Esprit_De_Vérité	Concept_Théologique	Autre nom du Paraclet, venant du Père	361,761,797,8515,14349,15338,15600
-Disciples	Personnage	Suivants de Jésus	103,825,838,854,1247,1452,1472,1574,1668,2260,2313,2580,2599,2682,3123,3201,3229,4838,4917,5011,5107,5119,5255,5291,6106,6127,6244,6411,8209,8887,9545,9570,10874,10884,10977,11043,11810,11983,12209,13076,13195,13601,13617,13887,14923,15129,15700,16044,16802,16823,16841,17195,17251,17399,19080,19306,19320,19341,19376,19463,19526,19634,19694,19725,19778,19886,19992,20035
-Monde	Concept_Théologique	Réalité terrestre opposée au royaume divin	256,264,270,704,2097,2128,2137,2181,3464,4949,5073,5547,5917,6438,6470,7706,7723,8019,8028,8099,8960,8966,9767,10598,10937,11230,12302,12430,12568,12575,12933,12970,13099,13111,14354,14401,14494,14613,14696,14709,15132,15152,15166,15174,15527,15577,15818,15874,16029,16035,16144,16156,16274,16286,16372,16417,16423,16490,16507,16517,16525,16535,16547,16555,16571,16580,16639,16680,16737,17269,17649,17656,17710,20411
-Mauvais	Personnage	Entité maléfique dont Jésus demande à Dieu de protéger ses disciples	16541
-Vérité	Concept_Théologique	Concept associé à la parole divine et à l'enseignement de Jésus	362,419,1187,1820,1875,1994,2228,3055,3077,4155,4281,4321,4506,5332,5491,5839,5952,7835,8214,8254,8384,8509,8516,8545,8563,8652,8842,9841,9983,12386,13451,13542,13587,13966,14101,14253,14351,15340,15487,15602,15608,15803,15911,16559,16595,17717,17735,20182
+Judée	Lieu	Région mentionnée comme point de départ de Jésus pour la Galilée	2249,2264,2604,3576,3744,6381,6408,10881
+Samaria	Lieu	Région que Jésus traverse en retournant en Galilée	
+Sychar	Lieu	Ville de Samarie proche de la terre donnée à Joseph par Jacob	2626
+Jacob	Personnage	Patriarche d'Israël qui a donné la terre à son fils Joseph	2632,2645,2798
+Joseph	Personnage	Fils de Jacob	1061,2638,5736,18746
+Puits_de_Jacob	Lieu	Lieu où Jésus parle avec la femme samaritaine	2643
+Femme_Samaritaine	Personnage	Femme de Samarie à qui Jésus parle au puits de Jacob	2697,2719
+Disciples	Personnage	Groupe des apôtres et autres fidèles de Jésus-Christ	103,825,838,854,1247,1452,1472,1574,1668,2260,2313,2580,2599,2682,3123,3201,3229,4838,4917,5011,5107,5119,5255,5291,6106,6127,6244,6411,8209,8887,9545,9570,10874,10884,10977,11043,11810,11983,12209,13076,13195,13601,13617,13887,14923,15129,15700,16044,16802,16823,16841,17195,17251,17399,19080,19306,19320,19341,19376,19463,19526,19634,19694,19725,19778,19886,19992,20035
+Dieu	Concept_Théologique	Être suprême dans les traditions abrahamiques	91,146,157,205,302,329,429,698,821,850,1148,1203,1793,1808,1840,1897,2092,2120,2168,2243,2493,2501,2508,2552,2745,4130,4138,4344,4679,4725,5394,5415,5425,5535,5803,5831,6301,6662,8389,8425,8433,8442,8573,8590,8757,8929,9230,9460,9575,9618,9655,10543,10576,10613,10827,10834,11147,11225,11498,11768,12891,13067,13157,13163,13791,13798,13804,13998,15392,16018,16083,16229,17981,19295,19597,19665,20241
+Esprit	Concept_Théologique	Donné par Dieu sans mesure	1914,3052,3067,3074,6174,11369,13580
+Vie_Éternelle	Concept_Théologique	Doctrine de la vie après la mort en communion avec Dieu	2089,2117,2533,2860,3313,4302,4632,5378,5691,5851,5991,6286,10429,12434,13038,16206,16219
+Colère_de_Dieu	Concept_Théologique	Reste sur ceux qui refusent de croire au Fils	90,204,301,328,697,820,849,1147,1202,1792,1839,1896,2167,2507,2550,2744,4343,4678,5414,5424,5534,5830,6300,6661,8388,8441,8572,8589,8928,9229,9654,10575,10612,10826,10833,11224,11497,11767,12890,13066,13156,16017,16082,17980,19664
+Christ	Concept_Théologique	Titre messianique attendu par les Samaritains et déclaré par Jésus	424,514,623,972,2394,3098,3185,6847,6886,6898,7010,7232,7258,7272,7299,9418,10367,11221,12620,19661
+Samaritains	Peuple	Peuple de la ville de Sychar, en Samarie	2565,2733,3370,3407
+Moisson	Concept_Théologique	Métaphore utilisée par Jésus pour expliquer l'importance du travail spirituel	3279,3300
+Semeur	Concept_Théologique	Métaphore utilisée par Jésus pour ceux qui prêchent ou commencent un travail spirituel	3319,3335
+Moissonneur	Concept_Théologique	Métaphore utilisée par Jésus pour ceux qui récoltent les fruits du travail spirituel	3303,3324,3338
+Cana	Lieu	Ville de Galilée où Jésus a effectué son premier miracle	1216,1227,1442,3534,3546,19713
+Jérusalem	Lieu	Ville sainte où de nombreux événements de la vie de Jésus se déroulèrent	39,484,1499,1694,2980,3007,3517,3751,3779,6363,6852,10328,11072,11847,12128,12143
+Fonctionnaire_Royal	Personnage	Officier dont le fils est guéri par Jésus à Cana	3540,3561,3618
+Fils_du_Fonctionnaire	Personnage	Enfant guéri par Jésus à Cana	
+Bethesda	Lieu	Piscine à Jérusalem où Jésus a guéri un infirme	3795
+Infirme_de_Bethesda	Personnage	Homme infirme guéri par Jésus à la piscine de Bethesda	3859
+Père_tout-puissant	Concept_Théologique	Représente Dieu le Père dans la Trinité chrétienne	
+Vie_éternelle	Concept_Théologique	Don de la vie continue après la mort, basé sur la croyance en Dieu et Jésus	2089,2117,2533,2860,3313,4302,4632,5378,5691,5851,5991,6286,10429,12434,13038,16206,16219
+Jugement	Concept_Théologique	Acte de jugement divin entre ceux qui ont fait le bien et ceux qui ont fait le mal	2173,4249,4309,4381,4430,4447,7831,12565,15540,15570
+Jean_le_Baptiste	Personnage	Précurseur de Jésus qui baptisait au Jourdain	631
+Simon-Pierre	Personnage	Apôtre de Jésus-Christ, également connu sous le nom de Pierre	933,4922,6270,13211,13283,13629,13900,17001,17120,17381,18917,19002,19707,19729,19868,19950,20049
+Mer_de_Galilée	Lieu	Mer mentionnée dans le Nouveau Testament, également appelée mer de Tibériade	1228,1443,3547,4807,19700
+Pain_d'orge	Artefact	Aliment distribué par Jésus lors de la multiplication des pains	4936,5039
+Poissons	Artefact	Aliment distribué par Jésus lors de la multiplication des pains	4940,4998,19841,19913,19942,19964
+Denier	Artefact	Monnaie romaine utilisée à l'époque de Jésus	4899,12001
+Pain_du_ciel	Concept_Théologique	Nourriture miraculeuse mentionnée dans l'Ancien Testament	767,2045,2058,2379,2471,5482,5511,5526,5540,5628,5720,5754,5878,5894,6063,12491
+Pôle_	Concept_Théologique	Accomplissement des œuvres de Dieu par la croyance en Jésus	
+Jésus_Christ	Personnage	Messie et Fils de Dieu, crucifié et ressuscité d'entre les morts	423
+Juifs	Peuple	Nation à laquelle appartiennent les Grands Prêtres et la foule	480,1319,1492,1592,1627,1771,2724,3035,3774,3951,4070,4080,4112,4845,5702,5920,6385,6542,6598,6618,7088,7975,8193,8593,8672,8818,9293,9403,9441,10257,10344,10476,10513,10893,11081,11291,11361,11395,11595,11604,11788,11835,12077,12112,13838,17066,17102,17283,17536,17594,17669,17750,17788,17854,17959,18095,18157,18279,18285,18316,18328,18341,18598,18759,18828,18862,19345
+Judas	Personnage	Un des Douze apôtres de Jésus-Christ, connu pour l'avoir trahi	6330,11979,13131,13571,13692,13732,16825,16908
+Père	Personnage	Terme utilisé par Jésus pour se référer à Dieu	353,441,1567,2516,2797,2967,3012,3050,3064,3707,4099,4133,4176,4189,4217,4238,4267,4276,4353,4557,4576,4687,4736,5393,5459,5517,5607,5679,5741,5776,5810,5824,5837,5860,6037,6049,6076,6237,7881,7895,7909,7919,8115,8150,8329,8343,8351,8403,8423,8436,8484,8492,8536,8628,8714,8745,8799,10140,10153,10204,10247,10394,10445,10466,10501,10591,10624,10655,10663,11516,12457,12468,12485,13014,13049,13102,13144,14008,14109,14121,14142,14175,14182,14199,14224,14237,14288,14304,14334,14427,14458,14511,14549,14572,14655,14714,14721,14741,14913,14926,14957,15056,15107,15275,15309,15337,15344,15403,15560,15653,15737,15923,15974,15997,16024,16041,16124,16176,16257,16430,16622,16696,16738,17042,17083,19276,19289,19400
+Synagogue	Lieu	Lieu de culte et de rassemblement pour les Juifs	5220,6097,9424,12878,17275
+Manne	Artefact	Nourriture providentielle donnée par Dieu aux Israélites dans le désert	5463,5867
+Grecs	Personnage	Non-Juifs présents à Jérusalem pour la fête de la Pâque	7113,12320
+Femme_adultère	Personnage	Femme surprise en flagrant délit d’adultère confrontée par les Pharisiens à Jésus	7465
+Mont_des_Oliviers	Lieu	Colline située à l'est de Jérusalem	7486
+Trésor	Lieu	Partie du Temple où étaient entreposées les offrandes	7926
+David	Personnage	Roi d'Israël, ancêtre du Christ selon la tradition biblique	7286,7294
+Bethléem	Lieu	Village natal de David et lieu de naissance attendu du Christ	7289
+Abraham	Personnage	Patriarche fondateur du peuple d'Israël	8188,8353,8391,8685,8833
+Diable	Personnage	Esprit du mal et adversaire de Dieu	8482,13125
+Homme_Aveugle	Personnage	Homme né aveugle, guéri par Jésus	8882
+Parents_Homme_Aveugle	Personnage	Parents de l'homme né aveugle	8882
+Siloé	Lieu	Piscine située à Jérusalem	9002,9118
+Évangile_Selon_Jean	Livre_Biblique	Livre du Nouveau Testament attribué à l'apôtre Jean, relatant la vie et les enseignements de Jésus	0,129,867,1687,2557,3466,4258,5091,5996,6810,7474,8267,9199,10145,10904,11811,12509,13343,14184,15062,15832,16718,17545,18401,19074,19896
+Parents_de_l'aveugle	Personnage	Parents de l'homme né aveugle, mentionnés dans l'histoire de la guérison par Jésus	8988,9307,11422
+Aveugle_né	Personnage	Homme guéri de sa cécité par Jésus	
+Pécheur	Concept_Théologique	Individu qui commet des péchés, considéré ici en relation avec l'homme guéri et Jésus	9247,9470,9479,9622
+Disciples_de_Jésus	Personnage	Suiveurs et élèves de Jésus	13,84,99,454,1003,1233,1264,1437,2246,2313,4827,5304,7744,9685,10316,10484,11451,11599,11960,12125,13060,13072,13653,16160,16791,16802,17195,18456,18522,18751,18768,18809,18871,19127,20045
+Portique_de_Salomon	Lieu	Partie du Temple de Jérusalem où Jésus enseignait	10340
+Pasteur	Concept_Théologique	Métaphore pour Jésus en tant que guide et protecteur de ses disciples	9883,10068,10085,10127,10197
+Démon	Concept_Théologique	Esprit maléfique, opposé à Dieu	2221,6325,6735,8613,8624,8684,10272,10290
+Lazare	Personnage	Ami de Jésus, ressuscité d'entre les morts par Lui	10744,10751,10784,10848,10964,11011,11060,11560,11923,11939,12093,12107,12251
+Béthanie	Lieu	Village près de Jérusalem, lieu de résidence de Lazare, Marthe et Marie	675,10753,11068,11910,11920
+Marie_de_Béthanie	Personnage	Sœur de Lazare, oignit les pieds de Jésus avec du parfum	10752,11067,11909,18473,18889
+Marthe	Personnage	Sœur de Lazare, elle servit Jésus lors d'un repas	10762,10843,11086,11099,11166,11283,11461,11937
+Thomas	Personnage	Apôtre, connu pour son doute et ses questions directes à Jésus	11037,19448,19533,19560,19708
+Romains	Peuple	Empire qui occupait la Palestine à l'époque de Jésus	11668
+Caïphe	Personnage	Grand prêtre qui a présidé le procès de Jésus	11684,17053,17085,17093,17379,17462
+Israël	Peuple	Peuple élu de Dieu, souvent mentionné dans la Bible	742,1105,1153,1983,12175
+Enfant_de_Dieu	Personnage	Croyants unis dans la foi en Jésus-Christ	90,204,300,328,697,820,849,1147,1202,1792,1839,1896,2167,2507,2551,2744,4343,4678,5414,5424,5534,5830,6300,6661,8388,8441,8572,8589,8928,9229,9654,10575,10612,10826,10833,11224,11497,11766,12890,13066,13156,16017,16082,17980,19664
+Éphraïm	Lieu	Ville près du désert où Jésus se retire avec ses disciples	11803
+Judas_Iscariote	Personnage	Disciple de Jésus, connu pour l'avoir trahi	13131
+Hosanna	Concept_Théologique	Acclamation de la foule lors de l'entrée triomphale de Jésus à Jérusalem	12161
+Fils_de_l'Homme	Personnage	Titre messianique utilisé par Jésus pour se désigner lui-même	988,1059,1146,1209,2061,2078,4342,5385,5734,5966,6146,6331,8127,9701,10611,10832,11223,12382,12634,12641,12703,13133,13693,13784,16470,17979,19663,19717,20053,20095,20132
+Loi	Concept_Théologique	Ensemble des commandements donnés par Dieu à Moïse	
+Isaïe	Personnage	Prophète majeur de l'Ancien Testament	601,2294,3231,3434,3804,5060,5726,5931,6550,6568,6578,6620,6853,7006,7242,7253,7263,7566,7888,7976,8057,9055,9062,9222,9241,10266,10281,10715,11650,11859,12535,12761,12790,12831,15741,17848
+Prince_de_ce_Monde	Concept_Théologique	Satan, représentant des forces du mal	2003,2474,8017,8026,9275,9766,10935,12429,12566,12572,13097,14648,14693,15574,17355,17647,17654,20141
+Dieu_Père	Concept_Théologique	Nom donné à la première personne de la Trinité chrétienne	
+Paraclet	Concept_Théologique	Désigne l'Esprit Saint, envoyé pour guider et rappeler les enseignements de Jésus	14341,14567,15330,15431,15503
+Esprit_Saint	Concept_Théologique	Troisième personne de la Trinité, envoyé par le Père en nom de Jésus	806,14568,19422
+Prince_de_ce_monde	Personnage	Figure représentant Satan ou les forces du mal	2003,2474,8017,8026,9275,9766,10935,12429,12566,12572,13097,14648,14693,15574,17355,17647,17654,20141
+Vigne	Concept_Théologique	Allégorie utilisée par Jésus pour représenter la relation entre lui, son Père et ses disciples	14730,14737,14812,14828
+Sarment	Concept_Théologique	Allégorie représentant les disciples en tant que branches de la vigne	14746,14759,14798,14870
+Évangile_Selon_Saint_Jean	Livre_Biblique	Auteur présumé : Jean, Date de rédaction : fin du 1er siècle, Langue originale : Grec	0,129,867,1687,2557,3466,4258,5091,5996,6810,7474,8267,9199,10145,10904,11811,12509,13343,14184,15062,15832,16718,17545,18401,19074,19896
+Le_Paraclet	Concept_Théologique	Origine : Promesse de Jésus, Interprétations : Consolateur, Esprit de Vérité, Implications : Présence divine continue avec les croyants	14566,15329,15502
+Les_disciples	Personnage	Époque : 1er siècle, Rôle : Apôtres et suiveurs de Jésus, Lignée : Divers	2312,3200,15128,19340,19375,19777
+Le_Père	Concept_Théologique	Origine : Concept trinitaire chrétien, Interprétations : Dieu le Père, Implications : Source de la création et figure divine	2515,3011,3049,3063,3706,4188,4216,4237,4266,4275,4352,4556,4575,5392,5606,5740,5775,5823,5836,6036,6048,6075,6236,7880,8149,10139,10152,10203,10469,10590,10654,10662,13013,13048,13101,13143,14141,14174,14181,14198,14223,14236,14287,14303,14333,14571,14654,14713,14720,14925,15402,15559,15652,15736,15999,16040,16123,17041,17082,19275,19399
+Le_Mauvais	Personnage	Époque : Indéfinie, Rôle : Adversaire du bien et de Dieu, Lignée : Spirituelle	
+Le_fils_de_perdition	Personnage	Époque : 1er siècle, Rôle : Traître, Lignée : Divers	431,987,1058,1145,1209,2060,2077,2518,3564,4162,4182,4191,4228,4256,4271,4342,5384,5683,5733,5966,6145,6331,8126,8282,8290,9701,10611,10831,11222,12381,12633,12641,12703,13133,13693,13783,14308,16469,17979,19662,19717,20053,20095,20132
+Judas_Iscariot	Personnage	Un des douze disciples de Jésus, connu pour l'avoir trahi	11979,13131
 Cédron	Lieu	Torrent près de Jérusalem	16809
-Jardin	Lieu	Endroit où Jésus fut arrêté, probablement Gethsémani	16815,17439,18834,18845
-Cohorte	Personnage	Groupe de soldats romains	16849,17059
+Jardin	Lieu	Lieu où Jésus fut arrêté	16815,17439,18834,18845
+Grands_Prévots	Personnage	Autorités religieuses juives qui ont participé à l'arrestation de Jésus	
 Malchus	Personnage	Serviteur du grand prêtre dont l'oreille fut coupée par Pierre	17023
-Anne	Personnage	Ancien grand prêtre juif	17051,17077
-Pilate	Personnage	Gouverneur romain qui présida au jugement de Jésus	17455,17574,17865,17908,17935,17984,18088,18177,18319,18622,18762,18770
-Prétoire	Lieu	Résidence officielle du gouverneur romain	17464,17473,17580,17999
-Barabbas	Personnage	Prisonnier libéré à la place de Jésus	17802
-César	Personnage	Empereur romain mentionné comme autorité suprême	18109,18117,18198
-Golgotha	Lieu	Lieu de crucifixion de Jésus, aussi appelé lieu du Crâne	18235
-Marie_de_Magdala	Personnage	Disciple de Jésus, première à voir le Christ ressuscité	18473,18889,19301
-Disciple_Bien_Aimé	Personnage	Disciple de Jésus à qui il confie sa mère	
-Joseph_d'Arimathie	Personnage	Disciple secret de Jésus qui s'occupe de son ensevelissement	18746
-Crucifixion	Événement	Exécution de Jésus sur la croix	
-Préparation	Événement	Jour précédant le sabbat, contexte de la crucifixion	18144,18596,18860
-Tombeau	Lieu	Lieu où le corps de Jésus fut déposé après sa crucifixion	11063,11317,11443,12254,18847,18865,18880,18897,18910,18938,18961,18984,19011,19052,19096,19111
-Mer_de_Tibériade	Lieu	Autre nom du lac de Galilée	4807,5265,19683,19700
-Zébédée	Personnage	Père de Jacques et Jean, deux apôtres de Jésus	19719
-Pierre	Personnage	Apôtre de Jésus, également nommé Simon fils de Jean	1001,1032,1314,6256,7618,11449,11458,11505,17027,17056,17146,17176,17187,17234,17426,17446,18907,18973,19850,20138,20238,20254,20292,20344
-Évangile_Selon_Jean	Livre_Biblique	Quatrième évangile du Nouveau Testament	0,129,867,1687,2557,3466,4258,5091,5996,6810,7474,8267,9199,10145,10904,11811,12509,13343,14184,15062,15832,16718,17545,18401,19074,19896
-Evangile_Selon_Saint_Jean	raconte:3	Jésus L'évangile relate la vie et les enseignements de Jésus	
-Jean_Baptiste	prophétise:3	Jésus Jean annonce la venue de Jésus comme le Messie	
-Jean_Baptiste	précède:3	Jésus Jean prépare la venue de Jésus	
-Jésus	succède:3	Moïse Jésus apporte la grâce et la vérité après la Loi de Moïse	
-Jésus	symbolise:3	Verbe Jésus est présenté comme l'incarnation du Verbe divin	
-André	appartient_à:2	Jésus André devient disciple de Jésus	
-Simon-Pierre	appartient_à:2	Jésus Simon-Pierre devient disciple de Jésus	
-Philippe	appartient_à:2	Jésus Philippe devient disciple de Jésus	
-Nathanaël	appartient_à:2	Jésus Nathanaël devient disciple de Jésus	
-André	descend_de:2	Jean André est présenté comme le fils de Jean	
-Simon-Pierre	descend_de:2	Jean Simon-Pierre est présenté comme le fils de Jean	
-Jésus	descend_de:2	Joseph Jésus est présenté comme le fils de Joseph	
-Béthanie	situé_dans:2	Jourdain Béthanie est décrite comme étant au-delà du Jourdain	
-André	contemporain_de:2	Simon-Pierre André et Simon-Pierre sont présentés comme frères	
-Bethsaïde	lieu_de:2	André Bethsaïde est mentionnée comme la ville d'André	
-Bethsaïde	lieu_de:2	Simon-Pierre Bethsaïde est mentionnée comme la ville de Pierre	
-Nazareth	lieu_de:2	Jésus Jésus est présenté comme originaire de Nazareth	
-Nathanaël	mentionne:2	Fils_de_Dieu Nathanaël reconnaît Jésus comme le Fils de Dieu	
-Nathanaël	mentionne:2	Roi_d_Israël Nathanaël reconnaît Jésus comme le Roi d'Israël	
-Jésus	précède:2	Philippe Jésus dit avoir vu Nathanaël avant que Philippe ne l'appelle	
-Jésus	accomplit:3	Événement Jésus change l'eau en vin à Cana, son premier miracle	
-Marie	mentionne:2	Jésus Marie informe Jésus du manque de vin aux noces	
-Jésus	succède:2	Capharnaüm Jésus se rend à Capharnaüm après les noces de Cana	
-Jésus	précède:2	Jérusalem Jésus monte à Jérusalem pour la Pâque	
-Jésus	mentionne:2	Temple Jésus appelle le Temple la maison de son Père	
-Nicodème	mentionne:2	Jésus Nicodème reconnaît Jésus comme un maître envoyé par Dieu	
-Jésus	interprète:2	Concept_Théologique Jésus explique à Nicodème la nécessité de naître d'en haut	
-Jésus	mentionne:2	Moïse Jésus fait référence à Moïse élevant le serpent dans le désert	
-Jésus	succède:2	Judée Jésus se rend en Judée après son entretien avec Nicodème	
-Jean	contemporain_de:2	Jésus Jean baptise en même temps que le ministère de Jésus en Judée	
-Jean_Baptiste	précède:3	Jésus Jean baptise avant Jésus et annonce sa venue	
-Jean_Baptiste	mentionne:3	Jésus Jean parle de Jésus comme celui qui vient après lui	
-Jésus	succède:3	Jean_Baptiste Jésus commence son ministère après Jean	
-Aenon	situé_dans:2	Samarie Aenon est décrit comme étant près de Salim	
-Jean_Baptiste	baptise:3	Peuple Jean baptise les gens qui viennent à lui	
-Jésus	traverse:2	Samarie Jésus passe par la Samarie en allant de Judée en Galilée	
-Jacob	ancêtre_de:2	Samaritains Les Samaritains considèrent Jacob comme leur ancêtre	
-Jésus	rencontre:3	Samaritaine Jésus parle avec une femme samaritaine au puits	
-Jésus	interprète:3	Eau_Vive Jésus utilise l'eau vive comme métaphore spirituelle	
-Jésus	symbolise:3	Messie Jésus s'identifie comme le Messie attendu	
-Samaritains	croient_en:3	Jésus Beaucoup de Samaritains croient en Jésus après l'avoir entendu	
-Jésus	quitte:2	Judée Jésus part de Judée pour aller en Galilée	
-Jésus	arrive_à:2	Galilée Jésus se rend en Galilée après avoir quitté la Judée	
-Jésus	précède:2	Galilée Jésus arrive en Galilée après avoir été en Judée	
-Jésus	raconte:3	Cana Jésus retourne à Cana où il avait changé l'eau en vin	
-Jésus	raconte:3	Capharnaüm Jésus guérit à distance le fils d'un fonctionnaire de Capharnaüm	
-Jésus	précède:2	Jérusalem Jésus monte à Jérusalem pour une fête juive	
-Jésus	raconte:3	Bethesda Jésus guérit un infirme à la piscine de Bethesda	
-Jésus	interprète:3	Sabbat Jésus défie l'interprétation stricte du sabbat en guérissant	
-Jésus	symbolise:3	Fils Jésus se présente comme le Fils de Dieu	
-Père	symbolise:3	Dieu Le Père représente Dieu dans le discours de Jésus	
-Jean	précède:2	Jésus Jean-Baptiste a témoigné de Jésus avant lui	
-Écritures	témoigne:3	Jésus Les Écritures rendent témoignage à Jésus selon ses paroles	
-Jésus	vient_au_nom_de:3	Dieu Jésus affirme venir au nom de son Père	
-Moïse	écrit_sur:3	Jésus Jésus affirme que Moïse a écrit à son sujet	
-Jésus	précède:2	Pâque L'événement de la multiplication des pains se produit peu avant la Pâque	
-Jésus	réalise:3	Multiplication_des_Pains Jésus multiplie les pains pour nourrir la foule	
-Jésus	réalise:3	Marche_sur_les_Eaux Jésus marche sur la mer pour rejoindre ses disciples	
-Jésus	se_rend_à:2	Capharnaüm Jésus se rend à Capharnaüm où il prononce un discours	
-Jésus	affirme_être:3	Pain_de_Vie Jésus se déclare être le pain de vie	
-Dieu	envoie:3	Jésus Jésus affirme à plusieurs reprises être envoyé par le Père	
-Jésus	descend_de:3	Dieu Jésus affirme être descendu du ciel, envoyé par Dieu	
-Jésus	symbolise:3	Pain_De_Vie Jésus se présente comme le pain de vie donnant la vie éternelle	
-Jésus	descend_de:2	Père Jésus affirme venir d'auprès du Père	
-Jésus	appartient_à:2	Douze Jésus a choisi les Douze comme disciples proches	
-Simon_Pierre	appartient_à:2	Douze Simon-Pierre fait partie des douze apôtres	
-Judas	appartient_à:2	Douze Judas est mentionné comme l'un des Douze	
-Jésus	prophétise:2	Judas Jésus prédit la trahison de Judas	
-Jésus	enseigne:3	Temple Jésus enseigne dans le Temple pendant la fête	
-Jésus	précède:2	Fête_Des_Tentes Jésus monte à Jérusalem pour la fête des Tentes	
-Moïse	donne:2	Loi Jésus mentionne que Moïse a donné la Loi	
-Jésus	interprète:2	Loi Jésus discute de l'interprétation de la Loi concernant le sabbat	
-Christ	mentionne:2	Jésus La foule s'interroge si Jésus est le Christ	
-Jésus	prophétise:3	Esprit Jésus annonce la venue de l'Esprit	
-David	ancêtre_de:2	Christ Le Christ est dit descendant de David	
-Bethléem	lieu_de:2	David Bethléem est mentionné comme le village de David	
-Nicodème	appartient_à:2	Pharisiens Nicodème est décrit comme l'un des Pharisiens	
-Jésus	précède:2	Mont_des_Oliviers Jésus va au mont des Oliviers	
-Jésus	interprète:3	Loi Jésus interprète la Loi concernant l'adultère	
-Moïse	précède:2	Loi Moïse est mentionné comme ayant prescrit la Loi	
-Jésus	symbolise:3	Lumière Jésus se déclare être la lumière du monde	
-Jésus	descend_de:3	Père Jésus affirme être envoyé par le Père	
-Fils_de_l'homme	symbolise:3	Jésus Jésus utilise ce titre pour se désigner	
-Abraham	précède:2	Jésus Jésus fait référence à Abraham comme lui étant antérieur	
-Jésus	mentionne:2	Abraham Jésus fait référence à Abraham dans son dialogue avec les Juifs	
-Jésus	interprète:3	Vérité Jésus enseigne que la vérité libère	
+Anne	Personnage	Beau-père de Caïphe et ancien grand prêtre	17051,17077
+Pilate	Personnage	Gouverneur romain qui a jugé Jésus	17455,17574,17865,17908,17935,17984,18088,18177,18319,18622,18762,18770
+Barabbas	Personnage	Brigand libéré à la place de Jésus	17802
+Soldats	Personnage	Garde romaine impliquée dans la flagellation et la crucifixion de Jésus	17820,18362,18446,18633,18671
+Grands_Prêtres	Personnage	Autorités juives réclamant la crucifixion de Jésus	7334,11636,11885,12101,16856,17629,17921,18188,18313
+César	Personnage	Empereur romain mentionné par les Juifs	18109,18117,18198
+Le_Dallage	Lieu	Lieu où Pilate siégeait pour le jugement, en hébreu Gabbatha	18136
+Prétoire	Lieu	Lieu où Pilate interrogeait Jésus	17464,17473,17580,17999
+Golgotha	Lieu	Lieu appelé "le Crâne" où Jésus fut crucifié	18235
+Marie_Mère_de_Jésus	Personnage	Mère de Jésus, présente à la crucifixion	13,84,99,454,1003,1232,1263,1437,2246,4827,5304,7744,9685,10316,10484,11451,11599,11960,12125,13060,13072,13653,16160,16791,18456,18522,18751,18768,18809,18871,19127,20045
+Marie_Femme_de_Clopas	Personnage	Femme présente à la crucifixion	2664,18468
+Marie_de_Magdala	Personnage	Disciple de Jésus qui découvre le tombeau vide et voit Jésus ressuscité	18473,18889,19301
+Disciple_Que_Jésus_Aimait	Personnage	Apôtre anonyme dans le texte, souvent identifié comme Jean	3571,3649,5245,5284,6607,7220,10841,11101,11743,11916,11924,12139,13087,13619,13738,18923,19657,19843,20030,20261
+Joseph_d'Arimathie	Personnage	Disciple de Jésus qui demanda son corps à Pilate pour l'ensevelir	18746
+Tombeau_Neuf	Artefact	Tombeau où Jésus fut déposé après la crucifixion	18847
+Vinaigre	Artefact	Liquide donné à boire à Jésus sur la croix	18551,18562,18574
+Autre_Disciple	Personnage	Disciple que Jésus aimait, également impliqué dans la découverte du tombeau vide	17125
+Thomas_Didyme	Personnage	Apôtre de Jésus-Christ qui doute de la résurrection jusqu'à ce qu'il voie Jésus ressuscité	
+Tombeau	Lieu	Endroit où Jésus a été enterré et d'où il est ressuscité	11063,11317,11443,12254,18847,18865,18880,18897,18910,18938,18961,18984,19011,19052,19096,19111
+Anges	Personnage	Êtres célestes qui apparaissent à Marie de Magdala au tombeau	1201,19116
+Mer_de_Tibériade	Lieu	Lieu où Jésus apparaît aux disciples après sa résurrection	4807,5265,19683,19700
+Pierre	Personnage	Apôtre de Jésus, également connu sous le nom de Simon, fils de Jean	1001,1032,1314,6256,7618,11449,11458,11505,17027,17056,17146,17176,17187,17234,17426,17446,18907,18973,19850,20138,20238,20254,20292,20344
+Frères	Peuple	Groupe des premiers chrétiens mentionnés dans le Nouveau Testament	1469,6399,6443,6523,19281,20331
+Jean_Baptiste	mentionne:2	Jésus Jean annonce la venue de Jésus comme l'agneau de Dieu	
+Jésus	vient:3	Monde Le Verbe était au commencement avec Dieu et vient dans le monde	
+Jean_Baptiste	prophétise:2	Jésus Jean annonce celui qui vient après lui, Jésus	
+Moïse	relate:1	Jésus Philippe mentionne Moïse écrivant au sujet de Jésus dans la Loi	
+Jean_Baptiste	baptise:3	Jésus Jean baptise Jésus et témoigne de l'Esprit descendant sur lui	
+André	mentionne:2	Simon_Pierre André annonce à son frère Simon qu'ils ont trouvé le Messie	
+Simon_Pierre	voit:2	Jésus Jésus renomme Simon en Céphas, ce qui signifie Pierre	
+Nazareth	associé_à:1	Jésus Jésus est identifié comme venant de Nazareth par Philippe	
+Philippe	mentionne:2	Nathanaël Philippe invite Nathanaël à rencontrer Jésus	
+Jean_Baptiste	précède:3	Jésus Jean précède Jésus en annonçant sa venue	
+Nathanaèl	mentionne:2	Jésus Nathanaèl reconnaît Jésus comme Rabbi et Fils de Dieu, roi d'Israël	
+Nathanaèl	mentionne:2	Philippe Nathanaèl mentionne Philippe qui l'a appelé	
+Jésus	mentionne:2	Nathanaèl Jésus mentionne avoir vu Nathanaèl sous le figuier	
+Jésus	mentionne:2	Philippe Jésus mentionne Philippe qui a appelé Nathanaèl	
+Jésus	prophétise:2	Nathanaèl Jésus prédit des événements futurs que Nathanaèl verra	
+Jésus	mentionne:2	Figurier Jésus mentionne qu'il a vu Nathanaèl sous le figuier	
+Jésus	mentionne:2	Ciel Jésus mentionne le ciel ouvert	
+Jésus	mentionne:2	Anges Jésus mentionne les anges montant et descendant au-dessus du Fils de l'homme	
+Noces_de_Cana	écrit_par:2	Évangile_selon_Saint_Jean Récit des noces de Cana écrit dans l'Évangile selon Saint Jean	
+Jésus	participe_à:2	Noces_de_Cana Jésus est invité et participe aux noces de Cana	
+Mère_de_Jésus	participe_à:2	Noces_de_Cana La mère de Jésus était aux noces de Cana	
+Servants	participe_à:2	Noces_de_Cana Les servants étaient aux noces de Cana	
+Jarre_de_pierre	utilisé_par:2	Jésus Jarre remplie d'eau par Jésus et changée en vin	
+Maître_du_repas	participe_à:2	Noces_de_Cana Maître du repas qui goûte l'eau changée en vin	
+Jésus	fréquente:2	Capharnaüm Jésus séjourne à Capharnaüm	
+Pâque	accomplit:3	Écriture La Pâque est célébrée conformément à l'Écriture	
+Jésus	purifie:3	Temple Jésus chasse les vendeurs et changeurs du Temple	
+Vendeurs_de_boeufs,_de_brebis_et_de_colombes	présent_dans:2	Temple Vendeurs trouvés dans le Temple	
+Changeurs	présent_dans:2	Temple Changeurs trouvés dans le Temple	
+Fouet_de_cordes	utilisé_par:2	Jésus Jésus utilise un fouet de cordes pour chasser les vendeurs et changeurs	
+Jésus	prophétise:2	Sanctuaire Jésus parle de la destruction et reconstruction du Sanctuaire en trois jours	
+Jésus	prophétise:2	Ressuscitation Jésus prédit sa propre résurrection après trois jours	
+Sanctuaire	symbolise:3	Corps_de_Jésus Jésus utilise le sanctuaire pour symboliser son propre corps	
+Disciples	croient_en:2	Écriture Après la résurrection, les disciples croient à l'Écriture et à la parole de Jésus	
+Nicodème	mentionne:1	Pharisiens Nicodème appartient aux Pharisiens	
+Nicodème	vient_à:2	Jésus Nicodème vient de nuit interroger Jésus	
+Nicodème	questionne:2	Jésus Nicodème interroge Jésus sur la naissance d'en haut	
+Jésus	mentionne:2	Moïse Jésus mentionne Moïse élevant le serpent dans le désert	
+Serpent_élevé_dans_le_désert	symbolise:3	Fils_de_l'homme Le serpent élevé dans le désert symbolise le Fils de l'homme	
+Nicodème	apprend_de:2	Jésus Nicodème reçoit l'enseignement de Jésus	
+Jésus	prophétise:3	Fils_unique_de_Dieu Jésus parle de lui-même comme étant le Fils unique de Dieu	
+Lumière	symbolise:3	Jésus La lumière symbolise Jésus venu dans le monde	
+Ténèbres	contredit:2	Lumière Les ténèbres, opposées à la lumière, sont aimées par ceux dont les œuvres sont mauvaises	
+Judea	fréquenté_par:2	Jésus Jésus séjourne dans la région de Judée avec ses disciples	
+Jean	mentionne:2	Jourdain Lieu où "celui à qui tu as rendu témoignage" baptisait	
+Jean	prophétise:2	Jésus Jean est envoyé avant Jésus et rend témoignage de lui	
+Jean	descend_de:3	Le_Ciel Jean dit qu'un homme ne peut rien recevoir "si cela ne lui a été donné du ciel"	
+Jésus	est_contemporain_de:1	Jean Le ministère de Jésus et celui de Jean se chevauchent	
+Pharisiens	mentionne:2	Jésus Ils apprennent que Jésus faisait beaucoup de disciples	
+Jésus	se_rend:3	Galilée Jésus quitte la Judée pour aller en Galilée	
+Jésus	traverse:2	Samaria Jésus traverse la Samarie	
+Jésus	arrive:3	Sychar Jésus arrive à la ville de Sychar	
+Sychar	est_proche_de:2	Puits_de_Jacob Le puits de Jacob se trouve à Sychar	
+Jacob	descend_de:3	Isaac Patriarche, père de Joseph, mentionné par la femme samaritaine	
+Jacob	donne:2	Terre Jacob a donné la terre à son fils Joseph	
+Jésus	parle:3	Femme_Samaritaine Jésus engage la conversation avec la femme samaritaine près du puits de Jacob	
+Femme_Samaritaine	mentionne:2	Jacob Elle mentionne l'histoire de Jacob et son puits	
+Jésus	parle:2	Disciples Les disciples arrivent et voient Jésus parler à la femme samaritaine	
+Jésus	donne:3	Vie_Éternelle Jésus promet l'eau vive qui donne la vie éternelle	
+Dieu	aime:3	Jésus Le Père aime le Fils et a tout remis dans sa main	
+Jésus	reçoit:3	Esprit Jésus reçoit l'Esprit sans mesure	
+Jésus	parle:3	Pharisiens Les Pharisiens entendent parler de l'activité de Jésus	
+Disciples	prient:3	Jésus Les disciples demandent à Jésus de manger	
+Jésus	évoque:2	Moisson Jésus utilise la métaphore de la moisson pour parler du travail spirituel	
+Moisson	est_récoltée_par:2	Moissonneur Moissonneur est celui qui récolte les fruits du travail spirituel	
+Samaritains	croient:3	Jésus Les Samaritains de la ville croient en lui	
+Jésus	demeure:2	Samaria Les Samaritains demandent à Jésus de rester avec eux	
+Jésus	part:2	Galilée Jésus quitte la Samarie et retourne en Galilée	
+Jean	mentionne:2	Jésus Les écrits de Jean racontent la vie et les actes de Jésus	
+Jésus	accomplit:2	Galilée Jésus réalise plusieurs miracles et enseignements en Galilée	
+Jésus	raconte:2	Cana Cana est mentionnée comme le lieu de plusieurs miracles de Jésus	
+Jésus	raconte:2	Capharnaüm Jésus prêche et réalise des miracles à Capharnaüm	
+Jésus	guérit:2	Fils_du_Fonctionnaire Jésus guérit le fils du fonctionnaire royal à Cana	
+Jésus	monte:2	Jérusalem Jésus monte à Jérusalem pour les fêtes juives et y accomplit des miracles	
+Jésus	guérit:2	Infirme_de_Bethesda Jésus guérit l'infirme à la piscine de Bethesda	
+Jean_le_Baptiste	rend_témoignage:2	Jésus Jean le Baptiste témoigne de Jésus	
+Jugement	accomplit:2	Vie_éternelle Le jugement divin détermine la vie éternelle, selon Jésus	
+Père_tout-puissant	donne:2	Jésus Jésus affirme recevoir son pouvoir de Dieu le Père	
+Jésus	raconte:2	Jugement Jésus parle du jugement dernier et de la résurrection des morts	
+Jean	raconte:3	Jésus L'évangile selon Jean relatant principalement la vie et les enseignements de Jésus	
+Jésus	mentionne:2	Moïse Jésus mentionne Moïse en soulignant sa relation avec les écritures (Jean 5:45-46)	
+Jésus	prophétise:3	Pain_d'orge Multiplication des pains (Jean 6:1-14)	
+Philippe	mentionne:2	Denier Philippe parle des deniers nécessaires pour acheter du pain (Jean 6:7)	
+Mer_de_Galilée	situé_dans:2	Capharnaüm Capharnaüm est situé près de la mer de Galilée (Jean 6:17)	
+Moïse	mentionné_dans:2	Pain_du_ciel Moïse mentionné par rapport à la manne donnée dans le désert (Jean 6:31)	
+Jésus	accomplit:3	Pain_du_ciel Jésus s'identifie comme le pain de vie descendant du ciel (Jean 6:35)	
+Jésus_Christ	mentionne:2	Père Jésus parle du Père comme celui qui l'a envoyé	
+Jésus_Christ	mentionne:2	Pain_de_vie Jésus se décrit comme le pain de vie	
+Manne	précède:2	Pain_de_vie La manne dans le désert est comparée au pain descendu du ciel	
+Jésus_Christ	mentionne:2	Vie_Éternelle Jésus annonce que celui qui croit en lui a la vie éternelle	
+Jésus_Christ	mentionne:2	Judas Judas est mentionné comme celui qui trahit Jésus	
+Jésus_Christ	mentionne:2	Simon-Pierre Pierre déclare que Jésus a les paroles de la vie éternelle	
+Jésus_Christ	mentionne:2	Moïse Jésus mentionne la Loi de Moïse et la circoncision	
+Jésus_Christ	dans:2	Galilée Jésus enseigne et accomplit des miracles en Galilée	
+Jésus_Christ	monte:2	Jérusalem Jésus monte en secret à Jérusalem pour la fête des Tentes	
+Jésus_Christ	enseigne:3	Synagogue Jésus donne son enseignement dans une synagogue à Capharnaüm	
+Jésus	raconte:2	Pharisiens Les Pharisiens envoyèrent des gardes pour saisir Jésus (Jean 7:32)	
+Jésus	raconte:2	Nicodème Nicodème défend Jésus devant les Pharisiens (Jean 7:50-51)	
+Pharisiens	mentionne:2	Moïse Les Pharisiens se réfèrent à la Loi de Moïse concernant l'adultère (Jean 8:5)	
+Grecs	mentionne:2	Juifs Les Juifs supputent si Jésus va enseigner aux Grecs (Jean 7:35)	
+Femme_adultère	raconte:2	Pharisiens Les Pharisiens amènent une femme surprise en adultère devant Jésus (Jean 8:3-4)	
+Temple	mentionne:2	Trésor Jésus prononce des paroles au Trésor du Temple (Jean 8:20)	
+Jésus	mentionne:2	David Discussions sur la provenance de Jésus par rapport à David (Jean 7:42)	
+Bethléem	mentionne:2	David Bethléem mentionné comme lieu attendu de la naissance du Christ (Jean 7:42)	
+Jésus	prophétise:2	Pharisiens Jésus annonce qu'ils mourront dans leur péché s'ils ne croient pas en lui (Jean 8:24)	
+Jésus	raconte:2	Pharisiens Jésus déclare être la lumière du monde (Jean 8:12)	
+Jésus	raconte:2	Femme_adultère Jésus pardonne à la femme adultère (Jean 8:10-11)	
+Évangile_Jean	raconte:3	Jésus Récit de la vie et des enseignements de Jésus	
+Jésus	prophétise:2	Vérité Jésus affirme que la vérité libérera les croyants	
+Jésus	mentionne:2	Abraham Jésus parle de la descendance d'Abraham	
+Jésus	mentionne:2	Dieu Jésus indique qu'il a été envoyé par Dieu	
+Jésus	mentionne:2	Diable Jésus décrit le diable comme le père du mensonge	
+Jésus	mentionne:2	Disciples Jésus parle de ses disciples et de ceux qui suivent sa parole	
 Juifs	descend_de:3	Abraham Les Juifs se déclarent descendants d'Abraham	
-Jésus	contredit:2	Juifs Jésus remet en question la compréhension des Juifs de leur héritage abrahamique	
-Jésus	accomplit:2	Guérison Jésus guérit un aveugle-né	
-Pharisiens	interprète:2	Sabbat Les Pharisiens questionnent la guérison de Jésus le jour du sabbat	
-Jésus	précède:3	Abraham Jésus affirme son existence avant Abraham	
-Temple	lieu_de:2	Enseignement Jésus enseigne dans le Temple	
-Siloé	lieu_de:2	Guérison L'aveugle-né se lave et recouvre la vue à Siloé	
-Jésus	raconte:3	Parabole_Bon_Pasteur Jésus utilise cette parabole pour enseigner sur sa mission	
-Jésus	précède:2	Fête_De_La_Dédicace Jésus enseigne avant et pendant cette fête	
-Jésus	mentionne:2	Moïse Jésus fait référence à Moïse dans son argumentation	
-Aveugle_Né	appartient_à:2	Juifs L'homme guéri fait partie du peuple juif	
-Juifs	contemporain_de:2	Pharisiens Les deux groupes sont présents et interagissent dans le récit	
-Jésus	symbolise:3	Bon_Pasteur Jésus s'identifie au bon pasteur dans sa parabole	
-Guérison_Aveugle_Né	précède:2	Parabole_Bon_Pasteur Le miracle est raconté avant l'enseignement de la parabole	
-Jésus	mentionne:2	Père Jésus fait plusieurs références à Dieu comme son Père	
-Temple	contient:2	Portique_De_Salomon Le portique est mentionné comme faisant partie du Temple	
-Fête_De_La_Dédicace	situé_dans:2	Jérusalem La fête est explicitement située à Jérusalem	
-Jésus	symbolise:3	Résurrection Jésus se déclare être la résurrection	
-Jésus	raconte:3	Résurrection Jésus ressuscite Lazare	
-Jean	précède:2	Jésus Jean a baptisé avant la venue de Jésus	
-Lazare	appartient_à:2	Béthanie Lazare est décrit comme étant de Béthanie	
-Marie	appartient_à:2	Béthanie Marie est décrite comme habitant Béthanie	
-Marthe	appartient_à:2	Béthanie Marthe est décrite comme habitant Béthanie	
-Jésus	se_retire_vers:2	Jourdain Jésus se retire au-delà du Jourdain	
-Béthanie	situé_dans:2	Judée Béthanie est près de Jérusalem, en Judée	
-Béthanie	proche_de:2	Jérusalem Béthanie est décrite comme proche de Jérusalem	
-Thomas	appartient_à:2	Jésus Thomas est l'un des disciples de Jésus	
-Caïphe	appartient_à:2	Pharisiens Caïphe est décrit comme grand prêtre parmi les Pharisiens	
-Pharisiens	s'oppose_à:3	Jésus Les Pharisiens cherchent à arrêter Jésus	
-Romains	menace:2	Jérusalem Les Juifs craignent que les Romains ne détruisent leur ville	
-Jésus	symbolise:3	Fils_de_Dieu Jésus se déclare être le Fils de Dieu	
-Jean	raconte:3	Jésus L'évangile relate les événements de la vie de Jésus	
-Jésus	précède:3	Pâque Les événements se déroulent avant la Pâque	
-Jésus	se_rend_à:2	Jérusalem Jésus se rend à Jérusalem pour la Pâque	
-Jésus	se_rend_à:2	Béthanie Jésus vient à Béthanie six jours avant la Pâque	
-Jésus	ressuscite:3	Lazare Jésus a ressuscité Lazare d'entre les morts	
-Marie	oint:3	Jésus Marie oint les pieds de Jésus avec du parfum	
-Judas_Iscariote	critique:2	Marie Judas critique l'utilisation du parfum coûteux	
-Grands_Prêtres	complotent_contre:3	Jésus Les grands prêtres décident de tuer Jésus	
-Pharisiens	s'opposent_à:2	Jésus Les Pharisiens s'inquiètent de la popularité de Jésus	
-Grecs	cherchent:2	Jésus Des Grecs demandent à voir Jésus	
-Philippe	informe:2	André Philippe informe André de la demande des Grecs	
-André	informe:2	Jésus André et Philippe informent Jésus de la demande des Grecs	
-Jésus	prophétise:3	Jésus Jésus annonce sa mort et sa glorification	
-Isaïe	prophétise:3	Jésus Les paroles d'Isaïe sont appliquées à Jésus	
-Jésus	symbolise:3	Lumière Jésus se décrit comme la lumière venue dans le monde	
-Jésus	descend_de:3	Père Jésus affirme avoir été envoyé par le Père	
-Judas_Iscariote	descend_de:2	Simon Judas est décrit comme le fils de Simon	
-Jésus	prophétise:3	Trahison_de_Judas Jésus annonce que l'un des disciples le livrera	
-Simon-Pierre	contemporain_de:2	Jésus Simon-Pierre interagit directement avec Jésus	
-Satan	influence:2	Judas_Iscariote Satan entre en Judas après que Jésus lui donne la bouchée	
-Jésus	prophétise:3	Reniement_de_Pierre Jésus prédit que Pierre le reniera trois fois	
-Jésus	symbolise:2	Fils_de_l'homme Jésus utilise ce titre pour parler de lui-même	
-Jésus	raconte:2	Lavement_des_pieds Jésus lave les pieds de ses disciples	
-Jésus	prophétise:2	Sa_mort Jésus parle de son départ imminent	
-Évangile_Selon_Saint_Jean	raconte:3	Jésus L'évangile rapporte les paroles et actions de Jésus	
-Jésus	symbolise:3	Vigne_Véritable Jésus se décrit comme la vigne véritable	
-Jésus	descend_de:3	Père Jésus affirme sa relation filiale avec Dieu le Père	
-Thomas	appartient_à:2	Jésus Thomas est présenté comme un disciple de Jésus	
-Philippe	appartient_à:2	Jésus Philippe est présenté comme un disciple de Jésus	
-Jésus	prophétise:2	Paraclet Jésus annonce la venue du Paraclet	
-Paraclet	symbolise:3	Esprit_Saint Le Paraclet est identifié comme l'Esprit Saint	
-Père	précède:2	Jésus Jésus indique qu'il va vers le Père	
-Jésus	interprète:2	Concept_Théologique Jésus explique plusieurs concepts théologiques à ses disciples	
-Prince_Du_Monde	symbolise:2	Concept_Théologique Le Prince du monde représente une force opposée à Jésus	
-Paraclet	symbolise:3	Esprit_De_Vérité Le Paraclet est explicitement identifié comme l'Esprit de vérité	
-Jésus	envoie:3	Paraclet Jésus affirme qu'il enverra le Paraclet	
-Père	envoie:3	Paraclet Le Paraclet vient du Père	
-Paraclet	témoigne:3	Jésus Le Paraclet rendra témoignage à Jésus	
-Disciples	témoignent:3	Jésus Les disciples témoigneront aussi de Jésus	
-Jésus	prophétise:3	Persécution_Des_Disciples Jésus annonce l'exclusion et la persécution future des disciples	
-Jésus	précède:3	Paraclet Jésus doit partir pour que le Paraclet vienne	
-Paraclet	succède:3	Jésus Le Paraclet viendra après le départ de Jésus	
-Paraclet	interprète:3	Vérité Le Paraclet introduira les disciples dans la vérité tout entière	
-Jésus	appartient_à:3	Père Jésus affirme que tout ce qu'a le Père est à lui	
-Jésus	prophétise:3	Retour_De_Jésus Jésus annonce son retour prochain	
-Disciples	appartiennent_à:3	Père Jésus dit que les disciples appartiennent au Père	
-Jésus	prie:3	Père Jésus adresse une prière au Père	
-Jésus	prophétise:3	Glorification_De_Jésus Jésus demande au Père de le glorifier	
-Disciples	n'appartiennent_pas:3	Monde Jésus affirme que ses disciples ne sont pas du monde	
-Père	protège:3	Disciples Jésus demande au Père de garder les disciples du Mauvais	
-Jésus	précède:3	Disciples Jésus guide ses disciples	
-Jésus	symbolise:3	Vérité Jésus se présente comme la vérité incarnée	
-Jésus	appartient_à:2	Père Jésus affirme son unité avec le Père	
-Disciples	appartient_à:3	Jésus Les disciples suivent Jésus	
-Judas	appartient_à:3	Disciples Judas était l'un des disciples de Jésus	
-Simon-Pierre	appartient_à:3	Disciples Simon-Pierre était l'un des principaux disciples	
-Jésus	raconte:3	Arrestation Le texte relate l'arrestation de Jésus	
-Judas	précède:3	Cohorte Judas guide la cohorte vers Jésus	
-Anne	précède:2	Caïphe Jésus est d'abord mené chez Anne, puis chez Caïphe	
-Caïphe	précède:2	Pilate Après Caïphe, Jésus est mené devant Pilate	
-Jésus	interprète:3	Royaume Jésus explique que son royaume n'est pas de ce monde	
-Pilate	interroge:3	Jésus Pilate interroge Jésus sur sa royauté	
-Pilate	juge:3	Jésus Pilate préside au jugement de Jésus	
-Juifs	demandent:3	Barabbas Les Juifs demandent la libération de Barabbas	
-Grands_Prêtres	s'opposent:3	Jésus Les grands prêtres demandent la crucifixion de Jésus	
-Jésus	crucifié_à:3	Golgotha Jésus est crucifié au lieu dit Golgotha	
-Marie	présente_à:2	Crucifixion Marie est présente lors de la crucifixion de Jésus	
-Marie_de_Magdala	présente_à:2	Crucifixion Marie de Magdala est présente lors de la crucifixion	
-Jésus	confie:3	Marie Jésus confie sa mère au Disciple Bien-Aimé	
-Joseph_d'Arimathie	ensevelit:3	Jésus Joseph d'Arimathie s'occupe de l'ensevelissement de Jésus	
-Nicodème	aide:2	Joseph_d'Arimathie Nicodème aide Joseph d'Arimathie pour l'ensevelissement	
-Crucifixion	précède:2	Pâque La crucifixion a lieu le jour de la Préparation, avant la Pâque	
-Préparation	précède:2	Pâque La Préparation est le jour précédant la Pâque	
-Marie_de_Magdala	mentionne:2	Résurrection Marie découvre le tombeau vide, signe de la résurrection	
-Simon-Pierre	contemporain_de:2	Marie_de_Magdala Ils sont tous deux disciples de Jésus à la même époque	
-Jésus	accomplit:3	Résurrection Jésus apparaît ressuscité à ses disciples	
-Thomas	appartient_à:2	Évangile_Selon_Saint_Jean Thomas est mentionné dans cet évangile	
-Jésus	interprète:2	Résurrection Jésus explique sa résurrection à ses disciples	
-Esprit_Saint	symbolise:2	Résurrection Jésus donne l'Esprit Saint aux disciples après sa résurrection	
-Jésus	précède:2	Père Jésus dit qu'il monte vers le Père	
-Marie_de_Magdala	raconte:2	Résurrection Marie annonce aux disciples qu'elle a vu le Seigneur ressuscité	
-Simon-Pierre	contemporain_de:2	Thomas Ils sont tous deux apôtres de Jésus	
-Mer_de_Tibériade	lieu_de:2	Résurrection Jésus apparaît ressuscité aux disciples près de cette mer	
-Nathanaël	appartient_à:2	Évangile_Selon_Saint_Jean Nathanaël est mentionné dans cet évangile	
-Zébédée	ancêtre_de:1	Disciples Deux des disciples présents sont fils de Zébédée	
-Jésus	ordonne:3	Pierre Jésus ordonne à Pierre de paître ses agneaux et ses brebis	
-Pierre	descend_de:2	Jean Pierre est appelé "Simon, fils de Jean"	
-Jean	raconte:3	Évangile_Selon_Jean Jean est présenté comme l'auteur du témoignage écrit	
-Jésus	prophétise:3	Pierre Jésus prédit le genre de mort par lequel Pierre glorifiera Dieu	
-Jésus	aime:2	Jean Jean est décrit comme "le disciple que Jésus aimait"	
-Pierre	interroge:2	Jésus Pierre questionne Jésus sur le sort de Jean	
-Évangile_Selon_Jean	mentionne:2	Jésus L'évangile rapporte de nombreuses actions de Jésus	
+Pharisiens	mentionne:2	Sabbat Pharisiens s'interrogent sur l'observance du Sabbat	
+Jésus	fait:3	Guérison_d'un_Aveugle Jésus guérit un homme aveugle de naissance en lui appliquant de la boue et en lui demandant de se laver à Siloé	
+Homme_Aveugle	mentionne:2	Jésus L'homme aveugle guéri parle de Jésus comme étant celui qui l'a guéri	
+Homme_Aveugle	mentionne:2	Siloé L'homme aveugle parle de la piscine de Siloé où il a recouvré la vue	
+Juifs	mentionne:2	Abraham Les Juifs disent qu'Abraham est leur père	
+Pharisiens	interrogent:2	Homme_Aveugle Les Pharisiens interrogent l'homme guéri sur sa guérison	
+Parents_Homme_Aveugle	mentionne:2	Homme_Aveugle Les parents de l'homme confirment son état de naissance aveugle	
+Homme_Aveugle	mentionne:2	Prophète L'homme guéri dit que Jésus est un prophète	
+Évangile_Selon_Jean	raconte:3	Guérison_de_l'aveugle_né Récit de la guérison miraculeuse par Jésus	
+Jésus	ripost:3	Aveugle_né Jésus guérit l'homme né aveugle	
+Juifs	menace:3	Parents_de_l'aveugle Les Juifs menaçaient d'exclure quiconque reconnaîtrait Jésus comme le Christ	
+Pécheur	mentionne:2	Jésus Les Juifs accusent Jésus d'être un pécheur	
+Pharisiens	oppose:2	Jésus Les Pharisiens questionnent et s'opposent à Jésus	
+Disciples_de_Jésus	est:3	Aveugle_né L'homme demande aux Pharisiens s'ils veulent devenir eux aussi des disciples de Jésus	
+Moïse	mentionne:2	Jésus Les Juifs se réclament disciples de Moïse en opposition à Jésus	
+Dieu	est_mentionné_par:2	Jésus Jésus affirme être envoyé par Dieu	
+Aveugle_né	est_guéri_par:3	Jésus L'homme né aveugle est guéri par Jésus	
+Pharisiens	interroge:2	Aveugle_né Les Pharisiens interrogent l'homme guéri	
+Parents_de_l'aveugle	mentionne:2	Synagogue Les parents parlent par crainte de l'exclusion de la synagogue	
+Jésus	appelle:2	Disciples_de_Jésus Jésus appelle ses disciples ses brebis	
+Jésus	explique:2	Pharisiens Jésus explique aux Pharisiens leur état spirituel	
+Jésus	parle_au_nom_de:2	Dieu Jésus affirme que ses actes sont au nom de Dieu	
+Pharisiens	interroge:2	Jésus Les Pharisiens demandent à Jésus de se déclarer ouvertement comme le Christ	
+Pharisiens	menace:2	Jésus Les Pharisiens menacent de lapider Jésus	
+Jésus	teaches:2	Portique_de_Salomon Jésus enseigne sous le portique de Salomon	
+Pasteur	mentionne:3	Jésus Jésus utilise la métaphore du bon pasteur pour se décrire	
+Démon	est_rejeté_par:2	Juifs Certains Juifs rejettent l'idée que Jésus ait un démon	
+Jean	précède:2	Lazare Narration de l'évangile selon Jean couvrant cette partie	
+Jésus	est_Fils_de:3	Père Déclaration de Jésus sur sa filiation divine	
+Jésus	fuit_vers:2	Jourdain Jésus se retire au-delà du Jourdain	
+Jean_le_Baptiste	baptise:2	Jourdain Lieu où Jean baptisait	
+Jésus	ressuscite:3	Lazare Jésus ressuscite Lazare selon Jean 11	
+Marie_de_Béthanie	est_sœur_de:3	Lazare Marie est la sœur de Lazare selon Jean 11:2	
+Marthe	est_sœur_de:3	Lazare Marthe est la sœur de Lazare selon Jean 11:2	
+Marie_de_Béthanie	est_sœur_de:3	Marthe Marie est la sœur de Marthe selon Jean 11:2	
+Jésus	aime:2	Lazare Jésus aimait Lazare selon Jean 11:5	
+Marthe	parle_à:2	Jésus Marthe parle à Jésus sur la mort de son frère selon Jean 11:21	
+Marie_de_Béthanie	parle_à:2	Jésus Marie parle à Jésus sur la mort de son frère selon Jean 11:32	
+Jésus	pleure_souvent:2	Jésus Jésus pleura lors de la mort de Lazare selon Jean 11:35	
+Disciples_de_Jésus	accompagnent:2	Jésus Les disciples accompagnent Jésus à Béthanie selon Jean 11:16	
+Thomas	parle_à:2	Disciples_de_Jésus Thomas encourage les disciples à aller avec Jésus selon Jean 11:16	
+Pharisiens	sont_informés:2	Jésus Les pharisiens sont informés des miracles de Jésus selon Jean 11:46	
+Pharisiens	conseillent:2	Pharisiens Les pharisiens réunissent un conseil contre Jésus selon Jean 11:47	
+Caïphe	parle_à:2	Pharisiens Caïphe parle aux pharisiens selon Jean 11:49	
+Caïphe	prophétise:2	Jésus Caïphe prophétisa que Jésus allait mourir pour la nation	
+Jésus	rassemble:2	Enfant_de_Dieu Jésus devait rassembler dans l'unité les enfants de Dieu dispersés	
+Pharisiens	résolurent_de_tuer:2	Jésus Les Pharisiens résolurent de tuer Jésus	
+Jésus	séjourne:2	Éphraïm Jésus se retire dans Éphraïm avec ses disciples	
+Marthe	sert:2	Jésus Marthe servait lors d'un repas en l'honneur de Jésus	
+Marie_de_Béthanie	oint:2	Jésus Marie de Béthanie oint les pieds de Jésus avec du parfum	
+Judas_Iscariote	trahit:2	Jésus Judas l'Iscariote allait livrer Jésus	
+Lazare	ressuscité_par:2	Jésus Jésus ressuscite Lazare d'entre les morts	
+Jérusalem	témoin:2	Jésus La foule venue à Jérusalem pour la fête apprit que Jésus venait	
+Pharisiens	informent:2	Jésus Les Pharisiens ordonnèrent que quiconque sachant où était Jésus devait le leur indiquer	
+Judas_Iscariote	informé_par:2	Caïphe Caïphe et les Pharisiens informèrent Judas de leur désir de trouver Jésus	
+Pâque	proximité:2	Jésus La Pâque étant proche, Jésus vint à Béthanie	
+Jésus	célèbre:2	Pâque Jésus célébra la Pâque juive à Jérusalem	
+Hosanna	cri_de:2	Foule Lors de l'entrée de Jésus à Jérusalem, la foule criait "Hosanna"	
+Philippe	intermédiaire:2	Grecs Les Grecs demandèrent à Philippe de voir Jésus	
+Philippe	soumet:2	Jésus Philippe et André soumettent la demande des Grecs à Jésus	
+Jésus	annonce:2	André_et_Philippe Jésus annonce à André et Philippe que l'heure de sa glorification est venue	
+Jésus	comprend:2	Disciples Les disciples comprirent l'accomplissement des prophéties après la glorification de Jésus	
+Jésus	prédit:2	Disciples Jésus prédit que le Fils de l'homme doit être élevé de terre	
+Jésus	prédit:2	Mort Jésus signifiait par là de quelle mort il allait mourir	
+Isaïe	prophétise:2	Aveuglement Isaïe a dit : "Il a aveuglé leurs yeux et endurci leur cœur"	
+Jésus	accomplit:2	Prophétie_d'Isaïe Jésus accomplissait la parole d'Isaïe	
+Prince_de_ce_Monde	jeté_dehors:2	Jésus Jésus annonce que le Prince de ce Monde va être jeté dehors	
+Pharisiens	mentionne:2	Évangile_Jean Les Pharisiens sont mentionnés dans le contexte de la peur d'exclusion de la synagogue	
+Simon-Pierre	mentionne:2	Évangile_Jean Simon-Pierre est mentionné dans le contexte de la réaction au lavement des pieds par Jésus	
+Judas_Iscariote	mentionne:2	Évangile_Jean Judas Iscariote est mentionné dans le contexte de sa trahison envers Jésus	
+Disciples	mentionne:2	Évangile_Jean Les disciples sont mentionnés dans le contexte du dernier repas de Jésus	
+Jésus_Christ	mentionne:2	Évangile_Jean C'est Jésus qui parle et agit tout au long du passage	
+Dieu_Père	mentionne:2	Évangile_Jean Jésus parle du Père qui l'a envoyé et de son unité avec Lui	
+Jésus_Christ	descend_de:3	Dieu_Père Jésus déclare qu'Il est envoyé par le Père	
+Évangile_Jean	raconte:3	Dernier_Repas L'Évangile selon Jean raconte le dernier repas de Jésus avec ses disciples	
+Évangile_Jean	raconte:3	Lavement_des_Pieds L'Évangile selon Jean raconte le lavement des pieds par Jésus	
+Évangile_Jean	raconte:3	Trahison_Judas L'Évangile selon Jean raconte la trahison de Judas	
+Évangile_Jean	raconte:3	Adieux_Jésus L'Évangile selon Jean raconte les adieux de Jésus à ses disciples	
+Jésus	est_le_chemin:2	Père Jésus est présenté comme le chemin vers le Père	
+Jésus	est_la_vérité:2	Père Jésus est présenté comme la vérité en relation avec le Père	
+Jésus	est_la_vie:2	Père Jésus est présenté comme la vie en relation avec le Père	
+Jésus	descend_de:3	Père Jésus est décrit comme étant dans le Père et le Père en lui	
+Jésus	nomme:1	Paraclet Jésus prophétise l'envoi du Paraclet	
+Esprit_Saint	est_envoyé_par:2	Père Le Père envoie l'Esprit Saint en nom de Jésus	
+Jésus	nomme:1	Esprit_Saint L'Esprit Saint est également nommé Paraclet par Jésus	
+Sarment	accomplit:1	Vigne Les disciples (sarments) doivent demeurer en Jésus (la vigne) pour porter du fruit	
+Disciples	appartient_à:3	Jésus Les disciples sont décrits comme étant choisis par Jésus	
+Jésus	prend_en_haine:2	Prince_de_ce_monde Le Prince de ce monde n’a pas de pouvoir sur Jésus	
+Évangile_Selon_Saint_Jean	raconte:3	Jésus_Christ Relation entre le livre et la figure centrale du texte	
+Évangile_Selon_Saint_Jean	raconte:3	Le_Paraclet L'Évangile parle du Paraclet comme un concept théologique important	
+Évangile_Selon_Saint_Jean	raconte:3	Les_disciples Les disciples sont des figures récurrentes dans l'Évangile selon Saint Jean	
+Jésus_Christ	prévoit:2	Le_Paraclet Jésus annonce l'arrivée du Paraclet pour après son départ vers le Père	
+Jésus_Christ	prophétise:2	Le_fils_de_perdition Seul un des disciples, appelé le fils de perdition, se perdra selon Jésus	
+Les_disciples	sont_exclus:2	Lieu Les disciples seront exclus des synagogues	
+Jésus_Christ	souffre:1	Le_Mauvais Jésus demande au Père de protéger ses disciples du Mauvais	
+Évangile_Jean	mentionne:2	Jésus Le texte de l'Évangile selon Saint Jean raconte la vie de Jésus	
+Jésus	prophétise:2	Disciples Jésus envoie ses disciples dans le monde (Jean 17:18)	
+Jésus	prophétise:2	Père Jésus parle de son unité avec le Père (Jean 17:21)	
+Judas_Iscariot	descend_de:3	Disciples Judas faisait partie des disciples de Jésus (Jean 18:2)	
+Simon-Pierre	rabjure:2	Jésus Pierre renie Jésus (Jean 18:17, 18:25-27)	
+Jésus	mentionne:2	Malchus Jésus mentionne Malchus lorsqu'il dit à Pierre de ranger son épée (Jean 18:10-11)	
+Anne	est_principal:2	Jésus Anne interroge Jésus (Jean 18:13)	
+Caïphe	rôle:2	Grand_Prévots Caïphe joue un rôle clé dans le procès de Jésus (Jean 18:24)	
+Grands_Prévots	accuse:2	Jésus Les Grands Prévozts accusaient Jésus devant Pilate (Jean 18:30)	
+Pilate	juge:2	Jésus Pilate questionne et juge Jésus (Jean 18:33-37)	
+Pilate	raconte:2	Flagellation_De_Jésus Pilate ordonne de flageller Jésus	
+Soldats	réalise:2	Flagellation_De_Jésus Les soldats flagellent Jésus	
+Jésus	portait:2	Couronne_d'Épines Les soldats placent une couronne d'épines sur la tête de Jésus	
+Couronne_d'Épines	symbolise:3	Roi_des_Juifs Représentation moqueuse de Jésus en tant que roi	
+Pilate	mentionne:2	Roi_des_Juifs Pilate appelle Jésus "le roi des Juifs"	
+Jésus	qq_mot_de_père:3	Marie_Mère_de_Jésus Identifiée par Jésus comme "femme" lors de la crucifixion	
+Disciple_Que_Jésus_Aimait	accueillit:2	Marie_Mère_de_Jésus Le disciple prend Marie chez lui après la crucifixion	
+Joseph_d'Arimathie	raconte:2	Enlèvement_du_Corps Joseph demande à Pilate le corps de Jésus pour l'ensevelir	
+Joseph_d'Arimathie	réalise:2	Enlèvement_du_Corps Joseph enlève le corps de Jésus	
+Nicodème	apporte:2	Aromates Nicodème apporte des aromates pour la sépulture de Jésus	
+Joseph_d'Arimathie	entient:2	Enveloppement_du_Corps Joseph enveloppe le corps de Jésus avec des linges et des aromates	
+Tombeau_Neuf	lié:2	Sépulture_de_Jésus Tombeau utilisé pour la sépulture de Jésus	
+Soldats	partage:2	Vêtements_de_Jésus Les soldats se partagent les vêtements de Jésus et tirent au sort sa tunique	
+Marie_de_Magdala	raconte:2	Tombeau Marie découvre le tombeau vide et informe Simon-Pierre	
+Autre_Disciple	mentionne:2	Jésus_Christ L'autre disciple court avec Simon-Pierre au tombeau et reconnaît la résurrection de Jésus	
+Simon-Pierre	mentionne:2	Tombeau Simon-Pierre entre dans le tombeau et voit les linges et le suaire	
+Jésus_Christ	apparaît_à:2	Marie_de_Magdala Jésus apparaît à Marie de Magdala près du tombeau	
+Jésus_Christ	apparaît_à:2	Disciples Jésus apparaît aux disciples le jour de sa résurrection	
+Thomas_Didyme	mentionne:1	Disciples Les disciples disent à Thomas qu'ils ont vu le Seigneur ressuscité	
+Jésus_Christ	apparaît_à:2	Thomas_Didyme Jésus apparaît à Thomas huit jours après sa résurrection et lui montre ses plaies	
+Marie_de_Magdala	annonce:2	Disciples Marie de Magdala annonce aux disciples qu'elle a vu Jésus ressuscité	
+Jésus_Christ	apparaît_à:2	Disciples Jésus se manifeste aux disciples sur le bord de la mer de Tibériade	
+Jean	raconte:3	Jésus L'évangile de Jean rapporte les faits liés à Jésus	
+Pierre	mentionne:2	Jésus Pierre exprime son amour pour Jésus trois fois dans le texte	
+Jésus	prophétise:3	Pierre Jésus prédit la manière dont Pierre va mourir pour glorifier Dieu	
+Pierre	mentionne:2	Disciple_Que_Jésus_Aimait Pierre pose des questions à Jésus sur le disciple que Jésus aimait	
+Disciple_Que_Jésus_Aimait	mentionne:2	Jésus Le disciple que Jésus aimait écrit et témoigne des faits sur Jésus	
+Frères	mentionne:2	Disciple_Que_Jésus_Aimait Les frères répandent le bruit que le disciple que Jésus aimait ne mourrait pas	
