@@ -25,3 +25,4 @@ Thumbs.db
 *.log
 # Configuration files with sensitive information
 config.yaml
+code.json
