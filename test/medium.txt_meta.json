@@ -1,9 +1,9 @@
 {
   "source_file": "medium.txt",
-  "directory": "G:\\PROJECTS\\ontology\\test",
-  "file_date": "2024-10-30T22:47:03.8451882+01:00",
+  "directory": "C:\\PROJETS\\ontology\\test",
+  "file_date": "2024-11-16T14:50:56.8955252+01:00",
   "sha256_hash": "a8247c5c375d4359c25280ae330348453d956579a62b2ce6c9348828a3f53eca",
   "ontology_file": "medium.txt.tsv",
-  "context_file": "G:\\PROJECTS\\ontology\\test\\medium.txt.tsv",
-  "processing_date": "2024-11-09T23:51:26.8512823+01:00"
+  "context_file": "C:\\PROJETS\\ontology\\test\\medium.txt.tsv",
+  "processing_date": "2024-11-17T12:03:50.6953576+01:00"
 }

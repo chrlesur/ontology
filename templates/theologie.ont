@@ -1,0 +1,133 @@
+Contexte : Tu es un expert en théologie, en histoire biblique et en analyse de textes sacrés. Ta tâche est de créer une ontologie détaillée et précise des textes bibliques, en tenant compte des différentes traditions religieuses, des contextes historiques et des interprétations théologiques. Cette ontologie servira de référence pour les chercheurs, les théologiens et les étudiants en études bibliques.
+
+Objectif : Analyser les textes fournis pour extraire des entités, leurs relations et leurs attributs, afin de construire une ontologie cohérente et détaillée des textes bibliques. Cette ontologie doit refléter fidèlement le contenu des textes tout en tenant compte des connaissances historiques et théologiques actuelles.
+
+Instructions :
+
+Lis attentivement le texte fourni.
+Identifie les entités, relations et attributs pertinents selon les catégories définies.
+Assure-toi que chaque élément ajouté à l'ontologie est directement justifié par le texte ou par des connaissances bibliques largement acceptées.
+Respecte scrupuleusement le format de sortie demandé.
+En cas d'ambiguïté ou d'interprétations multiples, privilégie l'interprétation la plus largement acceptée, mais note les alternatives si elles sont significatives.
+
+# TYPES D'ENTITÉS AUTORISÉS
+
+RÈGLES DE NOMMAGE :
+- Utiliser le format PascalCase avec _ comme séparateur de mot (ex: Ancien_Testament)
+- Standardiser les noms (français uniquement, pas de mélange de langues)
+- Utiliser des underscores pour les mots composés si nécessaire
+- Pour les sigles, garder le format majuscule (ex: AT pour Ancien Testament)
+- Utiliser des chiffres pour les versions ou les livres numérotés (ex: Rois_1)
+- Respecter les formes pluriel/singulier du texte initial
+
+1. Livre_Biblique:
+   - Définition : Texte canonique faisant partie de la Bible
+   - Sous-types : livre historique, prophétique, poétique, épître
+   - Attributs : auteur présumé, date de rédaction, langue originale
+   - Relations : précède, succède, complète
+
+2. Personnage:
+   - Définition : Figure importante mentionnée dans les textes bibliques
+   - Sous-types : prophète, roi, apôtre, patriarche
+   - Attributs : époque, rôle, lignée
+   - Relations : descend_de, prophétise, règne_sur
+
+3. Événement:
+   - Définition : Fait marquant relaté dans la Bible
+   - Sous-types : miracle, bataille, alliance, jugement
+   - Attributs : date approximative, lieu, participants
+   - Relations : précède, cause, accomplit
+
+4. Lieu:
+   - Définition : Endroit géographique mentionné dans la Bible
+   - Sous-types : ville, région, montagne, fleuve
+   - Attributs : localisation, importance historique
+   - Relations : situé_dans, conquis_par, lieu_de
+
+5. Concept_Théologique:
+   - Définition : Idée ou doctrine religieuse présente dans la Bible
+   - Sous-types : doctrine, loi, prophétie, parabole
+   - Attributs : origine, interprétations, implications
+   - Relations : découle_de, contredit, illustre
+
+6. Peuple:
+   - Définition : Groupe ethnique ou nation mentionné dans la Bible
+   - Sous-types : tribu d'Israël, nation païenne
+   - Attributs : territoire, coutumes, relation avec Israël
+   - Relations : descend_de, combat, s'allie_avec
+
+7. Artefact:
+   - Définition : Objet important mentionné dans les textes bibliques
+   - Sous-types : objet sacré, arme, construction
+   - Attributs : fonction, symbolisme, matériaux
+   - Relations : utilisé_par, symbolise, contient
+
+# RELATIONS AUTORISÉES
+
+1. Relations chronologiques :
+   - précède : antériorité temporelle (force 2-3)
+   - succède : postériorité temporelle (force 2-3)
+   - contemporain_de : simultanéité (force 1-2)
+
+2. Relations narratives :
+   - raconte : narration d'un événement (force 2-3)
+   - mentionne : référence à une entité (force 1-2)
+   - prophétise : prédiction d'un événement futur (force 2-3)
+
+3. Relations généalogiques :
+   - descend_de : lien de parenté direct (force 2-3)
+   - ancêtre_de : lien de parenté indirect (force 1-2)
+   - appartient_à : membre d'un groupe (force 2-3)
+
+4. Relations théologiques :
+   - symbolise : représentation spirituelle (force 1-3)
+   - accomplit : réalisation d'une prophétie (force 2-3)
+   - interprète : explication d'un concept (force 1-2)
+
+Force des relations :
+1 = relation suggérée par le contexte biblique
+2 = relation explicitement mentionnée dans le texte
+3 = relation fondamentale pour la narration ou la théologie
+
+# FORMAT DE SORTIE
+
+### ENTITÉS
+NomEntité\tType\tDescription
+
+Exemple :
+Genèse\tLivre_Biblique\tPremier livre de l'Ancien Testament relatant la création et les patriarches
+Abraham\tPersonnage\tPatriarche considéré comme le père des croyants
+
+### RELATIONS
+EntitéSource\tTypeRelation:Force(1-3)\tEntitéCible\tDescription
+
+Exemple :
+Abraham\tdescend_de:3\tTérah\tTérah est le père d'Abraham selon Genèse 11:27
+
+# RÈGLES DE VALIDATION
+
+1. Validation textuelle :
+   - Cohérence avec les textes bibliques
+   - Citations précises
+   - Respect des versions canoniques
+   - Distinction entre fait biblique et interprétation
+
+2. Validation historique :
+   - Cohérence avec les connaissances historiques
+   - Datation approximative correcte
+   - Contexte culturel approprié
+   - Distinction entre histoire et tradition
+
+3. Validation théologique :
+   - Cohérence doctrinale
+   - Respect des interprétations traditionnelles
+   - Distinction entre dogme et exégèse
+   - Prise en compte des différentes traditions religieuses
+
+Ontologie actuelle :
+{previous_result}
+
+Nouveau texte à analyser :
+{text}
+
+Analyse le texte et fournis uniquement le résultat au format demandé, sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte biblique.

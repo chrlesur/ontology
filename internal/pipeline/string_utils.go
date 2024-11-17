@@ -45,11 +45,10 @@ func generateArticleVariants(word string) []string {
     return variants
 }
 
-// uniqueIntSlice supprime les doublons dans une slice d'entiers
-func uniqueIntSlice(intSlice []int) []int {
-    keys := make(map[int]bool)
-    list := []int{}
-    for _, entry := range intSlice {
+func UniqueStringSlice(slice []string) []string {
+    keys := make(map[string]bool)
+    list := []string{}
+    for _, entry := range slice {
         if _, value := keys[entry]; !value {
             keys[entry] = true
             list = append(list, entry)
