@@ -12,7 +12,7 @@ import (
 )
 
 // saveResult sauvegarde les résultats de l'ontologie et génère les fichiers de sortie
-func (p *Pipeline) saveResult(result string, outputPath string, newContent []byte) error {
+func (p *Pipeline) saveResult(result string, outputPath string, newContent []byte, fileMetadata map[string]metadata.FileMetadata) error {
 	p.logger.Debug("Starting saveResult")
 	p.logger.Info("Number of elements in ontology: %d", len(p.ontology.Elements))
 	p.logger.Info("Number of relations in ontology: %d", len(p.ontology.Relations))
@@ -51,7 +51,7 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 			positions[i] = pr.Start
 		}
 
-		contextJSON, err := GenerateContextJSON(newContent, positions, p.contextWords, mergedPositions)
+		contextJSON, err := GenerateContextJSON(newContent, positions, p.contextWords, mergedPositions, fileMetadata, p.storage)
 		if err != nil {
 			p.logger.Error("Failed to generate context JSON: %v", err)
 			return fmt.Errorf("failed to generate context JSON: %w", err)
@@ -69,8 +69,12 @@ func (p *Pipeline) saveResult(result string, outputPath string, newContent []byt
 
 	// Générer et sauvegarder les métadonnées
 	metadataGen := metadata.NewGenerator(p.storage)
+	if metadataGen == nil {
+		return fmt.Errorf("failed to create metadata generator")
+	}
 	ontologyFile := filepath.Base(outputPath)
 	sourcePaths := p.getSourcePaths() // Nouvelle méthode pour obtenir tous les chemins sources
+	p.logger.Debug("Generating metadata for %d source paths", len(sourcePaths))
 	meta, err := metadataGen.GenerateMetadata(sourcePaths, ontologyFile, contextFile)
 	if err != nil {
 		p.logger.Error("Failed to generate metadata: %v", err)
@@ -125,9 +129,9 @@ func (p *Pipeline) generateTSVContent() string {
 func (p *Pipeline) getSourcePaths() []string {
 	var sourcePaths []string
 
-	// Fonction récursive pour parcourir les répertoires
-	var collectPaths func(path string) error
-	collectPaths = func(path string) error {
+	var walkDir func(path string) error
+	walkDir = func(path string) error {
+		p.logger.Debug("Checking path: %s", path)
 		isDir, err := p.storage.IsDirectory(path)
 		if err != nil {
 			p.logger.Error("Error checking if path is directory: %v", err)
@@ -135,41 +139,65 @@ func (p *Pipeline) getSourcePaths() []string {
 		}
 
 		if isDir {
+			p.logger.Debug("Path is a directory: %s", path)
 			files, err := p.storage.List(path)
 			if err != nil {
 				p.logger.Error("Error listing directory contents: %v", err)
 				return err
 			}
 
+			p.logger.Debug("Found %d items in directory %s", len(files), path)
 			for _, file := range files {
-				fullPath := filepath.Join(path, file)
-				err := collectPaths(fullPath)
+				// Assurez-vous que le chemin n'est pas dupliqué
+				fullPath := file
+				if !filepath.IsAbs(file) {
+					fullPath = filepath.Join(path, filepath.Base(file))
+				}
+				p.logger.Debug("Processing item: %s", fullPath)
+
+				subIsDir, err := p.storage.IsDirectory(fullPath)
 				if err != nil {
-					return err
+					p.logger.Error("Error checking if path is directory: %v", err)
+					continue
+				}
+
+				if subIsDir {
+					if err := walkDir(fullPath); err != nil {
+						return err
+					}
+				} else if isSupportedFileType(fullPath) {
+					p.logger.Debug("Adding supported file to source paths: %s", fullPath)
+					sourcePaths = append(sourcePaths, fullPath)
+				} else {
+					p.logger.Debug("Skipping unsupported file: %s", fullPath)
 				}
 			}
+		} else if isSupportedFileType(path) {
+			p.logger.Debug("Adding supported file to source paths: %s", path)
+			sourcePaths = append(sourcePaths, path)
 		} else {
-			// Vérifier si le fichier est d'un type supporté
-			if isSupportedFileType(path) {
-				sourcePaths = append(sourcePaths, path)
-			}
+			p.logger.Debug("Skipping unsupported file: %s", path)
 		}
 
 		return nil
 	}
 
-	err := collectPaths(p.inputPath)
+	p.logger.Debug("Starting to collect source paths from: %s", p.inputPath)
+	err := walkDir(p.inputPath)
 	if err != nil {
 		p.logger.Error("Error collecting source paths: %v", err)
-		// En cas d'erreur, retournez au moins le chemin d'entrée original
 		return []string{p.inputPath}
 	}
 
 	if len(sourcePaths) == 0 {
-		// Si aucun fichier n'a été trouvé, retournez le chemin d'entrée original
+		p.logger.Warning("No supported files found in %s", p.inputPath)
 		return []string{p.inputPath}
 	}
 
+	p.logger.Debug("Found %d source files", len(sourcePaths))
+	for _, path := range sourcePaths {
+		p.logger.Debug("Source file: %s", path)
+	}
 	return sourcePaths
 }
 

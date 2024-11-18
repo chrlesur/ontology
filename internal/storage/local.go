@@ -30,7 +30,6 @@ func NewLocalStorage(basePath string, logger *logger.Logger) *LocalStorage {
 }
 
 func (ls *LocalStorage) Read(path string) ([]byte, error) {
-	ls.logger.Debug("Reading from local storage: %s", path)
 	fullPath := ls.getFullPath(path)
 	ls.logger.Debug("Full path for reading: %s", fullPath)
 

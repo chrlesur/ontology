@@ -111,7 +111,7 @@ func (c *ClaudeClient) makeRequest(prompt string, context string) (string, error
 		log.Error("Error marshalling request: %v", err)
 		return "", fmt.Errorf("error marshalling request: %w", err)
 	}
-	log.Debug("Claude API Request Body : %s", requestBody)
+	//log.Debug("Claude API Request Body : %s", requestBody)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestBody))
 	if err != nil {
 		log.Error("Error creating request: %v", err)
@@ -122,7 +122,7 @@ func (c *ClaudeClient) makeRequest(prompt string, context string) (string, error
 	req.Header.Set("x-api-key", c.apiKey)
 	req.Header.Set("anthropic-version", "2023-06-01")
 
-	log.Debug("Sending request to Claude API : %s", prompt)
+	//log.Debug("Sending request to Claude API : %s", prompt)
 	resp, err := c.client.Do(req)
 	if err != nil {
 		log.Error("Error sending request: %v", err)
@@ -157,7 +157,7 @@ func (c *ClaudeClient) makeRequest(prompt string, context string) (string, error
 		log.Error("No content in response")
 		return "", fmt.Errorf("no content in response")
 	}
-	log.Debug("Claude API Response : %s", response.Content)
+	//log.Debug("Claude API Response : %s", response.Content)
 	log.Debug("Successfully received and parsed response from Claude API.")
 	return response.Content[0].Text, nil
 }

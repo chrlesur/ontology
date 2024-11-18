@@ -1,52 +1,55 @@
 Effet_Direct	Concept_Juridique	Principe permettant l'application directe de la Convention par les juridictions nationales	4416,4422
-Effet_Indirect	Concept_Juridique	Nécessité de transposition d'une norme internationale pour produire des effets juridiques dans l'ordre interne	24
-Directive_Européenne	Document_Juridique	Texte juridique européen nécessitant une transposition dans l'ordre interne	93
-RGPD	Document_Juridique	Règlement général sur la protection des données, texte d'effet direct	188,229,297
-Effet_Direct_Vertical	Concept_Juridique	Possibilité pour un justiciable d'invoquer un texte directement contre l'État	235,250,4416,4422
-Effet_Direct_Horizontal	Concept_Juridique	Possibilité d'invoquer un texte entre différents États ou personnes de droit privé	239,4416,4422
-Primauté	Concept_Juridique	Principe selon lequel la norme internationale l'emporte sur la norme interne en cas de conflit	313,327,446,491,537,593,642,1037
-Article_55_Constitution	Source_Droit	Article constitutionnel fixant le principe de primauté des textes internationaux	458,478,523,623
-Cour_Justice_UE	Organisation	Cour de justice de l'Union européenne	
-Tribunal_Constitutionnel_Polonais	Organisation	Haute juridiction polonaise ayant jugé sur la primauté du droit national	918,995
+Effet_Indirect	Concept_Juridique	Effet juridique d'une norme internationale nécessitant une transposition dans l'ordre interne	24
+Directive_Européenne	Document_Juridique	Texte législatif européen nécessitant une transposition nationale	93
+RGPD	Document_Juridique	Règlement Général sur la Protection des Données, texte européen d'effet direct	188,229,297
+Effet_Direct_Vertical	Concept_Juridique	Invocation d'un texte directement contre l'État par un justiciable	235,250,4416,4422
+Effet_Direct_Horizontal	Concept_Juridique	Invocation d'un texte entre différents États ou personnes de droit privé	239,4416,4422
+Primauté	Concept_Juridique	Principe de supériorité hiérarchique du droit international sur le droit interne	313,327,446,491,537,593,642,1037
+Constitution	Source_Droit	Texte fondamental de l'ordre juridique français	456,469,931,2001,2014,4585
+Article_55_Constitution	Document_Juridique	Article constitutionnel établissant la primauté du droit international	458,478,523,623
+Cour_De_Justice_UE	Organisation	Cour de justice de l'Union européenne	699,870,987
+Tribunal_Constitutionnel_Polonais	Organisation	Haute juridiction constitutionnelle de Pologne	918,995
+Article_7_TUE	Document_Juridique	Article du Traité de l'Union européenne relatif au respect de l'État de droit	2267
 Loi_Interne	Document_Juridique	Législation nationale d'un pays	1131,1160,1206
 Traité	Document_Juridique	Accord international entre États	496,510,554,578,728,743,767,785,896,936,960,1114,1137,1167,1234
-Principe_Abrogation_Loi_Antérieure	Principe_Juridique	Principe selon lequel une loi antérieure contraire à un traité est considérée comme abrogée	1149,1201
+Principe_Abrogation_Implicite	Principe_Juridique	Principe selon lequel une loi antérieure est abrogée par un traité postérieur	
 Lex_Posterior_Derogat_Priori	Principe_Juridique	Principe de droit romain signifiant "la loi postérieure abroge la loi antérieure"	1184
+Droit_Européen	Concept_Juridique	Ensemble des règles juridiques applicables en Europe	1040,1271,1334,1386,1421,4006
 Conseil_Europe	Organisation	Organisation internationale dont les États membres sont liés par la Convention	
+Union_Européenne	Organisation	Institution européenne protégeant les droits fondamentaux et s'intéressant au marché	139,898,991,1315,1434,1462,1587,1694,4501,4507,4577,4606,4658
 Convention_Européenne	Document_Juridique	Traité protégeant les droits fondamentaux et certaines libertés économiques	402,1302,1515,1539,1949,2144,3422,4398,4528,4615
-Union_Européenne	Organisation	Institution européenne protégeant les droits fondamentaux et le marché	139,898,991,1315,1434,1462,1587,1694,4501,4507,4577,4606,4658
-ONU	Organisation	Organisation des Nations Unies	
-Statut_Conseil_Europe	Document_Juridique	Document fondateur du Conseil de l'Europe signé à Londres en 1949	
-Prééminence_Droit	Concept_Juridique	Principe de l'État de droit où le pouvoir politique se soumet au droit	
-Démocratie	Concept_Juridique	Système politique basé sur la participation des citoyens	1905,1935,2071
+Cour_Européenne_Droits_Homme	Organisation	Juridiction internationale chargée de veiller au respect de la Convention européenne	2045,4369,4478
+État_Droit	Concept_Juridique	Principe selon lequel le pouvoir politique se soumet au droit	
+Démocratie	Concept_Juridique	Système politique où le pouvoir appartient au peuple	1905,1935,2071
 CEDH	Organisation	Cour européenne des droits de l'homme	2660,3558,3767,3790,4177,4279,4367
-Ordre_Public_Constitutionnel_Européen	Concept_Juridique	Ensemble de principes fondamentaux définis par la Convention européenne	1993,2090
-Droit_Vie	Droit	Droit indérogeable garanti par la Convention Européenne	
-Interdiction_Torture	Principe_Juridique	Principe indérogeable garanti par la Convention Européenne	
-Interdiction_Esclavage	Principe_Juridique	Principe indérogeable garanti par la Convention Européenne	
-Droit_Liberté_Sûreté	Droit	Droit fondamental protégé par la Convention européenne	
-Droit_Procès_Équitable	Droit	Droit fondamental protégé par la Convention européenne	2240,2256,2386
-Principe_Légalité_Délits_Peines	Principe_Juridique	Principe juridique fondamental en droit pénal	
-Droit_Respect_Vie_Privée_Familiale	Droit	Droit fondamental protégé par la Convention européenne	398,2307,2388,4247
-Procès_Équitable	Droit	Droit garanti par la Convention Européenne, fréquemment invoqué	2240,2256,2386
-Vie_Privée	Droit	Droit garanti par la Convention Européenne, fréquemment invoqué	398,2307,2388,4247
-Liberté_Pensée	Droit	Droit garanti par l'article 9 de la Convention Européenne	
-Liberté_Conscience	Droit	Droit garanti par l'article 9 de la Convention Européenne	
-Liberté_Religion	Droit	Droit garanti par l'article 9 de la Convention Européenne	
-Liberté_Expression	Droit	Droit garanti par la Convention Européenne, fréquemment invoqué	2328,2393
-Liberté_Réunion	Droit	Droit garanti par la Convention Européenne	
-Liberté_Association	Droit	Droit garanti par la Convention Européenne	
-Droit_Mariage	Droit	Droit garanti par la Convention Européenne	
-Droit_Recours_Effectif	Droit	Droit garanti par la Convention Européenne	2353,3865,4252
-Interdiction_Discrimination	Principe_Juridique	Principe garanti par la Convention Européenne	
-Interdiction_Travail_Forcé	Principe_Juridique	Principe indérogeable garanti par la Convention Européenne	2226,2441,2517
-Légalité_Peines	Principe_Juridique	Principe indérogeable garanti par la Convention Européenne	
-Protocoles_Additionnels	Document_Juridique	Textes ajoutés postérieurement à la Convention Européenne	2745,2770
-Droit_Propriété	Droit	Droit garanti par l'article 1 du premier protocole additionnel	
-Interdiction_Emprisonnement_Dette	Principe_Juridique	Principe garanti par le protocole 4 de la Convention Européenne	
-Abolition_Peine_Mort	Principe_Juridique	Principe garanti par le protocole 6 de la Convention Européenne	
-Égalité_Époux	Principe_Juridique	Principe garanti par un protocole additionnel de 1984	
-Non_Bis_In_Idem	Principe_Juridique	Principe interdisant d'être jugé deux fois pour les mêmes faits	3183,3189,3195
+Convention_Europeenne	Document_Juridique	Convention européenne des droits de l'homme	402,1302,1515,1539,1949,2144,3422,4398,4528,4615
+Liberte_Pensee_Conscience_Religion	Droit	Liberté fondamentale protégée par l'article 9 de la Convention	
+Liberte_Expression	Droit	Liberté fondamentale protégée par la Convention	2328,2393
+Liberte_Reunion_Association	Droit	Liberté fondamentale protégée par la Convention	
+Droit_Mariage	Droit	Droit fondamental protégé par la Convention	
+Droit_Recours_Effectif	Droit	Droit procédural garanti par la Convention	2353,3865,4252
+Interdiction_Discrimination	Principe_Juridique	Principe fondamental de la Convention	
+Proces_Equitable	Concept_Juridique	Notion juridique garantie par l'article 6 de la Convention	2240,2256,2386
+Vie_Privee	Droit	Droit fondamental protégé par l'article 8 de la Convention	398,2307,2388,4247
+Droits_Prives	Concept_Juridique	Ensemble des droits relatifs à la sphère privée des individus	2395
+Droits_Publics	Concept_Juridique	Ensemble des droits relatifs à la sphère publique des individus	2398
+Droit_Vie	Droit	Droit fondamental indérogeable protégé par la Convention	
+Interdiction_Torture	Principe_Juridique	Principe fondamental indérogeable de la Convention	
+Interdiction_Esclavage	Principe_Juridique	Principe fondamental indérogeable de la Convention	
+Interdiction_Travail_Force	Principe_Juridique	Principe fondamental indérogeable de la Convention	2226,2441,2517
+Legalite_Peines	Principe_Juridique	Principe juridique indérogeable protégé par l'article 7 de la Convention	
+Droits_Inderogeables	Concept_Juridique	Droits fondamentaux ne pouvant faire l'objet d'aucune dérogation	2474
+Violences_Policieres	Concept_Juridique	Abus de force par les autorités policières	2569,2577,2608
+Arret_Selmouni_France_2006	Document_Juridique	Décision de la CEDH concernant des violences policières en France	2615
+Protocoles_Additionnels	Document_Juridique	Textes ajoutés à la Convention ayant la même valeur juridique	2745,2770
+Premier_Protocole_Additionnel	Document_Juridique	Premier protocole ajouté à la Convention	2781,2805,2834
+Droit_Propriete	Droit	Droit fondamental protégé par l'article 1 du Premier Protocole Additionnel	
+Interdiction_Emprisonnement_Dette	Principe_Juridique	Principe juridique interdit par le Protocole n°4 de la Convention	
+Contrainte_Corps	Concept_Juridique	Ancienne pratique d'emprisonnement pour dettes	
+Liberte_Circulation	Droit	Droit fondamental protégé par un protocole additionnel	
+Protocole_6	Document_Juridique	Protocole additionnel à la Convention abolissant la peine de mort	
+Egalite_Epoux	Principe_Juridique	Principe d'égalité entre époux introduit par un protocole additionnel en 1984	
+Non_Bis_In_Idem	Principe_Juridique	Principe juridique interdisant d'être jugé deux fois pour les mêmes faits	3183,3189,3195
 Convention	Document_Juridique	Convention européenne des droits de l'homme	402,1302,1515,1539,1553,1594,1647,1949,1965,1979,2008,2058,2083,2099,2125,2144,2160,2175,2740,2760,2768,2789,3215,3221,3422,3477,3683,3699,3809,3821,3909,3936,4219,4231,4378,4398,4420,4458,4493,4528,4555,4615,4637,4653,4683
 Arrêt_23_Février_2012	Document_Juridique	Arrêt de la CEDH concernant l'interception et le refoulement de migrants	3547
 Article_3_Convention	Concept_Juridique	Article de la Convention interdisant la torture	3723
@@ -55,72 +58,68 @@ Article_13_Convention	Concept_Juridique	Article garantissant le droit à un reco
 Affaire_El_Masri	Document_Juridique	Affaire concernant un ressortissant allemand arrêté et torturé en Macédoine	4044
 Article_5_Convention	Concept_Juridique	Article garantissant le droit à la sûreté et interdisant les détentions arbitraires	458,478,523,623,4243
 Article_8_Convention	Concept_Juridique	Article protégeant le droit à la vie privée	2315
-Droits_Fondamentaux	Concept_Juridique	Ensemble des droits essentiels protégés par l'UE et la Convention Européenne	4611,4686
-Marché	Concept_Juridique	Domaine économique régulé par le droit de l'Union Européenne	4546,4587,4624,4677
+Droits_Fondamentaux	Concept_Juridique	Ensemble de droits essentiels protégés par l'UE et la Convention Européenne	4611,4686
+Marché	Concept_Juridique	Domaine économique concerné par le droit de l'UE et partiellement par la Convention Européenne	4546,4587,4624,4677
 Liberté_Entreprendre	Droit	Liberté économique protégée par la Convention Européenne	4628
-Droit_Convention	Source_Droit	Ensemble des règles juridiques issues de la Convention Européenne	
 Droit_Union_Européenne	Source_Droit	Ensemble des règles juridiques de l'Union Européenne	139,898,991,1315,1434,1462,1587,1694,4501,4507,4577,4606,4658
-Effet_Indirect	requiert:3	Directive_Européenne L'effet indirect nécessite une transposition de textes comme les directives européennes	
+Droit_Convention	Source_Droit	Ensemble des règles juridiques issues de la Convention Européenne	
+Effet_Indirect	requiert:3	Directive_Européenne L'effet indirect nécessite une transposition, comme pour les directives européennes	
 RGPD	modifie:2	Directive_Européenne Le RGPD a remplacé la directive de 1995 sur la protection des données	
-Primauté	dérive_de:3	Article_55_Constitution Le principe de primauté est prévu par l'article 55 de la Constitution	
-Cour_Justice_UE	contrôle:2	Tribunal_Constitutionnel_Polonais La CJUE a condamné la Pologne pour des manquements, entrant en conflit avec le tribunal constitutionnel polonais	
-Effet_Direct	implique:2	RGPD Le RGPD est cité comme exemple de texte ayant un effet direct	
-Article_55_Constitution	définit:3	Primauté L'article 55 fixe le principe de primauté des textes internationaux	
-Traité	abroge:2	Loi_Interne Un traité postérieur abroge une loi interne antérieure contraire	
-Principe_Abrogation_Loi_Antérieure	dérive_de:2	Lex_Posterior_Derogat_Priori Le principe d'abrogation de la loi antérieure découle du principe romain	
+Primauté	dérive_de:3	Article_55_Constitution Le principe de primauté est établi par l'article 55 de la Constitution	
+Cour_De_Justice_UE	applique:2	Article_7_TUE La CJUE a condamné la Pologne sur la base de l'article 7 du TUE	
+Tribunal_Constitutionnel_Polonais	contrôle:2	Constitution Le Tribunal constitutionnel polonais interprète la Constitution polonaise	
+Effet_Direct	précède:1	Effet_Indirect L'effet direct est présenté avant l'effet indirect dans le texte	
+Primauté	implique:3	Effet_Direct La primauté implique un effet direct des normes internationales	
+Article_55_Constitution	fait_partie_de:3	Constitution L'article 55 est une partie de la Constitution française	
+Traité	abroge:2	Loi_Interne Un traité postérieur abroge implicitement une loi interne antérieure	
+Principe_Abrogation_Implicite	dérive_de:3	Lex_Posterior_Derogat_Priori Le principe d'abrogation implicite découle du principe "lex posterior derogat priori"	
+Droit_Européen	fait_partie_de:3	Conseil_Europe Le droit du Conseil de l'Europe est une composante du droit européen	
+Droit_Européen	fait_partie_de:3	Union_Européenne Le droit de l'Union européenne est une composante du droit européen	
 Conseil_Europe	applique:3	Convention_Européenne Le Conseil de l'Europe applique la Convention européenne	
-Convention_Européenne	définit:3	Ordre_Public_Constitutionnel_Européen La Convention définit un ordre public constitutionnel européen	
-Statut_Conseil_Europe	établit:3	Conseil_Europe Le Statut établit le Conseil de l'Europe en 1949	
-Statut_Conseil_Europe	définit:2	Prééminence_Droit Le Statut définit le principe de prééminence du droit	
-Statut_Conseil_Europe	définit:2	Démocratie Le Statut définit la démocratie comme valeur fondamentale	
-CEDH	applique:3	Convention_Européenne La CEDH applique et interprète la Convention européenne	
-Convention_Européenne	protège:3	Droit_Vie La Convention protège le droit à la vie	
-Convention_Européenne	établit:3	Interdiction_Torture La Convention établit l'interdiction de la torture	
-Convention_Européenne	établit:3	Interdiction_Esclavage La Convention établit l'interdiction de l'esclavage	
-Convention_Européenne	protège:3	Droit_Liberté_Sûreté La Convention protège le droit à la liberté et à la sûreté	
-Convention_Européenne	protège:3	Droit_Procès_Équitable La Convention protège le droit au procès équitable	
-Convention_Européenne	établit:3	Principe_Légalité_Délits_Peines La Convention établit le principe de légalité des délits et des peines	
-Convention_Européenne	protège:3	Droit_Respect_Vie_Privée_Familiale La Convention protège le droit au respect de la vie privée et familiale	
-Convention_Européenne	définit:3	Procès_Équitable La Convention définit le droit au procès équitable	
-Convention_Européenne	définit:3	Vie_Privée La Convention définit le droit à la vie privée	
-Convention_Européenne	définit:3	Liberté_Pensée La Convention définit la liberté de pensée dans son article 9	
-Convention_Européenne	définit:3	Liberté_Conscience La Convention définit la liberté de conscience dans son article 9	
-Convention_Européenne	définit:3	Liberté_Religion La Convention définit la liberté de religion dans son article 9	
-Convention_Européenne	définit:3	Liberté_Expression La Convention définit la liberté d'expression	
-Convention_Européenne	définit:2	Liberté_Réunion La Convention définit la liberté de réunion	
-Convention_Européenne	définit:2	Liberté_Association La Convention définit la liberté d'association	
-Convention_Européenne	définit:2	Droit_Mariage La Convention définit le droit au mariage	
-Convention_Européenne	définit:2	Droit_Recours_Effectif La Convention définit le droit de recours effectif	
-Convention_Européenne	définit:2	Interdiction_Discrimination La Convention définit l'interdiction de discrimination	
-Convention_Européenne	définit:3	Droit_Vie La Convention définit le droit à la vie comme indérogeable	
-Convention_Européenne	définit:3	Interdiction_Torture La Convention définit l'interdiction de la torture comme indérogeable	
-Convention_Européenne	définit:3	Interdiction_Esclavage La Convention définit l'interdiction de l'esclavage comme indérogeable	
-Convention_Européenne	définit:3	Interdiction_Travail_Forcé La Convention définit l'interdiction du travail forcé comme indérogeable	
-Convention_Européenne	définit:3	Légalité_Peines La Convention définit le principe de légalité des peines comme indérogeable	
-CEDH	applique:3	Convention_Européenne La CEDH applique et interprète la Convention Européenne	
-Protocoles_Additionnels	complète:3	Convention_Européenne Les protocoles additionnels complètent la Convention avec la même valeur juridique	
-Protocoles_Additionnels	définit:3	Droit_Propriété Le premier protocole additionnel définit le droit de propriété	
-Protocoles_Additionnels	définit:2	Interdiction_Emprisonnement_Dette Le protocole 4 définit l'interdiction de l'emprisonnement pour dette	
-Protocoles_Additionnels	définit:3	Abolition_Peine_Mort Le protocole 6 définit l'abolition de la peine de mort	
-Protocoles_Additionnels	définit:2	Égalité_Époux Un protocole de 1984 définit l'égalité entre époux	
-Protocoles_Additionnels	définit:2	Non_Bis_In_Idem Un protocole définit le principe de non bis in idem	
-Convention	applique:3	Conseil_Europe La Convention s'applique aux États membres du Conseil de l'Europe	
-CEDH	applique:3	Convention La CEDH applique et interprète la Convention	
-Arrêt_23_Février_2012	dérive_de:2	Convention L'arrêt est basé sur l'application de la Convention	
-Article_3_Convention	fait_partie_de:3	Convention L'article 3 est une partie intégrante de la Convention	
-Article_4_Protocole_4	fait_partie_de:3	Convention L'article 4 du protocole 4 est lié à la Convention	
-Article_13_Convention	fait_partie_de:3	Convention L'article 13 est une partie intégrante de la Convention	
-Affaire_El_Masri	applique:2	Convention L'affaire El-Masri applique les principes de la Convention	
-Article_5_Convention	fait_partie_de:3	Convention L'article 5 est une partie intégrante de la Convention	
-Article_8_Convention	fait_partie_de:3	Convention L'article 8 est une partie intégrante de la Convention	
-Effet_Direct	conditionne:2	Convention L'effet direct permet l'application de la Convention par les juridictions nationales	
-Union_Européenne	précède:1	Conseil_Europe L'Union Européenne est présentée comme distincte du Conseil de l'Europe dans le texte	
-Union_Européenne	protège:2	Droits_Fondamentaux L'UE assure la protection des droits fondamentaux	
+Cour_Européenne_Droits_Homme	applique:3	Convention_Européenne La Cour européenne des droits de l'homme applique la Convention européenne	
+Convention_Européenne	définit:2	État_Droit La Convention européenne contribue à définir l'État de droit en Europe	
+Convention_Européenne	définit:2	Démocratie La Convention européenne contribue à définir la démocratie en Europe	
+Convention_Europeenne	définit:3	Liberte_Pensee_Conscience_Religion La Convention définit et protège cette liberté dans son article 9	
+Convention_Europeenne	définit:3	Liberte_Expression La Convention définit et protège cette liberté	
+Convention_Europeenne	définit:3	Liberte_Reunion_Association La Convention définit et protège cette liberté	
+Convention_Europeenne	définit:3	Droit_Mariage La Convention définit et protège ce droit	
+Convention_Europeenne	définit:3	Droit_Recours_Effectif La Convention établit ce droit procédural	
+Convention_Europeenne	établit:3	Interdiction_Discrimination La Convention établit ce principe fondamental	
+Convention_Europeenne	définit:3	Proces_Equitable La Convention définit ce concept dans son article 6	
+Convention_Europeenne	définit:3	Vie_Privee La Convention définit et protège ce droit dans son article 8	
+Droits_Inderogeables	fait_partie_de:3	Convention_Europeenne Ces droits font partie intégrante de la Convention	
+Droit_Vie	fait_partie_de:3	Droits_Inderogeables Ce droit est mentionné comme indérogeable	
+Interdiction_Torture	fait_partie_de:3	Droits_Inderogeables Cette interdiction est mentionnée comme indérogeable	
+Interdiction_Esclavage	fait_partie_de:3	Droits_Inderogeables Cette interdiction est mentionnée comme indérogeable	
+Interdiction_Travail_Force	fait_partie_de:3	Droits_Inderogeables Cette interdiction est mentionnée comme indérogeable	
+Legalite_Peines	fait_partie_de:3	Droits_Inderogeables Ce principe est mentionné comme indérogeable	
+CEDH	applique:3	Convention_Europeenne La CEDH applique la Convention dans ses décisions	
+Arret_Selmouni_France_2006	dérive_de:2	Violences_Policieres Cet arrêt concerne un cas de violences policières en France	
+Protocoles_Additionnels	complète:3	Convention_Europeenne Ces protocoles complètent la Convention avec la même valeur juridique	
+Premier_Protocole_Additionnel	définit:3	Droit_Propriete Ce protocole définit et protège le droit de propriété	
+Protocole_6	établit:3	Interdiction_Emprisonnement_Dette Ce protocole interdit l'emprisonnement pour dettes	
+Protocole_6	abroge:3	Contrainte_Corps Ce protocole met fin à la pratique de la contrainte par corps	
+Protocoles_Additionnels	établit:3	Liberte_Circulation Un protocole additionnel établit ce droit	
+Protocole_6	établit:3	Egalite_Epoux Ce protocole introduit le principe d'égalité entre époux	
+Protocoles_Additionnels	établit:3	Non_Bis_In_Idem Un protocole additionnel établit ce principe en matière pénale	
+Convention	applique:3	CEDH La CEDH applique et interprète la Convention	
+Conseil_Europe	contrôle:2	Convention Les États membres du Conseil de l'Europe sont liés par la Convention	
+CEDH	applique:3	Arrêt_23_Février_2012 La CEDH a rendu cet arrêt concernant l'interception de migrants	
+Arrêt_23_Février_2012	applique:2	Article_3_Convention L'arrêt applique l'article 3 de la Convention	
+Arrêt_23_Février_2012	applique:2	Article_4_Protocole_4 L'arrêt applique l'article 4 du protocole 4	
+Arrêt_23_Février_2012	applique:2	Article_13_Convention L'arrêt applique l'article 13 de la Convention	
+CEDH	applique:3	Affaire_El_Masri La CEDH a statué sur l'affaire El-Masri	
+Affaire_El_Masri	applique:2	Article_5_Convention L'affaire El-Masri implique l'application de l'article 5	
+Affaire_El_Masri	applique:2	Article_8_Convention L'affaire El-Masri implique l'application de l'article 8	
+Affaire_El_Masri	applique:2	Article_13_Convention L'affaire El-Masri implique l'application de l'article 13	
+Affaire_El_Masri	applique:2	Article_3_Convention L'affaire El-Masri implique l'application de l'article 3	
+Convention	implique:3	Effet_Direct La Convention a un effet direct dans les juridictions nationales	
+Union_Européenne	dérive_de:1	Conseil_Europe L'UE est présentée comme distincte de l'Europe des droits de l'homme	
+Union_Européenne	protège:2	Droits_Fondamentaux L'UE protège les droits fondamentaux	
 Convention_Européenne	protège:2	Droits_Fondamentaux La Convention protège principalement les droits fondamentaux	
 Convention_Européenne	protège:2	Liberté_Entreprendre La Convention protège la liberté d'entreprendre	
+Droit_Union_Européenne	fait_partie_de:2	Union_Européenne Le droit de l'UE est l'ensemble des règles de l'Union Européenne	
+Droit_Convention	fait_partie_de:2	Convention_Européenne Le droit de la Convention découle de la Convention Européenne	
+Droit_Union_Européenne	s'intéresse:3	Marché Le droit de l'UE s'intéresse principalement au marché	
+Droit_Convention	s'intéresse:3	Droits_Fondamentaux Le droit de la Convention s'intéresse principalement aux droits fondamentaux	
 Liberté_Entreprendre	fait_partie_de:2	Marché La liberté d'entreprendre est liée au concept de marché	
-Droit_Convention	dérive_de:3	Convention_Européenne Le droit de la Convention découle de la Convention Européenne	
-Droit_Union_Européenne	dérive_de:3	Union_Européenne Le droit de l'Union découle de l'Union Européenne	
-Droit_Union_Européenne	concerne:2	Marché Le droit de l'UE s'intéresse principalement au marché	
-Droit_Convention	concerne:2	Droits_Fondamentaux Le droit de la Convention s'intéresse principalement aux droits fondamentaux	
-Droit_Convention	chevauche:1	Droit_Union_Européenne Il existe un chevauchement entre ces deux sources de droit sur certains sujets	

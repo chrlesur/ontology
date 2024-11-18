@@ -6,8 +6,12 @@ import (
 	"bytes"
 	"sort"
 	"strings"
+	"unicode"
 
-	"github.com/mozillazg/go-unidecode"
+	"github.com/kljensen/snowball/french"
+	"golang.org/x/text/runes"
+	"golang.org/x/text/transform"
+	"golang.org/x/text/unicode/norm"
 )
 
 // PositionRange représente une plage de positions pour un élément
@@ -17,141 +21,150 @@ type PositionRange struct {
 	Element string
 }
 
-// createPositionIndex crée un index des positions pour chaque mot dans le contenu
-func (p *Pipeline) createPositionIndex(content []byte) map[string][]int {
-	log.Debug("Starting createPositionIndex")
-	index := make(map[string][]int)
-	words := bytes.Fields(content)
-
-	for i, word := range words {
-		variants := generateArticleVariants(string(word))
-		for _, variant := range variants {
-			normalizedVariant := normalizeWord(variant)
-			index[normalizedVariant] = append(index[normalizedVariant], i)
-		}
-	}
-
-	// Indexer les paires et triplets de mots
-	for i := 0; i < len(words)-1; i++ {
-		pair := normalizeWord(string(words[i])) + " " + normalizeWord(string(words[i+1]))
-		index[pair] = append(index[pair], i)
-
-		if i < len(words)-2 {
-			triplet := pair + " " + normalizeWord(string(words[i+2]))
-			index[triplet] = append(index[triplet], i)
-		}
-	}
-
-	log.Debug("Finished createPositionIndex. Total indexed terms: %d", len(index))
-	return index
+var stopWords = map[string]bool{
+	"le": true, "la": true, "les": true, "un": true, "une": true, "des": true,
+	"et": true, "en": true, "de": true, "du": true, "ce": true, "qui": true,
+	// Ajoutez d'autres mots stop si nécessaire
 }
 
-// findPositions trouve toutes les positions d'un mot ou d'une phrase dans le contenu
-func (p *Pipeline) findPositions(entityName string, index map[string][]int, fullContent string) []int {
-    p.logger.Debug("Starting findPositions for entity: %s", entityName)
-
-    contentWords := strings.Fields(fullContent)
-    var allPositions []int
-
-    // Générer les variantes de l'entité
-    variants := generateEntityVariants(entityName)
-    p.logger.Debug("Generated variants for %s: %v", entityName, variants)
-
-    for _, variant := range variants {
-        normalizedVariant := normalizeString(variant)
-        p.logger.Debug("Processing normalized variant: %s", normalizedVariant)
-
-        variantWords := strings.Fields(normalizedVariant)
-        // Ignorer les variantes d'un seul mot court
-        if len(variantWords) == 1 && len(variantWords[0]) <= 3 {
-            continue
+func (p *Pipeline) createInvertedIndex(content []byte) {
+    p.invertedIndex = make(map[string][]int)
+    words := bytes.Fields(content)
+    
+    for i := 0; i < len(words); i++ {
+        wordString := normalizeAndStem(string(words[i]))
+        parts := strings.Fields(wordString) // Pour gérer les mots composés après normalisation
+        
+        for _, part := range parts {
+            if !stopWords[part] && len(part) >= 3 {
+                p.addToIndex(part, i)
+            }
         }
-
-        // Recherche exacte en utilisant l'index
-        if positions, ok := index[normalizedVariant]; ok {
-            p.logger.Debug("Found exact match positions for %s: %v", variant, positions)
-            allPositions = append(allPositions, positions...)
-            continue
-        }
-
-        // Recherche exacte dans le contenu
-        for i := 0; i <= len(contentWords)-len(variantWords); i++ {
-            match := true
-            for j, word := range variantWords {
-                if !strings.Contains(normalizeString(contentWords[i+j]), word) {
-                    match = false
-                    break
+        
+        // Ajouter des bi-grammes normalisés
+        if i < len(words)-1 {
+            nextWord := normalizeAndStem(string(words[i+1]))
+            nextParts := strings.Fields(nextWord)
+            if len(parts) > 0 && len(nextParts) > 0 {
+                lastPart := parts[len(parts)-1]
+                firstNextPart := nextParts[0]
+                if !stopWords[lastPart] && !stopWords[firstNextPart] && 
+                   len(lastPart) >= 3 && len(firstNextPart) >= 3 {
+                    bigram := lastPart + " " + firstNextPart
+                    p.addToIndex(bigram, i)
                 }
             }
-            if match {
-                allPositions = append(allPositions, i)
-                p.logger.Debug("Found exact match for %s at position %d", variant, i)
-            }
         }
     }
+    
+    p.logger.Debug("Inverted index created with %d unique terms", len(p.invertedIndex))
+}
 
-    // Fusionner les positions proches
-    mergedPositions := mergeClosePositions(allPositions, 5) // 5 mots de distance max
+func (p *Pipeline) addToIndex(term string, position int) {
+	if _, exists := p.invertedIndex[term]; !exists {
+		p.invertedIndex[term] = []int{}
+	}
+	if len(p.invertedIndex[term]) == 0 || p.invertedIndex[term][len(p.invertedIndex[term])-1] != position {
+		p.invertedIndex[term] = append(p.invertedIndex[term], position)
+		p.logger.Debug("Add '%s' to index at %d.", term, position)
+	}
+}
 
-    if len(mergedPositions) > 0 {
-        p.logger.Debug("Found total unique positions for %s: %v", entityName, mergedPositions)
-    } else {
-        p.logger.Debug("No positions found for entity: %s", entityName)
+func (p *Pipeline) findPositions(entityName string, fullContent string) []int {
+	normalizedEntity := normalizeAndStem(entityName)
+	entityParts := strings.Fields(normalizedEntity)
+
+	var positions []int
+	if len(entityParts) == 1 {
+		return p.invertedIndex[entityParts[0]]
+	}
+
+	// Pour les entités multi-mots, rechercher chaque mot individuellement
+	for i, part := range entityParts {
+		partPositions := p.invertedIndex[part]
+		if i == 0 {
+			positions = partPositions
+		} else {
+			positions = intersectPositions(positions, partPositions, i)
+		}
+		if len(positions) == 0 {
+			break
+		}
+	}
+
+	return positions
+}
+
+func intersectPositions(pos1, pos2 []int, distance int) []int {
+	var result []int
+	i, j := 0, 0
+	for i < len(pos1) && j < len(pos2) {
+		if pos2[j] == pos1[i]+distance {
+			result = append(result, pos1[i])
+			i++
+			j++
+		} else if pos2[j] < pos1[i]+distance {
+			j++
+		} else {
+			i++
+		}
+	}
+	return result
+}
+
+func isFullMatch(index map[string][]int, parts []string, startPos int) bool {
+	for i, part := range parts[1:] {
+		nextPos := startPos + i + 1
+		if positions, exists := index[part]; !exists || !contains(positions, nextPos) {
+			return false
+		}
+	}
+	return true
+}
+
+func contains(slice []int, val int) bool {
+	for _, item := range slice {
+		if item == val {
+			return true
+		}
+	}
+	return false
+}
+
+func normalizeAndStem(text string) string {
+    if text == "" {
+        return ""
     }
-
-    return mergedPositions
+    text = strings.ToLower(text)
+    text = removeAccents(text)
+    text = strings.ReplaceAll(text, "_", " ") // Remplacer les underscores par des espaces
+    text = strings.Map(func(r rune) rune {
+        if unicode.IsLetter(r) || unicode.IsNumber(r) || r == ' ' {
+            return r
+        }
+        return ' '
+    }, text)
+    words := strings.Fields(text)
+    stemmedWords := make([]string, 0, len(words))
+    for _, word := range words {
+        stemmed := french.Stem(word, false)
+        if stemmed != "" {
+            stemmedWords = append(stemmedWords, stemmed)
+        }
+    }
+    return strings.Join(stemmedWords, " ")
 }
 
-func generateEntityVariants(entityName string) []string {
-	variants := []string{entityName}
-	words := strings.Fields(strings.ReplaceAll(entityName, "_", " "))
-
-	// Ajouter des variantes avec des sous-parties, en évitant les variantes à un seul mot
-	for i := 2; i <= len(words); i++ {
-		for j := 0; j <= len(words)-i; j++ {
-			variant := strings.Join(words[j:j+i], " ")
-			variants = append(variants, variant)
-			// Ajouter aussi la variante avec underscore
-			variants = append(variants, strings.ReplaceAll(variant, " ", "_"))
-		}
-	}
-
-	lowercaseEntity := strings.ToLower(entityName)
-
-	// Ajouter des variantes avec et sans tirets/underscores
-	if strings.Contains(lowercaseEntity, "-") || strings.Contains(lowercaseEntity, "_") {
-		variants = append(variants,
-			strings.ReplaceAll(lowercaseEntity, "-", " "),
-			strings.ReplaceAll(lowercaseEntity, "_", " "))
-	}
-
-	// Ajouter des variantes avec articles seulement si l'entité a plus d'un mot
-	if len(words) > 1 {
-		articleVariants := []string{
-			"l'" + lowercaseEntity,
-			"d'" + lowercaseEntity,
-			"le " + lowercaseEntity,
-			"la " + lowercaseEntity,
-			"les " + lowercaseEntity,
-		}
-		variants = append(variants, articleVariants...)
-	}
-
-	// Ajouter des variantes sans le premier mot (pour des cas comme "Article 55")
-	if len(words) > 2 {
-		withoutFirstWord := strings.Join(words[1:], " ")
-		variants = append(variants, withoutFirstWord)
-		variants = append(variants, strings.ReplaceAll(withoutFirstWord, " ", "_"))
-	}
-
-	return UniqueStringSlice(variants)
+func removeAccents(s string) string {
+	t := transform.Chain(norm.NFD, runes.Remove(runes.In(unicode.Mn)), norm.NFC)
+	result, _, _ := transform.String(t, s)
+	return result
 }
 
-// getAllPositionsFromNewContent récupère toutes les positions des éléments dans le nouveau contenu
 func (p *Pipeline) getAllPositionsFromNewContent() []PositionRange {
 	var allPositions []PositionRange
 	for _, element := range p.ontology.Elements {
-		positions := element.Positions
+		positions := p.findPositions(element.Name, string(p.fullContent))
 		for _, pos := range positions {
 			allPositions = append(allPositions, PositionRange{
 				Start:   pos,
@@ -160,11 +173,10 @@ func (p *Pipeline) getAllPositionsFromNewContent() []PositionRange {
 			})
 		}
 	}
-	log.Debug("Total position ranges collected from ontology: %d", len(allPositions))
+	p.logger.Debug("Total position ranges collected from ontology: %d", len(allPositions))
 	return allPositions
 }
 
-// mergeOverlappingPositions fusionne les plages de positions qui se chevauchent
 func mergeOverlappingPositions(positions []PositionRange) []PositionRange {
 	if len(positions) == 0 {
 		return positions
@@ -193,24 +205,14 @@ func mergeOverlappingPositions(positions []PositionRange) []PositionRange {
 	return merged
 }
 
-func normalizeString(s string) string {
-	return strings.ToLower(unidecode.Unidecode(s))
-}
-
-func mergeClosePositions(positions []int, maxDistance int) []int {
-    if len(positions) == 0 {
-        return positions
-    }
-
-    sort.Ints(positions)
-    var merged []int
-    merged = append(merged, positions[0])
-
-    for i := 1; i < len(positions); i++ {
-        if positions[i] - merged[len(merged)-1] > maxDistance {
-            merged = append(merged, positions[i])
-        }
-    }
-
-    return merged
+func uniqueIntSlice(intSlice []int) []int {
+	keys := make(map[int]bool)
+	list := []int{}
+	for _, entry := range intSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }

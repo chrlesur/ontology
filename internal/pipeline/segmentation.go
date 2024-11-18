@@ -48,9 +48,10 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 		return "", nil, fmt.Errorf("aucun contenu trouvé dans l'entrée")
 	}
 
-	p.fullContent = content
-	p.positionIndex = p.createPositionIndex(p.fullContent)
-	p.logger.Debug("Position index created. Number of entries: %d", len(p.positionIndex))
+    p.fullContent = content
+    p.createInvertedIndex(p.fullContent)
+    p.logger.Debug("Inverted index created. Number of entries: %d", len(p.invertedIndex))
+
 
 	// Initialisation du tokenizer
 	tke, err := tiktoken.GetEncoding("cl100k_base")
@@ -63,8 +64,8 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 	p.logger.Info("Nombre de tokens du contenu d'entrée : %d", contentTokens)
 
 	p.fullContent = content
-	positionIndex := p.createPositionIndex(p.fullContent)
-	p.logger.Debug("Index de position créé. Nombre d'entrées : %d", len(positionIndex))
+	p.createInvertedIndex(p.fullContent)
+    p.logger.Debug("Inverted index created. Number of entries: %d", len(p.invertedIndex))
 
 	segments, offsets, err := segmenter.Segment(content, segmenter.SegmentConfig{
 		MaxTokens:   p.config.MaxTokens,
@@ -111,7 +112,7 @@ func (p *Pipeline) processSinglePass(input string, previousResult string, includ
 			})
 			p.logger.Debug("Contexte pour le segment %d/%d, Longueur : %d octets", i+1, len(segments), len(context))
 
-			result, err := p.processSegment(seg.Content, context, previousResult, positionIndex, includePositions, seg.Start)
+            result, err := p.processSegment(seg.Content, context, previousResult, includePositions, seg.Start)
 			if err != nil {
 				p.logger.Error(i18n.GetMessage("SegmentProcessingError"), i+1, err)
 				return
@@ -295,7 +296,7 @@ func (p *Pipeline) insertResults(db *sql.DB, result string) error {
 					p.logger.Warning("Invalid strength value: %v", err)
 					continue
 				}
-				
+
 				target := parts[2]
 				description := strings.Join(parts[3:], " ")
 
@@ -327,7 +328,7 @@ func (p *Pipeline) insertResults(db *sql.DB, result string) error {
 					Name:        strings.TrimSpace(parts[0]),
 					Type:        strings.TrimSpace(parts[1]),
 					Description: strings.TrimSpace(description),
-					Positions:   p.findPositions(strings.TrimSpace(parts[0]), p.positionIndex, string(p.fullContent)),
+					Positions:   p.findPositions(strings.TrimSpace(parts[0]), string(p.fullContent)),
 					CreatedAt:   time.Now(),
 					UpdatedAt:   time.Now(),
 				}

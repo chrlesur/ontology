@@ -11,7 +11,7 @@ import (
 )
 
 // processSegment traite un segment individuel du contenu
-func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, positionIndex map[string][]int, includePositions bool, offset int) (string, error) {
+func (p *Pipeline) processSegment(segment []byte, context string, previousResult string, includePositions bool, offset int) (string, error) {
 	log.Debug("Processing segment of length %d, context length %d, previous result length %d, offset %d", len(segment), len(context), len(previousResult), offset)
 	log.Debug("Segment content preview: %s", truncateString(string(segment), 200))
 	log.Debug("Context preview: %s", truncateString(context, 200))
@@ -47,18 +47,17 @@ func (p *Pipeline) processSegment(segment []byte, context string, previousResult
 	// Normaliser le résultat enrichi
 	normalizedResult := normalizeTSV(enrichedResult)
 
-	log.Debug("Enriched result length: %d, preview: %s", len(normalizedResult), truncateString(normalizedResult, 100))
+	log.Info("Enriched result length: %d, preview: %s", len(normalizedResult), truncateString(normalizedResult, 100))
 
-	p.enrichOntologyWithPositions(normalizedResult, positionIndex, includePositions, string(segment), offset)
+	p.enrichOntologyWithPositions(normalizedResult, includePositions, string(segment), offset)
 
 	return normalizedResult, nil
 }
 
 // enrichOntologyWithPositions enrichit l'ontologie avec les positions des éléments
-func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIndex map[string][]int, includePositions bool, content string, offset int) {
+func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, includePositions bool, content string, offset int) {
 	log.Debug("Starting enrichOntologyWithPositions with offset %d", offset)
 	log.Debug("Include positions: %v", includePositions)
-	log.Debug("Position index size: %d", len(positionIndex))
 
 	lines := strings.Split(enrichedResult, "\n")
 	log.Debug("Number of lines to process: %d", len(lines))
@@ -83,11 +82,11 @@ func (p *Pipeline) enrichOntologyWithPositions(enrichedResult string, positionIn
 
 			if includePositions {
 				log.Debug("Searching for positions of entity: %s", name)
-				allPositions := p.findPositions(name, positionIndex, string(p.fullContent))
+				allPositions := p.findPositions(name, string(p.fullContent))
 				log.Debug("Found %d positions for entity %s: %v", len(allPositions), name, allPositions)
 				if len(allPositions) > 0 {
 					// Garder toutes les positions trouvées
-					element.SetPositions(uniquePositions(allPositions))
+					element.SetPositions(uniqueIntSlice(allPositions))
 					log.Debug("Set %d positions for element %s: %v", len(allPositions), name, allPositions)
 				} else {
 					log.Debug("No positions found for element %s", name)

@@ -6,12 +6,14 @@ import (
 	"database/sql"
 	"fmt"
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 
 	"github.com/chrlesur/Ontology/internal/config"
 	"github.com/chrlesur/Ontology/internal/i18n"
 	"github.com/chrlesur/Ontology/internal/llm"
 	"github.com/chrlesur/Ontology/internal/logger"
+	"github.com/chrlesur/Ontology/internal/metadata"
 	"github.com/chrlesur/Ontology/internal/model"
 	"github.com/chrlesur/Ontology/internal/storage"
 
@@ -52,6 +54,7 @@ type Pipeline struct {
 	fullContent              []byte // stocker le contenu complet du document.
 	segmentOffsets           []int  // stocker les offsets de début de chaque segment.
 	db                       *sql.DB
+	invertedIndex map[string][]int
 }
 
 // NewPipeline crée une nouvelle instance du pipeline de traitement
@@ -180,11 +183,28 @@ func (p *Pipeline) ExecutePipeline(input string, output string, passes int, exis
 		p.logger.Info("Token count change in pass %d: %d", i+1, newTokenCount-initialTokenCount)
 	}
 
+	// Générer les métadonnées
+	metadataGen := metadata.NewGenerator(p.storage)
+	sourcePaths := p.getSourcePaths()
+	meta, err := metadataGen.GenerateMetadata(sourcePaths, filepath.Base(output), "")
+	if err != nil {
+		p.logger.Error("Failed to generate metadata: %v", err)
+		return fmt.Errorf("failed to generate metadata: %w", err)
+	}
+
 	// Sauvegarder les résultats
-	err = p.saveResult(result, output, finalContent)
+	err = p.saveResult(result, output, finalContent, meta.Files)
 	if err != nil {
 		p.logger.Error(i18n.GetMessage("ErrSavingResult"), err)
 		return fmt.Errorf("%s: %w", i18n.GetMessage("ErrSavingResult"), err)
+	}
+
+	// Sauvegarder les métadonnées
+	metaFilePath := strings.TrimSuffix(output, filepath.Ext(output)) + "_meta.json"
+	err = metadataGen.SaveMetadata(meta, metaFilePath)
+	if err != nil {
+		p.logger.Error("Failed to save metadata: %v", err)
+		return fmt.Errorf("failed to save metadata: %w", err)
 	}
 
 	p.logger.Info("Pipeline execution completed successfully")
@@ -211,8 +231,9 @@ func (p *Pipeline) readPromptFile(filePath string) (string, error) {
 }
 
 func (p *Pipeline) Close() error {
-    if p.db != nil {
-        return p.db.Close()
-    }
-    return nil
+	if p.db != nil {
+		return p.db.Close()
+	}
+	return nil
 }
+
