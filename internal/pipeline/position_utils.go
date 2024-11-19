@@ -32,27 +32,10 @@ func (p *Pipeline) createInvertedIndex(content []byte) {
     words := bytes.Fields(content)
     
     for i := 0; i < len(words); i++ {
-        wordString := normalizeAndStem(string(words[i]))
-        parts := strings.Fields(wordString) // Pour gérer les mots composés après normalisation
-        
-        for _, part := range parts {
-            if !stopWords[part] && len(part) >= 3 {
-                p.addToIndex(part, i)
-            }
-        }
-        
-        // Ajouter des bi-grammes normalisés
-        if i < len(words)-1 {
-            nextWord := normalizeAndStem(string(words[i+1]))
-            nextParts := strings.Fields(nextWord)
-            if len(parts) > 0 && len(nextParts) > 0 {
-                lastPart := parts[len(parts)-1]
-                firstNextPart := nextParts[0]
-                if !stopWords[lastPart] && !stopWords[firstNextPart] && 
-                   len(lastPart) >= 3 && len(firstNextPart) >= 3 {
-                    bigram := lastPart + " " + firstNextPart
-                    p.addToIndex(bigram, i)
-                }
+        normalizedWords := strings.Fields(normalizeAndStem(string(words[i])))
+        for _, word := range normalizedWords {
+            if !stopWords[word] && len(word) >= 3 {
+                p.addToIndex(word, i)
             }
         }
     }
@@ -71,88 +54,66 @@ func (p *Pipeline) addToIndex(term string, position int) {
 }
 
 func (p *Pipeline) findPositions(entityName string, fullContent string) []int {
-	normalizedEntity := normalizeAndStem(entityName)
-	entityParts := strings.Fields(normalizedEntity)
+    normalizedEntity := normalizeAndStem(entityName)
+    entityParts := strings.Fields(normalizedEntity)
+    
+    var positions []int
+    maxDistance := 5 // Distance maximale entre les mots
 
-	var positions []int
-	if len(entityParts) == 1 {
-		return p.invertedIndex[entityParts[0]]
-	}
+    if len(entityParts) == 1 {
+        return p.invertedIndex[entityParts[0]]
+    }
 
-	// Pour les entités multi-mots, rechercher chaque mot individuellement
-	for i, part := range entityParts {
-		partPositions := p.invertedIndex[part]
-		if i == 0 {
-			positions = partPositions
-		} else {
-			positions = intersectPositions(positions, partPositions, i)
-		}
-		if len(positions) == 0 {
-			break
-		}
-	}
-
-	return positions
+    for i, part := range entityParts {
+        if pos, exists := p.invertedIndex[part]; exists {
+            if i == 0 {
+                positions = pos
+            } else {
+                positions = intersectNearPositions(positions, pos, maxDistance)
+            }
+            if len(positions) == 0 {
+                break
+            }
+        } else {
+            return []int{} // Si un mot n'est pas trouvé, aucune correspondance possible
+        }
+    }
+    
+    return positions
 }
 
-func intersectPositions(pos1, pos2 []int, distance int) []int {
-	var result []int
-	i, j := 0, 0
-	for i < len(pos1) && j < len(pos2) {
-		if pos2[j] == pos1[i]+distance {
-			result = append(result, pos1[i])
-			i++
-			j++
-		} else if pos2[j] < pos1[i]+distance {
-			j++
-		} else {
-			i++
-		}
-	}
-	return result
-}
-
-func isFullMatch(index map[string][]int, parts []string, startPos int) bool {
-	for i, part := range parts[1:] {
-		nextPos := startPos + i + 1
-		if positions, exists := index[part]; !exists || !contains(positions, nextPos) {
-			return false
-		}
-	}
-	return true
-}
-
-func contains(slice []int, val int) bool {
-	for _, item := range slice {
-		if item == val {
-			return true
-		}
-	}
-	return false
+func intersectNearPositions(pos1, pos2 []int, maxDistance int) []int {
+    var result []int
+    for _, p1 := range pos1 {
+        for _, p2 := range pos2 {
+            if p2 > p1 && p2 - p1 <= maxDistance {
+                result = append(result, p1)
+                break
+            }
+        }
+    }
+    return result
 }
 
 func normalizeAndStem(text string) string {
-    if text == "" {
-        return ""
-    }
-    text = strings.ToLower(text)
-    text = removeAccents(text)
-    text = strings.ReplaceAll(text, "_", " ") // Remplacer les underscores par des espaces
-    text = strings.Map(func(r rune) rune {
-        if unicode.IsLetter(r) || unicode.IsNumber(r) || r == ' ' {
-            return r
-        }
-        return ' '
-    }, text)
-    words := strings.Fields(text)
-    stemmedWords := make([]string, 0, len(words))
-    for _, word := range words {
-        stemmed := french.Stem(word, false)
-        if stemmed != "" {
-            stemmedWords = append(stemmedWords, stemmed)
-        }
-    }
-    return strings.Join(stemmedWords, " ")
+	text = strings.ToLower(text)
+	text = removeAccents(text)
+	text = strings.ReplaceAll(text, "_", " ")
+	text = strings.Map(func(r rune) rune {
+		if unicode.IsLetter(r) || unicode.IsNumber(r) || unicode.IsSpace(r) {
+			return r
+		}
+		return ' '
+	}, text)
+	words := strings.Fields(text)
+	stemmedWords := make([]string, 0, len(words))
+	for _, word := range words {
+		stemmed := french.Stem(word, false)
+		if stemmed != "" && len(stemmed) >= 3 {
+			stemmedWords = append(stemmedWords, stemmed)
+		}
+	}
+	return strings.Join(stemmedWords, " ")
 }
 
 func removeAccents(s string) string {

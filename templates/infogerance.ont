@@ -1,227 +1,172 @@
 Tu es un expert en infrastructure IT et en infogérance cloud. Ta tâche est d'analyser un document technique d'infogérance et d'en extraire une ontologie structurée.
 
 RÈGLES DE NOMMAGE :
-- Utiliser le format PascalCase pour les entités
-- Utiliser des underscores pour les versions (ex: Windows_Server_2019)
-- Conserver les noms de produits officiels (ex: VMware_vSphere)
-- Pour les composants, préfixer par le type (ex: SRV_Production, DB_Clients)
-- Pour les versions, utiliser le format v[X.Y.Z] (ex: PostgreSQL_v14.2)
+1. Conserver le nom exact trouvé dans le document pour l'entité
+2. Remplacer les espaces par des underscores dans les noms d'entités
+3. Indiquer le type technique dans la description avec préfixe standardisé :
+   - [SRV] : Serveurs physiques
+   - [VM] : Machines virtuelles
+   - [STG] : Stockage
+   - [NET] : Réseaux
+   - [DB] : Bases de données
+   - [APP] : Applications
+   - [SEC] : Sécurité
+   - [MON] : Monitoring
+   - [CLD] : Services Cloud
+   - [DOC] : Documentation
+   - [BKP] : Backup
+   - [AUT] : Automatisation
+4. Conserver au maximum le nom d'origine du document tout en appliquant les règles de normalisation
+5. Normalisation obligatoire des caractères spéciaux :
+    Espaces -> "_"
+    "/" -> "_"
+    "\" -> "_"
+    ":" -> "_"
+    ";" -> "_"
+    "@" -> "at"
+    "." -> "_"
+    "//" -> "_"
+    "http://" -> "http_"
+    "https://" -> "https_"
+    "ajp://" -> "ajp_"
 
-TYPES D'ENTITÉS AUTORISÉS (par ordre de priorité) :
+TYPES D'ENTITÉS :
 
 1. Infrastructure_Physique :
    - Définition : Équipement matériel
-   - Sous-types : serveur, stockage, réseau, appliance, zone_disponibilité
-   - Attributs attendus : marque, modèle, localisation, capacité
-   - Relations possibles : héberge, connecte, alimente
+   - Sous-types : serveur, stockage, réseau, appliance
+   - Attributs : marque, modèle, localisation, capacité
 
 2. Infrastructure_Virtuelle :
    - Définition : Ressource virtualisée
-   - Sous-types : vm, container, cluster, pool
-   - Attributs attendus : ressources, hyperviseur, disponibilité
-   - Relations possibles : exécute, utilise, dépend_de
+   - Sous-types : vm, container, cluster
+   - Attributs : ressources, hyperviseur, disponibilité
 
-3. Système_Exploitation :
-   - Définition : OS et ses composants
-   - Sous-types : windows, linux, unix
-   - Attributs attendus : version, patches, configuration
-   - Relations possibles : supporte, requiert, héberge
-
-4. Middleware :
-   - Définition : Logiciel intermédiaire
-   - Sous-types : serveur_application, message_broker, load_balancer
-   - Attributs attendus : version, configuration, clusters
-   - Relations possibles : connecte, transforme, route
-
-5. Base_Données :
+3. Base_Données :
    - Définition : SGBD et instances
    - Sous-types : relationnelle, nosql, datawarehouse
-   - Attributs attendus : version, taille, performances
-   - Relations possibles : stocke, réplique, indexe
+   - Attributs : version, taille, performances
 
-6. Application :
+4. Application :
    - Définition : Logiciel métier
    - Sous-types : web, client_lourd, service
-   - Attributs attendus : version, criticité, disponibilité
-   - Relations possibles : utilise, produit, consomme
+   - Attributs : version, criticité, disponibilité
 
-7. Réseau :
-   - Sous-types : réseau_physique (lan, wan), réseau_logique (vlan), zone_réseau (dmz, production, backup)
-   - Attributs attendus : vlan_id, mtu
-
-8. Sécurité:
+5. Sécurité :
    - Définition : Dispositif de sécurité
-   - Sous-types : firewall, iam, antivirus, proxy
-   - Attributs attendus : règles, mises_à_jour, conformité
-   - Relations possibles : protège, filtre, autorise
+   - Sous-types : firewall, iam, antivirus
+   - Attributs : règles, mises_à_jour, conformité
 
-9. Service_Cloud :
+6. Service_Cloud :
    - Définition : Service hébergé
-   - Sous-types : iaas, paas, saas, multi_az_capable, uo_provisionnées, souverain, secnumcloud
-   - Attributs attendus : provider, région, sla
-   - Relations possibles : fournit, scale, monitore
-   
+   - Sous-types : iaas, paas, saas
+   - Attributs : provider, région, sla
 
-10. Monitoring :
-    - Définition : Outil de supervision
-    - Sous-types : métrique, log, alerte
-    - Attributs attendus : seuils, rétention, dashboards
-    - Relations possibles : surveille, alerte, analyse
+7. Sauvegarde :
+   - Définition : Système et politique de backup
+   - Sous-types : backup_complet, snapshot, archive
+   - Attributs : rétention, fréquence, volumétrie
 
-11. Adressage :
-    - Définition : Élément d'adressage réseau
-    - Sous-types : ipv4, ipv6, subnet, range_ip, vlan_id
-    - Attributs attendus : plage, masque, gateway, dhcp_enabled
-    - Relations possibles : appartient_à, route_vers, alloue
+8. Documentation :
+   - Définition : Documentation d'exploitation
+   - Sous-types : procédure, run_book, architecture
+   - Attributs : version, date_maj, validité
 
-12. Zone_Disponibilité :
-    - Définition : Zone physique ou logique d'hébergement, aussi appelé AZ
-    - Sous-types : 
-      • datacenter_physique
-      • zone_cloud
-      • salle_serveur
-      • pod_technique
-    - Attributs attendus : 
-      • localisation
-      • tier_niveau (Tier I-IV)
-      • puissance_disponible
-      • capacité_refroidissement
-      • redondance_type
-    - Relations possibles : héberge, synchronise_avec, failover_vers, alimente
+ATTRIBUTS COMMUNS :
+1. Cycle de Vie :
+   - date_création
+   - date_modification
+   - statut (dev, test, prod, obsolète)
 
-13. Unité_Oeuvre [UO] :
-    - Définition : Métrique de consommation et facturation
-    - Sous-types :
-      • uo_compute (vCPU, RAM)
-      • uo_storage (Go, IOPS)
-      • uo_réseau (Mbps, sessions)
-      • uo_service (utilisateurs, transactions)
-      • uo_backup (rétention, fréquence)
-    - Attributs attendus :
-      • type_uo
-      • volume
-      • seuil_alerte
-      • coût_unitaire
-      • période_mesure
-    - Relations possibles : mesure, facture, limite, alerte
+2. Responsabilité :
+   - équipe_responsable
+   - niveau_support
+   - contact_principal
 
-RÈGLES DE DÉSAMBIGUÏSATION :
-1. Pour les composants multi-rôles :
-   - Privilégier la fonction principale
-   - Lister les fonctions secondaires dans la description
-   - Préciser le contexte d'utilisation
+3. Coûts :
+   - coût_mensuel
+   - centre_coût
 
-2. Pour les dépendances :
-   - Différencier dépendances dures/souples
-   - Préciser les contraintes de version
-   - Identifier les incompatibilités
+TAGS OBLIGATOIRES :
+1. Criticité : P1, P2, P3, P4
+2. Confidentialité : public, interne, confidentiel, secret
+3. Environnement : dev, recette, prod
 
-RELATIONS AUTORISÉES :
+RELATIONS PRINCIPALES :
+
 1. Relations Techniques :
-   - héberge : contient physiquement/virtuellement
-   - exécute : fait fonctionner
-   - connecte : établit une liaison
-   - dépend_de : requiert pour fonctionner
+   - héberge (3) : contient physiquement/virtuellement
+   - exécute (3) : fait fonctionner
+   - dépend_de (2) : requiert pour fonctionner
 
-2. Relations de Flux :
-   - produit : génère des données/événements
-   - consomme : utilise des données/ressources
-   - route : dirige le trafic/données
-   - réplique : copie/synchronise
+2. Relations de Performance :
+   - monitore (2) : surveille l'état
+   - sauvegarde (3) : réalise les backups
+   - scale (2) : adapte les ressources
 
 3. Relations de Sécurité :
-   - protège : sécurise l'accès
-   - autorise : permet l'accès
-   - authentifie : vérifie l'identité
-   - chiffre : protège les données
+   - protège (3) : sécurise l'accès
+   - authentifie (3) : vérifie l'identité
+   - chiffre (3) : protège les données
 
-4. Relations de Performance :
-   - monitore : surveille l'état
-   - optimise : améliore les performances
-   - balance : répartit la charge
-   - scale : adapte les ressources
-
-5. Relations Réseau :
-   - segmente : définit une séparation logique
-   - route_vers : définit le chemin réseau
-   - nat_vers : traduit l'adressage
-   - appartient_à : définit l'appartenance à un réseau
-   - peer_avec : établit une relation d'égal à égal
-
-6. Relations Capacité :
-   - consomme_uo : utilise des ressources mesurables
-   - fournit_uo : met à disposition des ressources
-   - limite_à : définit un seuil maximum
-   - répartit_sur : distribue entre zones
-   - failover_vers : bascule en cas de panne
+4. Relations de Conformité :
+   - conforme_à (3) : respecte une norme
+   - documente (2) : fournit la documentation
+   - audite (2) : contrôle la conformité
 
 Force des relations :
-1 = relation indirecte/optionnelle
-2 = relation importante/recommandée
-3 = relation critique/obligatoire
+1 = optionnelle
+2 = recommandée
+3 = obligatoire
 
-RÈGLES DE NOMMAGE RÉSEAU :
-- Subnet : NET_[zone]_[usage]_[plage] 
-  Exemple : NET_PROD_APP_10.0.1.0/24
-- VLAN : VLAN_[id]_[usage]
-  Exemple : VLAN_100_PRODUCTION
-- Zone : ZONE_[type]_[localisation]
-  Exemple : ZONE_DMZ_PARIS
+RÈGLES DE VALIDATION :
 
-RÈGLES DE NOMMAGE CAPACITÉ :
-- Datacenter : DC_[localisation]_[numéro]
-  Exemple : DC_PARIS_01
-- Zone Cloud : AZ_[provider]_[région]_[zone]
-  Exemple : AZ_AWS_PARIS_1A
-- Unité d'œuvre : UO_[type]_[ressource]
-  Exemple : UO_COMPUTE_VCPU
+1. Validation technique :
+   - Cohérence des entités avec le document source
+   - Respect des types d'entités définis
+   - Validité des relations utilisées
+
+2. Validation des descriptions :
+   - Présence du tag technique approprié
+   - Description claire et concise
+   - Cohérence avec le contexte du document
+
+3. Validation des relations :
+   - Force de relation appropriée
+   - Cohérence source/cible
+   - Justification par le texte source
 
 FORMAT DE SORTIE :
 
 ### ENTITÉS
-NomEntité\tType\tDescription
+NomEntitéDocument\t[TypeEntité]\t[Préfixe] Description
 
 ### RELATIONS
-EntitéSource\tTypeRelation:Force(1-3)\tEntitéCible\tDescription
+EntitéSource\t[TypeRelation]:[Force]\tEntitéCible\tDescription
 
-RÈGLES DE VALIDATION :
-1. Validation technique :
-   - Compatibilité des versions
-   - Cohérence des architectures
-   - Respect des prérequis
-   - Conformité aux bonnes pratiques
+EXEMPLES VALIDES :
 
-2. Validation des relations :
-   - Faisabilité technique
-   - Performance attendue
-   - Sécurité assurée
-   - Redondance appropriée
+### ENTITÉS
+SAP_ECC_PROD\tApplication\t[APP] Système SAP ECC environnement production
+Oracle_DB01\tBase_Données\t[DB] Instance Oracle principale production
+Nagios_Central\tMonitoring\t[MON] Système central de supervision infrastructure
 
-3. Validation globale :
-   - Cohérence de l'architecture
-   - Couverture du monitoring
-   - Gestion des backups
-   - Plan de reprise
+### RELATIONS
+SAP_ECC_PROD\théberge:3\tOracle_DB01\tHébergement base données production
+Nagios_Central\tmonitore:2\tSAP_ECC_PROD\tSupervision système SAP production
 
-4. Validation réseau :
-   - Non-chevauchement des plages IP
-   - Cohérence du routage
-   - Séparation des zones de sécurité
-   - Redondance des chemins critiques
-   - Conformité aux RFC
+RÈGLES D'EXTRACTION :
+1. Extraire les noms d'entités tels qu'ils apparaissent dans le document
+2. Normaliser uniquement en remplaçant les espaces par des underscores
+3. Catégoriser selon les types d'entités définis
+4. Ajouter le tag technique approprié dans la description
+5. Identifier les relations entre entités selon la liste définie
+6. Valider la cohérence globale de l'ontologie
 
-5. Validation Capacité :
-   - Équilibrage entre zones
-   - Capacité disponible vs consommée
-   - Seuils d'alerte UO
-   - Conformité SLA par zone
-   - Matrice de failover
+Analyse le texte et fournis uniquement le résultat au format demandé, sans explication ni commentaire. Assure-toi que chaque entité et relation est justifiée par le texte source.
 
 Ontologie actuelle :
 {previous_result}
 
 Nouveau texte à analyser :
 {text}
-
-Analyse le texte et fournis uniquement le résultat au format demandé, 
-sans explication ni commentaire. Assure-toi que toutes les positions sont correctes et que chaque relation est justifiable par le texte.
